@@ -250,8 +250,8 @@ app.post("/api/planilla/empleados/batch", async (c) => {
 
     const existing = await sql`
       SELECT id FROM planilla_empleados
-      WHERE LOWER(UNACCENT(apellido)) = LOWER(UNACCENT(${apellido}))
-        AND LOWER(UNACCENT(nombre)) = LOWER(UNACCENT(${nombre}))
+      WHERE LOWER(apellido) = LOWER(${apellido})
+        AND LOWER(nombre) = LOWER(${nombre})
       LIMIT 1`;
 
     if (existing.length > 0) { existentes++; continue; }
