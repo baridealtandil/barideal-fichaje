@@ -381,6 +381,6 @@ app.get("/api/metricas/hoy", async (c) => {
 app.get("/", (c) => c.json({ app: "Bar Ideal API", version: "2.1", status: "ok" }));
 
 await migrate();
-const port = parseInt(Bun.env.PORT ?? "3000");
+coconst port = parseInt(Bun.env.PORT ?? "8080");
 console.log(`🍺 Bar Ideal API v2.1 corriendo en puerto ${port}`);
 Bun.serve({ port, fetch: app.fetch });
