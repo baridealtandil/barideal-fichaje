@@ -7,8 +7,6 @@
   <link rel="apple-touch-icon" href="/logo-ideal.png"/>
   <link rel="icon" type="image/png" href="/logo-ideal.png"/>
   <meta name="theme-color" content="#0A0A0A"/>
-  <meta name="apple-mobile-web-app-title" content="ideal"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -398,7 +396,7 @@ canvas { max-height: 240px; }
 <aside class="sidebar">
   <div class="sidebar-brand">
     <div style="margin-bottom:6px">
-      <img src="/logo-ideal.png" alt="ideal Bar &amp; Restaurant" style="width:150px;height:auto;filter:invert(1)"/>
+      <img src="/logo-ideal.png" alt="ideal" style="width:150px;height:auto;filter:invert(1)"/>
     </div>
     <p style="font-size:10px;color:#444;letter-spacing:1px;text-transform:uppercase">Dashboard</p>
   </div>
@@ -542,6 +540,29 @@ canvas { max-height: 240px; }
       <div class="emp-grid" id="emp-grid">
         <div class="empty-state">Cargando empleados…</div>
       </div>
+      <!-- Vinculación planilla -->
+      <div class="panel" style="margin-top:20px">
+        <div class="panel-header">
+          <div class="panel-title">👥 Empleados de la planilla</div>
+          <div class="filters">
+            <span style="font-size:12px;color:var(--text3)" id="planilla-status">Cargando…</span>
+          </div>
+        </div>
+        <div class="panel-body">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nombre en planilla</th>
+                <th>Rol</th>
+                <th>Vinculado con</th>
+                <th>Estado</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-planilla"></tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
     <!-- ── ANÁLISIS ── -->
@@ -645,9 +666,9 @@ canvas { max-height: 240px; }
           <div class="filters">
             <input type="date" id="semana-inicio" onchange="cargarHorarios()">
             <button class="btn btn-outline" onclick="document.getElementById('file-horarios').click()">
-              📁 Cargar planilla CSV
+              📁 Importar planilla Excel
             </button>
-            <input type="file" id="file-horarios" accept=".csv,.xlsx" style="display:none" onchange="importarHorarios(event)">
+            <input type="file" id="file-horarios" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarHorarios(event)">
           </div>
         </div>
         <div class="panel-body">
@@ -673,8 +694,12 @@ canvas { max-height: 240px; }
         </div>
         <div class="panel-body-p" style="border-top:1px solid var(--border)">
           <p style="font-size:12px;color:var(--text3);line-height:1.6">
-            💡 <strong style="color:var(--text2)">Formato CSV para importar:</strong> columnas: empleado_id, fecha (YYYY-MM-DD), entrada, salida, entrada2, salida2 (últimas dos opcionales). Hora en formato HH:MM.
+            💡 <strong style="color:var(--text2)">Importar planilla Excel:</strong> Usá la planilla oficial del Bar Ideal. El sistema detecta automáticamente los empleados y sus horarios. Los empleados de la planilla se vincularán con los registrados en la app al primer fichaje.
           </p>
+          <div id="sin-vincular-alert" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(255,180,0,0.1);border:1px solid rgba(255,180,0,0.3);border-radius:8px;font-size:12px;color:#FFB400">
+            ⚠️ <strong id="sin-vincular-count">0</strong> empleado(s) de la planilla aún no vinculados con la app.
+            <button onclick="showSection('empleados')" style="margin-left:8px;background:none;border:none;color:#FFB400;text-decoration:underline;cursor:pointer;font-size:12px">Ver empleados</button>
+          </div>
         </div>
       </div>
     </section>
@@ -719,7 +744,7 @@ canvas { max-height: 240px; }
 // ══════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════
-const API = 'https://magnificent-determination-production-1d42.up.railway.app'; // ← actualizar
+const API = 'https://magnificent-determination-production-1d42.up.railway.app';
 const BAR_LAT = -37.327585; // Coordenadas Bar ideal
 const BAR_LNG = -59.1383669;
 const TOLERANCIA_MINUTOS = 10; // minutos de gracia para llegada tarde
@@ -734,7 +759,8 @@ let paginaActual = 1;
 const POR_PAGINA = 20;
 let chartHoras = null;
 let modalData = {};
-let horariosSemana = {}; // { empleado_id: { 'YYYY-MM-DD': {entrada, salida, ...} } }
+let horariosSemana = {};
+let planillaEmpleados = []; // empleados de la planilla
 let semanaActual = [];
 
 // ══════════════════════════════════
@@ -1295,22 +1321,19 @@ function cerrarModal() {
 }
 
 function guardarTurno() {
-  const entrada = document.getElementById('m-entrada').value;
-  const salida = document.getElementById('m-salida').value;
+  const entrada1 = document.getElementById('m-entrada').value;
+  const salida1  = document.getElementById('m-salida').value;
   const entrada2 = document.getElementById('m-entrada2').value;
-  const salida2 = document.getElementById('m-salida2').value;
+  const salida2  = document.getElementById('m-salida2').value;
 
   if (!horariosSemana[modalEmpId]) horariosSemana[modalEmpId] = {};
-  horariosSemana[modalEmpId][modalFecha] = { entrada, salida, entrada2, salida2 };
+  horariosSemana[modalEmpId][modalFecha] = { entrada: entrada1, salida: salida1, entrada2, salida2 };
 
-  // Guardar en localStorage para persistencia
-  localStorage.setItem('barideal_horarios', JSON.stringify(horariosSemana));
-
-  // Enviar a la API
+  // Enviar a la API usando planilla_emp_id
   fetch(`${API}/api/horarios`, {
     method: 'POST', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ empleado_id: modalEmpId, fecha: modalFecha, entrada, salida, entrada2, salida2 })
-  }).catch(() => {}); // Si falla, ya guardamos local
+    body: JSON.stringify({ planilla_emp_id: modalEmpId, fecha: modalFecha, entrada1, salida1, entrada2, salida2 })
+  }).catch(() => {});
 
   cerrarModal();
   renderTablaHorarios();
@@ -1329,31 +1352,223 @@ function borrarTurno() {
   renderTablaHorarios();
 }
 
-// ── Importar CSV ──
+// ── Importar Excel (planilla oficial) ──
 async function importarHorarios(event) {
   const file = event.target.files[0];
   if (!file) return;
-  const text = await file.text();
-  const lineas = text.trim().split('\n').slice(1); // skip header
-  lineas.forEach(linea => {
-    const cols = linea.split(',').map(c => c.trim().replace(/"/g, ''));
-    const [empId, fecha, entrada, salida, entrada2, salida2] = cols;
-    if (!empId || !fecha) return;
-    if (!horariosSemana[empId]) horariosSemana[empId] = {};
-    horariosSemana[empId][fecha] = { entrada: entrada||'', salida: salida||'', entrada2: entrada2||'', salida2: salida2||'' };
-  });
-  localStorage.setItem('barideal_horarios', JSON.stringify(horariosSemana));
 
-  // Sincronizar con API en batch
-  fetch(`${API}/api/horarios/batch`, {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ horarios: horariosSemana })
-  }).catch(() => {});
+  const semanaInput = document.getElementById('semana-inicio').value;
+  if (!semanaInput) {
+    alert('⚠️ Seleccioná primero la semana antes de importar la planilla.');
+    event.target.value = '';
+    return;
+  }
 
-  renderTablaHorarios();
-  calcularKPIs();
-  alert('✅ Planilla importada correctamente');
+  const lunes = getLunesDe(semanaInput);
+  const diasSemana = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(lunes);
+    d.setDate(lunes.getDate() + i);
+    diasSemana.push(d.toISOString().split('T')[0]);
+  }
+
+  // Leer Excel con SheetJS
+  const buffer = await file.arrayBuffer();
+  const wb = XLSX.read(buffer, { type: 'array' });
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+  // Buscar fila de encabezado (contiene "Apellido y Nombre")
+  let headerRow = -1;
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i].some(c => String(c).toLowerCase().includes('apellido'))) {
+      headerRow = i; break;
+    }
+  }
+  if (headerRow === -1) { alert('No se encontró la fila de encabezado en el Excel.'); return; }
+
+  const header = rows[headerRow].map(c => String(c).toLowerCase().trim());
+  const colNombre  = header.findIndex(h => h.includes('apellido') || h.includes('nombre'));
+  const colRol     = header.findIndex(h => h.includes('rol'));
+  const colEnt1    = header.findIndex(h => h.includes('entrada 1') || h.includes('entrada1'));
+  const colSal1    = header.findIndex(h => h.includes('salida 1') || h.includes('salida1'));
+  const colEnt2    = header.findIndex(h => h.includes('entrada 2') || h.includes('entrada2'));
+  const colSal2    = header.findIndex(h => h.includes('salida 2') || h.includes('salida2'));
+  const colLun     = header.findIndex(h => h === 'lun');
+  const colDom     = colLun >= 0 ? colLun + 6 : -1;
+
+  const empleadosBatch = [];
+  const horariosBatch  = [];
+  let empsProcesados = 0;
+
+  for (let i = headerRow + 1; i < rows.length; i++) {
+    const row = rows[i];
+    const nombreCompleto = String(row[colNombre] || '').trim();
+    if (!nombreCompleto) continue;
+
+    // Separar apellido y nombre (formato "Apellido Nombre" o "Apellido, Nombre")
+    let apellido, nombre;
+    if (nombreCompleto.includes(',')) {
+      [apellido, nombre] = nombreCompleto.split(',').map(s => s.trim());
+    } else {
+      const partes = nombreCompleto.split(' ');
+      apellido = partes[0];
+      nombre   = partes.slice(1).join(' ');
+    }
+
+    const rol = String(row[colRol] || '').trim();
+    const entrada1 = fmtTimeExcel(row[colEnt1]);
+    const salida1  = fmtTimeExcel(row[colSal1]);
+    const entrada2 = fmtTimeExcel(row[colEnt2]);
+    const salida2  = fmtTimeExcel(row[colSal2]);
+
+    empleadosBatch.push({ nombre, apellido, rol });
+
+    // Generar horario para cada día de la semana
+    for (let d = 0; d < 7; d++) {
+      const colDia = colLun + d;
+      const estadoCelda = colDia >= 0 ? String(row[colDia] || '').trim().toUpperCase() : '';
+      let estado = 'normal';
+      if (estadoCelda === 'F') estado = 'franco';
+      if (estadoCelda === 'A') estado = 'ausente';
+
+      horariosBatch.push({
+        nombre, apellido, rol,
+        fecha: diasSemana[d],
+        entrada1: estado === 'normal' ? entrada1 : null,
+        salida1:  estado === 'normal' ? salida1  : null,
+        entrada2: estado === 'normal' ? entrada2 : null,
+        salida2:  estado === 'normal' ? salida2  : null,
+        estado
+      });
+    }
+    empsProcesados++;
+  }
+
+  if (!empsProcesados) { alert('No se encontraron empleados en la planilla.'); return; }
+
+  // Subir empleados a la planilla primero
+  try {
+    const r1 = await fetch(`${API}/api/planilla/empleados/batch`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ empleados: empleadosBatch })
+    });
+    const d1 = await r1.json();
+
+    // Cargar planilla actualizada para obtener IDs
+    const planRes = await fetch(`${API}/api/planilla/empleados`);
+    planillaEmpleados = await planRes.json();
+
+    // Mapear horarios con planilla_emp_id real
+    const horariosConId = horariosBatch.map(h => {
+      const pe = encontrarEnPlanilla(h.nombre, h.apellido);
+      if (!pe) return null;
+      return { planilla_emp_id: pe.id, fecha: h.fecha, entrada1: h.entrada1, salida1: h.salida1, entrada2: h.entrada2, salida2: h.salida2, estado: h.estado };
+    }).filter(Boolean);
+
+    const r2 = await fetch(`${API}/api/horarios/batch`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ semana: semanaInput, horarios: horariosConId })
+    });
+    const d2 = await r2.json();
+
+    alert(`✅ Planilla importada\n${d1.insertados} empleados nuevos en planilla\n${d2.guardados} horarios cargados`);
+    await cargarPlanillaEmpleados();
+    cargarHorarios();
+  } catch(e) {
+    alert('Error al importar: ' + e.message);
+  }
   event.target.value = '';
+}
+
+function fmtTimeExcel(val) {
+  if (!val) return null;
+  const s = String(val).trim();
+  if (!s) return null;
+  // Si es número decimal de Excel (fracción de día)
+  if (!isNaN(parseFloat(s)) && !s.includes(':')) {
+    const totalMin = Math.round(parseFloat(s) * 24 * 60);
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  }
+  // Si ya viene en formato HH:MM
+  if (s.includes(':')) return s.substring(0, 5);
+  return null;
+}
+
+function encontrarEnPlanilla(nombre, apellido) {
+  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  return planillaEmpleados.find(pe =>
+    norm(pe.apellido) === norm(apellido) &&
+    norm(pe.nombre).split(' ').some(p => norm(nombre).split(' ').includes(p))
+  ) || null;
+}
+
+// ── Cargar planilla de empleados ──
+async function cargarPlanillaEmpleados() {
+  try {
+    const res = await fetch(`${API}/api/planilla/empleados`);
+    planillaEmpleados = await res.json();
+    renderTablaPlanilla();
+
+    // Alerta si hay sin vincular
+    const sinVincular = planillaEmpleados.filter(pe => !pe.empleado_id).length;
+    const alertEl = document.getElementById('sin-vincular-alert');
+    if (alertEl) {
+      alertEl.style.display = sinVincular > 0 ? 'block' : 'none';
+      document.getElementById('sin-vincular-count').textContent = sinVincular;
+    }
+    document.getElementById('planilla-status').textContent = `${planillaEmpleados.length} empleados en planilla`;
+  } catch(e) {
+    console.error('Error cargando planilla:', e);
+  }
+}
+
+function renderTablaPlanilla() {
+  const tbody = document.getElementById('tabla-planilla');
+  if (!tbody) return;
+  if (!planillaEmpleados.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Sin empleados en planilla. Importá la planilla Excel.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = planillaEmpleados.map(pe => {
+    const vinculado = pe.empleado_id;
+    const nombre_app = vinculado ? `${pe.emp_nombre || ''} ${pe.emp_apellido || ''}`.trim() : '—';
+    const estado = vinculado
+      ? '<span style="color:#4CAF50">✓ Vinculado</span>'
+      : '<span style="color:#FFB400">⚠ Sin vincular</span>';
+
+    const opcionesEmpleados = todosLosEmpleados.map(e =>
+      `<option value="${e.id}">${e.nombre} ${e.apellido}</option>`
+    ).join('');
+
+    const accion = vinculado
+      ? `<span style="font-size:12px;color:var(--text3)">${nombre_app}</span>`
+      : `<select onchange="vincularManual(${pe.id}, this.value)" style="background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px">
+           <option value="">Vincular con…</option>
+           ${opcionesEmpleados}
+         </select>`;
+
+    return `<tr>
+      <td>${pe.apellido} ${pe.nombre}</td>
+      <td><span style="font-size:11px;color:var(--text3)">${pe.rol || '—'}</span></td>
+      <td>${nombre_app}</td>
+      <td>${estado}</td>
+      <td>${accion}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function vincularManual(planillaEmpId, empleadoId) {
+  if (!empleadoId) return;
+  try {
+    await fetch(`${API}/api/planilla/empleados/vincular`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ planilla_emp_id: planillaEmpId, empleado_id: parseInt(empleadoId) })
+    });
+    await cargarPlanillaEmpleados();
+  } catch(e) { alert('Error al vincular: ' + e.message); }
 }
 
 // ══════════════════════════════════

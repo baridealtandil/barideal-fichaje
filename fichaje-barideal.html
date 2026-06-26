@@ -42,6 +42,20 @@ html, body {
 .screen.active { display: flex; }
 
 /* ── ONBOARDING ── */
+/* Matching screen */
+.match-opcion {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: left;
+}
+.match-opcion:hover { background: rgba(255,255,255,0.12); }
+.match-opcion .match-nombre { font-size: 15px; font-weight: 600; color: #fff; }
+.match-opcion .match-rol { font-size: 12px; color: var(--off); margin-top: 2px; }
+
 #screen-onboarding {
   align-items: center; justify-content: center;
   padding: 40px 28px; gap: 28px;
@@ -257,6 +271,21 @@ html, body {
     </div>
     <button class="btn-primary" id="btn-registrar" onclick="registrar()">Ingresar</button>
     <p class="disclaimer">Tus datos se usan solo para el sistema de fichaje del Bar ideal.</p>
+  </div>
+</div>
+
+<!-- ── MATCHING ── -->
+<div id="screen-matching" class="screen">
+  <div class="brand">
+    <div class="brand-wordmark">
+      <img src="/logo-ideal.png" alt="ideal Bar &amp; Restaurant" style="width:220px;height:auto;filter:invert(1)"/>
+    </div>
+  </div>
+  <div class="onboarding-card">
+    <h2>¿Sos vos?</h2>
+    <p>Encontramos tu nombre en la planilla. Confirmá para vincular tu cuenta.</p>
+    <div id="matching-opciones" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px"></div>
+    <button class="btn-primary" onclick="matchNoSoyYo()" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:var(--off);margin-top:4px">No soy ninguno de estos</button>
   </div>
 </div>
 
@@ -493,6 +522,8 @@ function mostrarExito(f) {
 // ══════════════════════════════════
 //  REGISTRO
 // ══════════════════════════════════
+let matchingPendiente = null; // datos del empleado esperando match
+
 async function registrar() {
   const nombre = document.getElementById('input-nombre').value.trim();
   const apellido = document.getElementById('input-apellido').value.trim();
@@ -501,6 +532,7 @@ async function registrar() {
   const btn = document.getElementById('btn-registrar');
   btn.disabled = true; btn.textContent = 'Registrando…';
   try {
+    // Primero registrar el empleado
     const r = await fetch(`${API}/api/empleados`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nombre, apellido, celular })
@@ -508,8 +540,52 @@ async function registrar() {
     if (!r.ok) throw new Error();
     const emp = await r.json();
     localStorage.setItem('barideal_empleado', JSON.stringify(emp));
-    iniciarApp(emp);
-  } catch { btn.disabled = false; btn.textContent = 'Ingresar'; toast('Error al registrar. Verificá tu conexión.'); }
+
+    // Buscar match en planilla
+    const mr = await fetch(`${API}/api/matching/buscar`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre, apellido })
+    });
+    const { matches } = await mr.json();
+
+    if (matches && matches.length > 0) {
+      // Mostrar pantalla de matching
+      matchingPendiente = emp;
+      const container = document.getElementById('matching-opciones');
+      container.innerHTML = matches.map(m => `
+        <div class="match-opcion" onclick="confirmarMatch(${m.id})">
+          <div class="match-nombre">${m.apellido} ${m.nombre}</div>
+          <div class="match-rol">${m.rol || 'Sin rol asignado'}</div>
+        </div>
+      `).join('');
+      document.getElementById('screen-onboarding').classList.remove('active');
+      document.getElementById('screen-matching').classList.add('active');
+    } else {
+      // Sin match, ir directo a la app
+      iniciarApp(emp);
+    }
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'Ingresar';
+    toast('Error al registrar. Verificá tu conexión.');
+  }
+}
+
+async function confirmarMatch(planillaEmpId) {
+  if (!matchingPendiente) return;
+  try {
+    await fetch(`${API}/api/matching/confirmar`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ planilla_emp_id: planillaEmpId, empleado_id: matchingPendiente.id })
+    });
+  } catch(e) { console.error('Error confirmando match:', e); }
+  document.getElementById('screen-matching').classList.remove('active');
+  iniciarApp(matchingPendiente);
+}
+
+function matchNoSoyYo() {
+  if (!matchingPendiente) return;
+  document.getElementById('screen-matching').classList.remove('active');
+  iniciarApp(matchingPendiente);
 }
 
 // ══════════════════════════════════
