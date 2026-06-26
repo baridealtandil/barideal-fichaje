@@ -293,20 +293,129 @@ canvas { max-height: 240px; }
 .bolsa-breakdown span { color: var(--text); font-weight: 600; }
 
 /* ── HORARIOS ── */
-.horarios-table th { min-width: 90px; }
-.day-col { text-align: center; }
+.horarios-table { border-collapse: collapse; width: 100%; min-width: 700px; }
+.horarios-table th {
+  padding: 8px 6px; font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text3); border-bottom: 2px solid var(--border);
+  text-align: center; white-space: nowrap; position: sticky; top: 0; background: var(--bg);
+}
+.horarios-table th.th-nombre { text-align: left; min-width: 160px; padding-left: 12px; }
+.horarios-table th.th-rol { text-align: left; min-width: 100px; color: var(--text3); }
+.horarios-table .sector-row td {
+  padding: 6px 12px; font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--text3); background: rgba(255,255,255,0.03);
+  border-top: 1px solid var(--border);
+}
+.horarios-table td { border-bottom: 1px solid rgba(255,255,255,0.04); }
+.td-nombre { padding: 0 8px 0 12px; font-size: 13px; color: var(--text); font-weight: 500; white-space: nowrap; }
+.td-rol { padding: 0 8px; font-size: 11px; color: var(--text3); white-space: nowrap; }
+
+/* Celda de turno */
 .turno-cell {
-  text-align: center; font-size: 12px; color: var(--text2); cursor: pointer;
-  position: relative;
+  padding: 4px 3px; text-align: center; cursor: pointer;
+  transition: background 0.1s; min-width: 88px;
 }
-.turno-cell:hover { background: var(--border2); }
-.turno-slot {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 5px; padding: 3px 6px;
-  font-size: 11px; color: #DDD; margin: 2px;
-  white-space: nowrap;
+.turno-cell:hover .cell-inner { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); }
+.cell-inner {
+  border: 1.5px dashed rgba(255,255,255,0.1);
+  border-radius: 7px; padding: 5px 4px; min-height: 44px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; transition: all 0.15s; position: relative;
 }
+.cell-inner.has-turno { border-style: solid; border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.05); }
+.cell-inner.is-franco { border-color: rgba(100,180,255,0.3); background: rgba(100,180,255,0.06); }
+.cell-inner.is-ausente { border-color: rgba(255,80,80,0.3); background: rgba(255,80,80,0.06); }
+.cell-inner.is-hoy { border-color: rgba(255,200,0,0.4); background: rgba(255,200,0,0.05); }
+
+.turno-hora { font-size: 11px; color: #DDD; font-weight: 500; line-height: 1.3; white-space: nowrap; }
+.turno-hora2 { font-size: 10px; color: var(--text3); line-height: 1.3; white-space: nowrap; }
+.turno-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.5px; padding: 1px 6px;
+  border-radius: 4px; text-transform: uppercase;
+}
+.turno-badge.franco { color: #64B4FF; background: rgba(100,180,255,0.15); }
+.turno-badge.ausente { color: #FF5050; background: rgba(255,80,80,0.15); }
+.cell-add { font-size: 18px; color: rgba(255,255,255,0.15); line-height: 1; }
+
+/* Quick action buttons en la celda */
+.cell-actions {
+  display: none; position: absolute; top: -2px; right: -2px;
+  gap: 2px;
+}
+.turno-cell:hover .cell-actions { display: flex; }
+.cell-btn {
+  width: 18px; height: 18px; border-radius: 4px; border: none; cursor: pointer;
+  font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.1s;
+}
+.cell-btn:hover { opacity: 0.8; }
+.cell-btn-f { background: rgba(100,180,255,0.3); color: #64B4FF; }
+.cell-btn-a { background: rgba(255,80,80,0.3); color: #FF5050; }
+
+/* Modal turno mejorado */
+.modal-turno-new {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 0; width: 340px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.modal-turno-header {
+  padding: 16px 20px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.modal-turno-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.modal-turno-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.modal-close-btn {
+  background: none; border: none; color: var(--text3); cursor: pointer;
+  font-size: 20px; line-height: 1; padding: 0; margin-top: -2px;
+}
+.modal-quick-btns {
+  display: flex; gap: 8px; padding: 14px 20px 0;
+}
+.mqb {
+  flex: 1; padding: 8px; border-radius: 8px; border: 1.5px solid;
+  cursor: pointer; font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+  text-transform: uppercase; transition: all 0.15s; text-align: center;
+}
+.mqb-franco { color: #64B4FF; border-color: rgba(100,180,255,0.3); background: rgba(100,180,255,0.08); }
+.mqb-franco:hover,.mqb-franco.active { background: rgba(100,180,255,0.2); }
+.mqb-ausente { color: #FF5050; border-color: rgba(255,80,80,0.3); background: rgba(255,80,80,0.08); }
+.mqb-ausente:hover,.mqb-ausente.active { background: rgba(255,80,80,0.2); }
+.mqb-borrar { color: var(--text3); border-color: var(--border); background: transparent; }
+.mqb-borrar:hover { background: rgba(255,255,255,0.05); }
+.modal-time-section { padding: 14px 20px; }
+.modal-time-group { margin-bottom: 12px; }
+.modal-time-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 6px; }
+.modal-time-row { display: flex; gap: 8px; align-items: center; }
+.modal-time-sep { font-size: 12px; color: var(--text3); }
+.time-input {
+  flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 7px;
+  padding: 8px 10px; color: var(--text); font-size: 14px; font-family: inherit;
+  text-align: center; outline: none; transition: border-color 0.15s;
+}
+.time-input:focus { border-color: rgba(255,255,255,0.3); }
+.modal-footer { padding: 12px 20px 16px; display: flex; gap: 8px; }
+.btn-guardar-turno {
+  flex: 1; padding: 10px; background: var(--gold); color: #000;
+  border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.btn-guardar-turno:hover { opacity: 0.85; }
+.btn-cancelar-turno {
+  padding: 10px 16px; background: transparent; color: var(--text3);
+  border: 1px solid var(--border); border-radius: 8px; font-size: 13px;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-cancelar-turno:hover { color: var(--text); }
+
+.semana-nav { display: flex; align-items: center; gap: 8px; }
+.semana-nav-btn {
+  background: var(--border2); border: 1px solid var(--border); color: var(--text2);
+  border-radius: 6px; padding: 5px 10px; cursor: pointer; font-size: 14px;
+  transition: background 0.15s;
+}
+.semana-nav-btn:hover { background: rgba(255,255,255,0.1); }
+.semana-label { font-size: 13px; color: var(--text2); min-width: 160px; text-align: center; }
+
 .turno-slot.t2 {
   background: rgba(66,165,245,0.1);
   border-color: rgba(66,165,245,0.3);
@@ -663,43 +772,54 @@ canvas { max-height: 240px; }
       <div class="panel" style="margin-bottom:20px">
         <div class="panel-header">
           <div class="panel-title">Planilla semanal de turnos</div>
-          <div class="filters">
-            <input type="date" id="semana-inicio" onchange="cargarHorarios()">
-            <button class="btn btn-outline" onclick="document.getElementById('file-horarios').click()">
-              📁 Importar planilla Excel
+          <div class="filters" style="gap:8px">
+            <!-- Navegación semana -->
+            <div class="semana-nav">
+              <button class="semana-nav-btn" onclick="navegarSemana(-1)">◀</button>
+              <span class="semana-label" id="semana-label">—</span>
+              <button class="semana-nav-btn" onclick="navegarSemana(1)">▶</button>
+            </div>
+            <input type="date" id="semana-inicio" onchange="cargarHorarios()" style="display:none">
+            <button class="btn btn-outline" onclick="irAHoy()" style="font-size:12px">Hoy</button>
+            <button class="btn btn-outline" onclick="document.getElementById('file-horarios').click()" style="font-size:12px">
+              📁 Importar Excel
             </button>
             <input type="file" id="file-horarios" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarHorarios(event)">
           </div>
         </div>
-        <div class="panel-body">
-          <div style="overflow-x:auto">
-            <table class="horarios-table">
-              <thead>
-                <tr>
-                  <th>Empleado</th>
-                  <th class="day-col" id="th-lun">Lun</th>
-                  <th class="day-col" id="th-mar">Mar</th>
-                  <th class="day-col" id="th-mie">Mié</th>
-                  <th class="day-col" id="th-jue">Jue</th>
-                  <th class="day-col" id="th-vie">Vie</th>
-                  <th class="day-col" id="th-sab">Sáb</th>
-                  <th class="day-col" id="th-dom">Dom</th>
-                </tr>
-              </thead>
-              <tbody id="tabla-horarios">
-                <tr><td colspan="8" class="empty-state">Seleccioná una semana</td></tr>
-              </tbody>
-            </table>
-          </div>
+
+        <!-- Leyenda rápida -->
+        <div style="display:flex;gap:16px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text3)">
+          <span>💡 Clic en celda para editar turno</span>
+          <span style="color:#64B4FF">■ Franco</span>
+          <span style="color:#FF5050">■ Ausente</span>
+          <span style="color:#DDD">■ Turno asignado</span>
         </div>
-        <div class="panel-body-p" style="border-top:1px solid var(--border)">
-          <p style="font-size:12px;color:var(--text3);line-height:1.6">
-            💡 <strong style="color:var(--text2)">Importar planilla Excel:</strong> Usá la planilla oficial del Bar Ideal. El sistema detecta automáticamente los empleados y sus horarios. Los empleados de la planilla se vincularán con los registrados en la app al primer fichaje.
-          </p>
-          <div id="sin-vincular-alert" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(255,180,0,0.1);border:1px solid rgba(255,180,0,0.3);border-radius:8px;font-size:12px;color:#FFB400">
-            ⚠️ <strong id="sin-vincular-count">0</strong> empleado(s) de la planilla aún no vinculados con la app.
-            <button onclick="showSection('empleados')" style="margin-left:8px;background:none;border:none;color:#FFB400;text-decoration:underline;cursor:pointer;font-size:12px">Ver empleados</button>
-          </div>
+
+        <div style="overflow-x:auto">
+          <table class="horarios-table">
+            <thead>
+              <tr>
+                <th class="th-nombre">Empleado</th>
+                <th class="th-rol">Rol</th>
+                <th id="th-lun">Lun</th>
+                <th id="th-mar">Mar</th>
+                <th id="th-mie">Mié</th>
+                <th id="th-jue">Jue</th>
+                <th id="th-vie">Vie</th>
+                <th id="th-sab">Sáb</th>
+                <th id="th-dom">Dom</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-horarios">
+              <tr><td colspan="9" class="empty-state">Cargando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="sin-vincular-alert" style="display:none;margin:12px 16px;padding:10px 14px;background:rgba(255,180,0,0.1);border:1px solid rgba(255,180,0,0.3);border-radius:8px;font-size:12px;color:#FFB400">
+          ⚠️ <strong id="sin-vincular-count">0</strong> empleado(s) de la planilla aún no vinculados con la app.
+          <button onclick="showSection('empleados')" style="margin-left:8px;background:none;border:none;color:#FFB400;text-decoration:underline;cursor:pointer;font-size:12px">Ver empleados</button>
         </div>
       </div>
     </section>
@@ -707,35 +827,47 @@ canvas { max-height: 240px; }
   </div><!-- /content -->
 </main>
 
-<!-- ── MODAL TURNO ── -->
+<!-- ── MODAL TURNO NUEVO ── -->
 <div class="modal-bg" id="modal-turno">
-  <div class="modal">
-    <h3 id="modal-title">Asignar turno</h3>
-    <div id="modal-info" style="font-size:13px;color:var(--text2);margin-bottom:16px;"></div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Entrada 1</label>
-        <input type="time" id="m-entrada">
+  <div class="modal-turno-new">
+    <div class="modal-turno-header">
+      <div>
+        <div class="modal-turno-title" id="modal-title">Turno</div>
+        <div class="modal-turno-sub" id="modal-info"></div>
       </div>
-      <div class="form-group">
-        <label>Salida 1</label>
-        <input type="time" id="m-salida">
+      <button class="modal-close-btn" onclick="cerrarModal()">×</button>
+    </div>
+
+    <!-- Botones rápidos -->
+    <div class="modal-quick-btns">
+      <button class="mqb mqb-franco" id="mqb-franco" onclick="toggleEstadoModal('franco')">F Franco</button>
+      <button class="mqb mqb-ausente" id="mqb-ausente" onclick="toggleEstadoModal('ausente')">A Ausente</button>
+      <button class="mqb mqb-borrar" onclick="borrarTurno()">✕ Borrar</button>
+    </div>
+
+    <!-- Horarios -->
+    <div class="modal-time-section">
+      <div class="modal-time-group">
+        <div class="modal-time-label">Turno principal</div>
+        <div class="modal-time-row">
+          <input type="time" class="time-input" id="m-entrada" placeholder="09:00">
+          <span class="modal-time-sep">→</span>
+          <input type="time" class="time-input" id="m-salida" placeholder="17:00">
+        </div>
+      </div>
+      <div class="modal-time-group">
+        <div class="modal-time-label">2º turno <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></div>
+        <div class="modal-time-row">
+          <input type="time" class="time-input" id="m-entrada2" placeholder="—">
+          <span class="modal-time-sep">→</span>
+          <input type="time" class="time-input" id="m-salida2" placeholder="—">
+        </div>
       </div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Entrada 2 (opcional)</label>
-        <input type="time" id="m-entrada2">
-      </div>
-      <div class="form-group">
-        <label>Salida 2 (opcional)</label>
-        <input type="time" id="m-salida2">
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-danger" onclick="borrarTurno()">Borrar</button>
-      <button class="btn btn-outline" onclick="cerrarModal()">Cancelar</button>
-      <button class="btn btn-gold" onclick="guardarTurno()">Guardar</button>
+
+    <div class="modal-footer">
+      <button class="btn-cancelar-turno" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-guardar-turno" onclick="guardarTurno()">Guardar turno</button>
     </div>
   </div>
 </div>
@@ -1634,25 +1766,7 @@ function exportarExcel() {
 })();
 
 // Cargar horarios desde la API al arrancar
-async function cargarHorariosAPI() {
-  try {
-    const r = await fetch(`${API}/api/horarios`);
-    if (r.ok) {
-      const data = await r.json();
-      data.forEach(h => {
-        if (!horariosSemana[h.empleado_id]) horariosSemana[h.empleado_id] = {};
-        horariosSemana[h.empleado_id][h.fecha] = {
-          entrada: h.entrada, salida: h.salida,
-          entrada2: h.entrada2, salida2: h.salida2
-        };
-      });
-      localStorage.setItem('barideal_horarios', JSON.stringify(horariosSemana));
-      renderTablaHorarios();
-      calcularKPIs();
-    }
-  } catch {}
-}
-cargarHorariosAPI();
+// cargarHorariosAPI reemplazado por cargarHorarios()
 </script>
 </body>
 </html>
