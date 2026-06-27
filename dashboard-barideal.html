@@ -1534,7 +1534,12 @@ function getLunesDe(fecha) {
   return d;
 }
 
-function cargarHorarios() {
+async function cargarHorarios() {
+  // Si la planilla no está cargada, cargarla primero
+  if (!planillaEmpleados.length) {
+    await cargarPlanillaEmpleados();
+  }
+
   const semanaInput = document.getElementById('semana-inicio').value;
   const lunes = getLunesDe(semanaInput);
   semanaActual = [];
@@ -1690,6 +1695,11 @@ async function importarHorarios(event) {
     const row = rows[i];
     const nombreCompleto = String(row[colNombre] || '').trim();
     if (!nombreCompleto) continue;
+    // Ignorar filas que son instrucciones o encabezados secundarios
+    if (nombreCompleto.toUpperCase().startsWith('INSTRUCCIONES') ||
+        nombreCompleto.toUpperCase().startsWith('NOTA') ||
+        nombreCompleto.toUpperCase().startsWith('ACLARACIÓN') ||
+        nombreCompleto.length > 60) continue;
 
     // Separar apellido y nombre (formato "Apellido Nombre" o "Apellido, Nombre")
     let apellido, nombre;
