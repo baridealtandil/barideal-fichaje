@@ -140,36 +140,79 @@ html, body {
 .turno-hora { font-size: 17px; font-weight: 600; color: var(--white); }
 .turno-sub { font-size: 11px; color: var(--dim); margin-top: 3px; }
 
-/* Botón circular */
-.btn-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
-.btn-ring {
-  position: absolute; width: 176px; height: 176px; border-radius: 50%;
-  border: 1.5px solid transparent; border-top-color: var(--white);
-  animation: spin 1.5s linear infinite; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+/* Botón circular con radar */
+.btn-wrap {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  width: 200px; height: 200px; margin: 0 auto;
 }
-.btn-ring.active { opacity: 1; }
-@keyframes spin { to { transform: rotate(360deg); } }
 
+/* Anillos radar */
+.radar-ring {
+  position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,0.12);
+  pointer-events: none;
+}
+.radar-ring-1 { width: 200px; height: 200px; }
+.radar-ring-2 { width: 160px; height: 160px; }
+
+/* Pulso radar animado */
+.radar-pulse {
+  position: absolute; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.5);
+  width: 148px; height: 148px;
+  animation: radar-expand 2.5s ease-out infinite;
+  pointer-events: none; opacity: 0;
+}
+.radar-pulse:nth-child(2) { animation-delay: 0.8s; }
+.radar-pulse:nth-child(3) { animation-delay: 1.6s; }
+
+@keyframes radar-expand {
+  0%   { transform: scale(1);   opacity: 0.6; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Barrido radar giratorio */
+.radar-sweep {
+  position: absolute; width: 200px; height: 200px; border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 70%, rgba(255,255,255,0.08) 100%);
+  animation: radar-spin 3s linear infinite;
+  pointer-events: none; opacity: 0; transition: opacity 0.4s;
+}
+.radar-sweep.active { opacity: 1; }
+@keyframes radar-spin { to { transform: rotate(360deg); } }
+
+/* Botón principal */
 #btn-fichar {
+  position: relative; z-index: 2;
   width: 148px; height: 148px; border-radius: 50%;
   background: var(--card); border: 1.5px solid var(--border);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
   cursor: pointer; transition: border-color 0.2s, transform 0.1s, background 0.2s;
   outline: none; -webkit-tap-highlight-color: transparent;
 }
 #btn-fichar:not(:disabled):active { transform: scale(0.94); }
 #btn-fichar:disabled { opacity: 0.35; cursor: not-allowed; }
-#btn-fichar.entrada { border-color: var(--white); background: rgba(255,255,255,0.05); }
-#btn-fichar.salida  { border-color: var(--success); background: rgba(76,175,80,0.06); }
-#btn-fichar.entrada2 { border-color: var(--info);    background: rgba(66,165,245,0.06); }
-#btn-fichar.salida2  { border-color: #CE93D8; background: rgba(156,39,176,0.06); }
+#btn-fichar.entrada  { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.04); }
+#btn-fichar.salida   { border-color: rgba(76,175,80,0.7);  background: rgba(76,175,80,0.05); }
+#btn-fichar.entrada2 { border-color: rgba(66,165,245,0.7); background: rgba(66,165,245,0.05); }
+#btn-fichar.salida2  { border-color: rgba(156,39,176,0.7); background: rgba(156,39,176,0.05); }
 
-.btn-icon { font-size: 28px; line-height: 1; }
-.btn-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--dim); }
-#btn-fichar.entrada  .btn-label { color: var(--white); }
+/* SVG pocillo dentro del botón */
+.btn-coffee {
+  width: 42px; height: 42px; flex-shrink: 0;
+}
+
+.btn-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--dim); margin-top: 2px; }
+#btn-fichar.entrada  .btn-label { color: rgba(255,255,255,0.9); }
 #btn-fichar.salida   .btn-label { color: var(--success); }
 #btn-fichar.entrada2 .btn-label { color: var(--info); }
 #btn-fichar.salida2  .btn-label { color: #CE93D8; }
+
+/* Color del pocillo según estado */
+#btn-fichar.entrada  .coffee-cup { stroke: rgba(255,255,255,0.9); }
+#btn-fichar.salida   .coffee-cup { stroke: var(--success); }
+#btn-fichar.entrada2 .coffee-cup { stroke: var(--info); }
+#btn-fichar.salida2  .coffee-cup { stroke: #CE93D8; }
+#btn-fichar:disabled .coffee-cup { stroke: var(--dim); }
 
 /* Geo status */
 .geo-status {
