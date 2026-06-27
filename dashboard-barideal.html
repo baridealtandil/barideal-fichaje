@@ -1745,9 +1745,11 @@ function renderTablaHorarios() {
           } else if (h.estado === 'ausente') {
             cls += ' is-ausente';
             contenido = `<span class="turno-badge ausente">Ausente</span>`;
-          } else if (h.entrada) {
+          } else if (h.entrada1 || h.entrada) {
+            const e1 = h.entrada1||h.entrada;
+            const s1 = h.salida1||h.salida||'?';
             cls += ' has-turno';
-            contenido = `<span class="turno-hora">${h.entrada.substring(0,5)}–${(h.salida||'?').substring(0,5)}</span>`;
+            contenido = `<span class="turno-hora">${e1.substring(0,5)}–${s1.substring(0,5)}</span>`;
             if (h.entrada2) contenido += `<span class="turno-hora2">${h.entrada2.substring(0,5)}–${(h.salida2||'?').substring(0,5)}</span>`;
           }
         }
@@ -1784,8 +1786,8 @@ function abrirModal(empId, fecha, nombre, rol) {
   document.getElementById('modal-info').textContent =
     d.toLocaleDateString('es-AR', {weekday:'long', day:'numeric', month:'long'}) + (rol ? ` · ${rol}` : '');
 
-  document.getElementById('m-entrada').value  = h.entrada  ? h.entrada.substring(0,5)  : '';
-  document.getElementById('m-salida').value   = h.salida   ? h.salida.substring(0,5)   : '';
+  document.getElementById('m-entrada').value  = (h.entrada1||h.entrada)  ? (h.entrada1||h.entrada).substring(0,5)  : '';
+  document.getElementById('m-salida').value   = (h.salida1||h.salida)   ? (h.salida1||h.salida).substring(0,5)   : '';
   document.getElementById('m-entrada2').value = h.entrada2 ? h.entrada2.substring(0,5) : '';
   document.getElementById('m-salida2').value  = h.salida2  ? h.salida2.substring(0,5)  : '';
 
