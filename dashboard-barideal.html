@@ -1810,29 +1810,31 @@ function abrirModal(empId, fecha, nombre, rol) {
   document.getElementById('m-entrada2').value = h.entrada2 ? h.entrada2.substring(0,5) : '';
   document.getElementById('m-salida2').value  = h.salida2  ? h.salida2.substring(0,5)  : '';
 
-  // Checkboxes de días — marcar solo el día actual
+  // Checkboxes de días — marcar solo el día actual, deshabilitar días pasados
   const diasNombres = ['L','M','M','J','V','S','D'];
   const diasContainer = document.getElementById('dias-checks');
+  const hoyStr2 = new Date().toISOString().split('T')[0];
   diasContainer.innerHTML = semanaActual.map((f, i) => {
     const checked = f === fecha;
+    const pasado = f < hoyStr2;
     const d2 = new Date(f + 'T12:00');
-    return `<label style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
-      <input type="checkbox" id="dia-${i}" value="${f}" ${checked ? 'checked' : ''}
-        style="width:16px;height:16px;accent-color:#F0F0F0;cursor:pointer">
-      <span style="font-size:10px;font-weight:700;color:#777">${diasNombres[i]}</span>
+    return `<label style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:${pasado ? 'not-allowed' : 'pointer'};opacity:${pasado ? '0.35' : '1'}">
+      <input type="checkbox" id="dia-${i}" value="${f}" ${checked && !pasado ? 'checked' : ''} ${pasado ? 'disabled' : ''}
+        style="width:16px;height:16px;accent-color:#F0F0F0;cursor:${pasado ? 'not-allowed' : 'pointer'}">
+      <span style="font-size:10px;font-weight:700;color:${pasado ? '#444' : '#777'}">${diasNombres[i]}</span>
       <span style="font-size:9px;color:#444">${d2.getDate()}/${d2.getMonth()+1}</span>
     </label>`;
   }).join('');
 
-  // Checkboxes de empleados del mismo sector
+  // Checkboxes de todos los empleados de la planilla
   const empContainer = document.getElementById('emp-checks');
-  const mismoSector = planillaEmpleados.filter(pe => pe.rol === rol);
-  empContainer.innerHTML = mismoSector.map(pe => {
+  empContainer.innerHTML = planillaEmpleados.map(pe => {
     const checked = pe.id === empId;
     return `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 0">
-      <input type="checkbox" id="emp-${pe.id}" value="${pe.id}" ${checked ? 'checked' : ''}
+      <input type="checkbox" class="emp-check" data-id="${pe.id}" ${checked ? 'checked' : ''}
         style="width:15px;height:15px;accent-color:#F0F0F0;cursor:pointer">
       <span style="font-size:13px;color:#DDD">${pe.apellido} ${pe.nombre}</span>
+      <span style="font-size:10px;color:#555">${pe.rol||''}</span>
     </label>`;
   }).join('');
 
@@ -1878,10 +1880,9 @@ async function guardarTurno() {
     return el ? el.checked : false;
   });
 
-  // Empleados seleccionados via checkboxes
-  const empsSeleccionados = planillaEmpleados
-    .filter(pe => { const el = document.getElementById('emp-' + pe.id); return el ? el.checked : false; })
-    .map(pe => pe.id);
+  // Empleados seleccionados via checkboxes (usar data-id para evitar conflictos)
+  const empChecks = document.querySelectorAll('#emp-checks .emp-check:checked');
+  const empsSeleccionados = Array.from(empChecks).map(el => parseInt(el.dataset.id));
 
   // Fallback: si no hay checkboxes visibles, usar los valores del modal
   const fechas = diasSeleccionados.length > 0 ? diasSeleccionados : [modalFecha];
