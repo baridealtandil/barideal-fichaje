@@ -321,21 +321,39 @@ app.get("/api/horarios", async (c) => {
 
 // Guardar/actualizar horario de un empleado en una fecha
 app.post("/api/horarios", async (c) => {
-  const { planilla_emp_id, fecha, entrada1, salida1, entrada2, salida2, estado } = await c.req.json();
-  if (!planilla_emp_id || !fecha)
-    return c.json({ error: "planilla_emp_id y fecha son requeridos" }, 400);
+  try {
+    const body = await c.req.json();
+    const { planilla_emp_id, fecha } = body;
+    if (!planilla_emp_id || !fecha)
+      return c.json({ error: "planilla_emp_id y fecha son requeridos" }, 400);
 
-  const t = v => (v && v.trim()) ? v.trim() : null;
+    const t = v => (v && String(v).trim()) ? String(v).trim() : null;
+    const e1 = t(body.entrada1);
+    const s1 = t(body.salida1);
+    const e2 = t(body.entrada2);
+    const s2 = t(body.salida2);
+    const est = body.estado || 'normal';
 
-  const [horario] = await sql`
-    INSERT INTO horarios (planilla_emp_id, fecha, entrada1, salida1, entrada2, salida2, estado)
-    VALUES (${planilla_emp_id}, ${fecha}::date, ${t(entrada1)}, ${t(salida1)}, ${t(entrada2)}, ${t(salida2)}, ${estado || 'normal'})
-    ON CONFLICT (planilla_emp_id, fecha) DO UPDATE SET
-      entrada1 = EXCLUDED.entrada1, salida1 = EXCLUDED.salida1,
-      entrada2 = EXCLUDED.entrada2, salida2 = EXCLUDED.salida2,
-      estado   = EXCLUDED.estado
-    RETURNING *`;
-  return c.json(horario);
+    // Intentar UPDATE primero
+    const existing = await sql`SELECT id FROM horarios WHERE planilla_emp_id = ${planilla_emp_id} AND fecha = ${fecha}::date LIMIT 1`;
+
+    let horario;
+    if (existing.length > 0) {
+      [horario] = await sql`
+        UPDATE horarios SET entrada1=${e1}, salida1=${s1}, entrada2=${e2}, salida2=${s2}, estado=${est}
+        WHERE planilla_emp_id=${planilla_emp_id} AND fecha=${fecha}::date
+        RETURNING *`;
+    } else {
+      [horario] = await sql`
+        INSERT INTO horarios (planilla_emp_id, fecha, entrada1, salida1, entrada2, salida2, estado)
+        VALUES (${planilla_emp_id}, ${fecha}::date, ${e1}, ${s1}, ${e2}, ${s2}, ${est})
+        RETURNING *`;
+    }
+    return c.json(horario);
+  } catch(e) {
+    console.error("Error POST /api/horarios:", e.message);
+    return c.json({ error: e.message }, 500);
+  }
 });
 
 // Importar semana completa desde Excel
