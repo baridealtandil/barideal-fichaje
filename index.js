@@ -56,6 +56,13 @@ async function migrate() {
       UNIQUE(planilla_emp_id, fecha)
     )`;
 
+  // Migración: agregar planilla_emp_id si la tabla horarios fue creada sin ella
+  try {
+    await sql`ALTER TABLE horarios ADD COLUMN IF NOT EXISTS planilla_emp_id INTEGER REFERENCES planilla_empleados(id)`;
+    await sql`ALTER TABLE horarios DROP CONSTRAINT IF EXISTS horarios_planilla_emp_id_fecha_key`;
+    await sql`ALTER TABLE horarios ADD CONSTRAINT IF NOT EXISTS horarios_planilla_emp_id_fecha_key UNIQUE (planilla_emp_id, fecha)`;
+  } catch(e) { console.log('Migración planilla_emp_id:', e.message); }
+
   await sql`CREATE INDEX IF NOT EXISTS idx_fichajes_empleado ON fichajes(empleado_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_fichajes_fecha ON fichajes(fecha_hora)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_horarios_fecha ON horarios(fecha)`;
