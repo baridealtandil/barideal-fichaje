@@ -1686,7 +1686,7 @@ async function cargarHorarios() {
       horariosSemana = {};
       horariosAPI.forEach(h => {
         const pid = h.planilla_emp_id;
-        const fecha = h.fecha ? h.fecha.split('T')[0] : null;
+        const fecha = h.fecha ? h.fecha.substring(0,10) : null;
         if (!pid || !fecha) return;
         if (!horariosSemana[pid]) horariosSemana[pid] = {};
         horariosSemana[pid][fecha] = {
@@ -1836,11 +1836,11 @@ async function guardarTurno() {
       alert('Error al guardar: ' + err);
       return;
     }
-    // Actualizar estado local
+    // Actualizar estado local y recargar grilla
     if (!horariosSemana[modalEmpId]) horariosSemana[modalEmpId] = {};
     horariosSemana[modalEmpId][modalFecha] = { entrada: entrada1, salida: salida1, entrada2, salida2, estado: modalEstado };
     cerrarModal();
-    renderTablaHorarios();
+    await cargarHorarios();
   } catch(e) {
     alert('Error de conexión: ' + e.message);
   } finally {
