@@ -1614,7 +1614,14 @@ function cargarAnalisis() {
 // ══════════════════════════════════
 //  HORARIOS SEMANAL
 // ══════════════════════════════════
+// ══════════════════════════════════
+//  MÓDULO HORARIOS — REESCRITO
+// ══════════════════════════════════
+
 let semanaOffset = 0;
+let modalEmpId = null;
+let modalFecha = null;
+let modalEstado = 'normal';
 
 function getLunesDe(fecha) {
   const d = fecha ? new Date(fecha + 'T12:00') : new Date();
@@ -1635,19 +1642,16 @@ function irAHoy() {
 }
 
 async function cargarHorarios() {
-  // Si la planilla no está cargada, cargarla primero
-  if (!planillaEmpleados.length) {
-    await cargarPlanillaEmpleados();
-  }
+  if (!planillaEmpleados.length) await cargarPlanillaEmpleados();
 
-  // Calcular lunes según offset
+  // Calcular semana según offset
   const hoy = new Date();
   const diaHoy = hoy.getDay();
   const diffHoy = diaHoy === 0 ? -6 : 1 - diaHoy;
-  const lunesBase = new Date(hoy);
-  lunesBase.setDate(hoy.getDate() + diffHoy + semanaOffset * 7);
-  lunesBase.setHours(0,0,0,0);
-  const lunes = lunesBase;
+  const lunes = new Date(hoy);
+  lunes.setDate(hoy.getDate() + diffHoy + semanaOffset * 7);
+  lunes.setHours(0,0,0,0);
+
   semanaActual = [];
   for (let i = 0; i < 7; i++) {
     const d = new Date(lunes);
@@ -1655,19 +1659,54 @@ async function cargarHorarios() {
     semanaActual.push(d.toISOString().split('T')[0]);
   }
 
+  // Label de semana
+  const ini = new Date(semanaActual[0] + 'T12:00');
+  const fin = new Date(semanaActual[6] + 'T12:00');
+  const labelEl = document.getElementById('semana-label');
+  if (labelEl) labelEl.textContent = `${ini.getDate()}/${ini.getMonth()+1} – ${fin.getDate()}/${fin.getMonth()+1}/${fin.getFullYear()}`;
+
+  // Headers
   const diasNombres = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
   const ids = ['th-lun','th-mar','th-mie','th-jue','th-vie','th-sab','th-dom'];
+  const hoyStr = new Date().toISOString().split('T')[0];
   semanaActual.forEach((fecha, i) => {
     const el = document.getElementById(ids[i]);
+    if (!el) return;
     const d = new Date(fecha + 'T12:00');
-    el.innerHTML = `${diasNombres[i]}<br><span style="font-size:10px;font-weight:400;color:var(--text3)">${d.getDate()}/${d.getMonth()+1}</span>`;
+    const esHoy = fecha === hoyStr;
+    el.innerHTML = `<span style="${esHoy ? 'color:#FFD700' : ''}">${diasNombres[i]}</span><br>
+      <span style="font-size:10px;font-weight:400;color:${esHoy ? '#FFD700' : 'var(--text3)'}">${d.getDate()}/${d.getMonth()+1}</span>`;
   });
+
+  // Cargar horarios de la API
+  try {
+    const res = await fetch(`${API}/api/horarios?semana=${semanaActual[0]}`);
+    if (res.ok) {
+      const horariosAPI = await res.json();
+      horariosSemana = {};
+      horariosAPI.forEach(h => {
+        const pid = h.planilla_emp_id;
+        const fecha = h.fecha ? h.fecha.split('T')[0] : null;
+        if (!pid || !fecha) return;
+        if (!horariosSemana[pid]) horariosSemana[pid] = {};
+        horariosSemana[pid][fecha] = {
+          entrada:  h.entrada1,
+          salida:   h.salida1,
+          entrada2: h.entrada2,
+          salida2:  h.salida2,
+          estado:   h.estado || 'normal'
+        };
+      });
+    }
+  } catch(e) { console.error('Error cargando horarios:', e); }
 
   renderTablaHorarios();
 }
 
 function renderTablaHorarios() {
   const tbody = document.getElementById('tabla-horarios');
+  if (!tbody) return;
+
   if (!planillaEmpleados.length) {
     tbody.innerHTML = `<tr><td colspan="9" class="empty-state">Importá la planilla Excel para ver los empleados</td></tr>`;
     return;
@@ -1676,9 +1715,9 @@ function renderTablaHorarios() {
   const hoyStr = new Date().toISOString().split('T')[0];
   const sectores = {};
   planillaEmpleados.forEach(pe => {
-    const sector = pe.rol || 'Sin sector';
-    if (!sectores[sector]) sectores[sector] = [];
-    sectores[sector].push(pe);
+    const s = pe.rol || 'Sin sector';
+    if (!sectores[s]) sectores[s] = [];
+    sectores[s].push(pe);
   });
 
   let html = '';
@@ -1688,37 +1727,34 @@ function renderTablaHorarios() {
       const celdas = semanaActual.map(fecha => {
         const h = (horariosSemana[pe.id] || {})[fecha];
         const esHoy = fecha === hoyStr;
-        let innerClass = esHoy ? 'cell-inner is-hoy' : 'cell-inner';
+        let cls = esHoy ? 'cell-inner is-hoy' : 'cell-inner';
         let contenido = `<span class="cell-add">+</span>`;
+
         if (h) {
           if (h.estado === 'franco') {
-            innerClass += ' is-franco';
+            cls += ' is-franco';
             contenido = `<span class="turno-badge franco">Franco</span>`;
           } else if (h.estado === 'ausente') {
-            innerClass += ' is-ausente';
+            cls += ' is-ausente';
             contenido = `<span class="turno-badge ausente">Ausente</span>`;
           } else if (h.entrada) {
-            innerClass += ' has-turno';
-            const e1 = h.entrada ? h.entrada.substring(0,5) : '';
-            const s1 = h.salida  ? h.salida.substring(0,5)  : '?';
-            contenido = `<span class="turno-hora">${e1}–${s1}</span>`;
-            if (h.entrada2) {
-              const e2 = h.entrada2.substring(0,5);
-              const s2 = h.salida2 ? h.salida2.substring(0,5) : '?';
-              contenido += `<span class="turno-hora2">${e2}–${s2}</span>`;
-            }
+            cls += ' has-turno';
+            contenido = `<span class="turno-hora">${h.entrada.substring(0,5)}–${(h.salida||'?').substring(0,5)}</span>`;
+            if (h.entrada2) contenido += `<span class="turno-hora2">${h.entrada2.substring(0,5)}–${(h.salida2||'?').substring(0,5)}</span>`;
           }
         }
+
         return `<td class="turno-cell" onclick="abrirModal(${pe.id},'${fecha}','${pe.apellido} ${pe.nombre}','${pe.rol||''}')">
-          <div class="${innerClass}">
+          <div class="${cls}">
             ${contenido}
             <div class="cell-actions">
-              <button class="cell-btn cell-btn-f" onclick="event.stopPropagation();guardarEstadoRapido(${pe.id},'${fecha}','franco')" title="Franco">F</button>
-              <button class="cell-btn cell-btn-a" onclick="event.stopPropagation();guardarEstadoRapido(${pe.id},'${fecha}','ausente')" title="Ausente">A</button>
+              <button class="cell-btn cell-btn-f" onclick="event.stopPropagation();guardarEstadoRapido(${pe.id},'${fecha}','franco')">F</button>
+              <button class="cell-btn cell-btn-a" onclick="event.stopPropagation();guardarEstadoRapido(${pe.id},'${fecha}','ausente')">A</button>
             </div>
           </div>
         </td>`;
       }).join('');
+
       html += `<tr>
         <td class="td-nombre">${pe.apellido} ${pe.nombre}</td>
         <td class="td-rol">${pe.rol || '—'}</td>
@@ -1729,18 +1765,33 @@ function renderTablaHorarios() {
   tbody.innerHTML = html;
 }
 
-// ── Modal ──
-let modalEmpId = null, modalFecha = null;
-
-function abrirModal(empId, fecha, nombre) {
-  modalEmpId = empId; modalFecha = fecha;
+function abrirModal(empId, fecha, nombre, rol) {
+  modalEmpId = empId;
+  modalFecha = fecha;
   const h = (horariosSemana[empId] || {})[fecha] || {};
-  document.getElementById('modal-title').textContent = 'Turno — ' + nombre;
-  document.getElementById('modal-info').textContent = fmtFecha(fecha + 'T12:00');
-  document.getElementById('m-entrada').value = h.entrada || '';
-  document.getElementById('m-salida').value = h.salida || '';
-  document.getElementById('m-entrada2').value = h.entrada2 || '';
-  document.getElementById('m-salida2').value = h.salida2 || '';
+  modalEstado = h.estado || 'normal';
+
+  document.getElementById('modal-title').textContent = nombre;
+  const d = new Date(fecha + 'T12:00');
+  document.getElementById('modal-info').textContent =
+    d.toLocaleDateString('es-AR', {weekday:'long', day:'numeric', month:'long'}) + (rol ? ` · ${rol}` : '');
+
+  document.getElementById('m-entrada').value  = h.entrada  ? h.entrada.substring(0,5)  : '';
+  document.getElementById('m-salida').value   = h.salida   ? h.salida.substring(0,5)   : '';
+  document.getElementById('m-entrada2').value = h.entrada2 ? h.entrada2.substring(0,5) : '';
+  document.getElementById('m-salida2').value  = h.salida2  ? h.salida2.substring(0,5)  : '';
+
+  // Estado botones rápidos
+  document.getElementById('mqb-franco').classList.toggle('active', modalEstado === 'franco');
+  document.getElementById('mqb-ausente').classList.toggle('active', modalEstado === 'ausente');
+
+  const disabled = modalEstado !== 'normal';
+  ['m-entrada','m-salida','m-entrada2','m-salida2'].forEach(id => {
+    const el = document.getElementById(id);
+    el.disabled = disabled;
+    el.style.opacity = disabled ? '0.4' : '1';
+  });
+
   document.getElementById('modal-turno').classList.add('show');
 }
 
@@ -1748,26 +1799,36 @@ function cerrarModal() {
   document.getElementById('modal-turno').classList.remove('show');
 }
 
-async function guardarTurno() {
-  const entrada1 = document.getElementById('m-entrada').value || null;
-  const salida1  = document.getElementById('m-salida').value  || null;
-  const entrada2 = document.getElementById('m-entrada2').value || null;
-  const salida2  = document.getElementById('m-salida2').value  || null;
+function toggleEstadoModal(estado) {
+  modalEstado = modalEstado === estado ? 'normal' : estado;
+  document.getElementById('mqb-franco').classList.toggle('active', modalEstado === 'franco');
+  document.getElementById('mqb-ausente').classList.toggle('active', modalEstado === 'ausente');
+  const disabled = modalEstado !== 'normal';
+  ['m-entrada','m-salida','m-entrada2','m-salida2'].forEach(id => {
+    const el = document.getElementById(id);
+    el.disabled = disabled;
+    el.style.opacity = disabled ? '0.4' : '1';
+  });
+}
 
-  if (!horariosSemana[modalEmpId]) horariosSemana[modalEmpId] = {};
-  horariosSemana[modalEmpId][modalFecha] = { entrada: entrada1, salida: salida1, entrada2, salida2, estado: modalEstado };
+async function guardarTurno() {
+  const btn = document.querySelector('.btn-guardar-turno');
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
+
+  const entrada1 = modalEstado === 'normal' ? (document.getElementById('m-entrada').value || null) : null;
+  const salida1  = modalEstado === 'normal' ? (document.getElementById('m-salida').value  || null) : null;
+  const entrada2 = modalEstado === 'normal' ? (document.getElementById('m-entrada2').value || null) : null;
+  const salida2  = modalEstado === 'normal' ? (document.getElementById('m-salida2').value  || null) : null;
 
   try {
     const r = await fetch(`${API}/api/horarios`, {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         planilla_emp_id: modalEmpId,
         fecha: modalFecha,
-        entrada1: modalEstado === 'normal' ? entrada1 : null,
-        salida1:  modalEstado === 'normal' ? salida1  : null,
-        entrada2: modalEstado === 'normal' ? entrada2 : null,
-        salida2:  modalEstado === 'normal' ? salida2  : null,
-        estado: modalEstado || 'normal'
+        entrada1, salida1, entrada2, salida2,
+        estado: modalEstado
       })
     });
     if (!r.ok) {
@@ -1775,25 +1836,55 @@ async function guardarTurno() {
       alert('Error al guardar: ' + err);
       return;
     }
+    // Actualizar estado local
+    if (!horariosSemana[modalEmpId]) horariosSemana[modalEmpId] = {};
+    horariosSemana[modalEmpId][modalFecha] = { entrada: entrada1, salida: salida1, entrada2, salida2, estado: modalEstado };
+    cerrarModal();
+    renderTablaHorarios();
   } catch(e) {
     alert('Error de conexión: ' + e.message);
-    return;
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Guardar turno'; }
   }
-
-  cerrarModal();
-  await cargarHorarios();
 }
 
-function borrarTurno() {
-  if (!horariosSemana[modalEmpId]) { cerrarModal(); return; }
-  delete horariosSemana[modalEmpId][modalFecha];
-  localStorage.setItem('barideal_horarios', JSON.stringify(horariosSemana));
-  fetch(`${API}/api/horarios`, {
-    method: 'DELETE', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ empleado_id: modalEmpId, fecha: modalFecha })
-  }).catch(() => {});
-  cerrarModal();
-  renderTablaHorarios();
+async function borrarTurno() {
+  if (!modalEmpId || !modalFecha) { cerrarModal(); return; }
+  // Guardar con estado normal y sin horarios = efectivamente borra
+  try {
+    await fetch(`${API}/api/horarios`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        planilla_emp_id: modalEmpId,
+        fecha: modalFecha,
+        entrada1: null, salida1: null, entrada2: null, salida2: null,
+        estado: 'normal'
+      })
+    });
+    if (horariosSemana[modalEmpId]) delete horariosSemana[modalEmpId][modalFecha];
+    cerrarModal();
+    renderTablaHorarios();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function guardarEstadoRapido(planillaEmpId, fecha, estado) {
+  const actual = (horariosSemana[planillaEmpId] || {})[fecha];
+  const nuevoEstado = actual && actual.estado === estado ? 'normal' : estado;
+  try {
+    await fetch(`${API}/api/horarios`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        planilla_emp_id: planillaEmpId,
+        fecha, entrada1: null, salida1: null, entrada2: null, salida2: null,
+        estado: nuevoEstado
+      })
+    });
+    if (!horariosSemana[planillaEmpId]) horariosSemana[planillaEmpId] = {};
+    horariosSemana[planillaEmpId][fecha] = { estado: nuevoEstado };
+    renderTablaHorarios();
+  } catch(e) { alert('Error: ' + e.message); }
 }
 
 // ── Importar Excel (planilla oficial) ──
