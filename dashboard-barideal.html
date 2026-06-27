@@ -1562,33 +1562,65 @@ async function cargarHorarios() {
 
 function renderTablaHorarios() {
   const tbody = document.getElementById('tabla-horarios');
-  if (!todosLosEmpleados.length) {
-    tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Cargando empleados…</td></tr>`;
+  if (!planillaEmpleados.length) {
+    tbody.innerHTML = `<tr><td colspan="9" class="empty-state">Importá la planilla Excel para ver los empleados</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = todosLosEmpleados.map(e => {
-    const celdas = semanaActual.map((fecha, i) => {
-      const h = (horariosSemana[e.id] || {})[fecha];
-      let contenido = `<span class="btn-add-turno" onclick="abrirModal(${e.id},'${fecha}','${e.nombre} ${e.apellido}')">+</span>`;
-      if (h && h.entrada) {
-        contenido = `
-          <div class="turno-slot" onclick="abrirModal(${e.id},'${fecha}','${e.nombre} ${e.apellido}')">
-            ${h.entrada.substring(0,5)}–${(h.salida||'?').substring(0,5)}
-          </div>
-          ${h.entrada2 ? `<div class="turno-slot t2" onclick="abrirModal(${e.id},'${fecha}','${e.nombre} ${e.apellido}')">${h.entrada2.substring(0,5)}–${(h.salida2||'?').substring(0,5)}</div>` : ''}
-        `;
-      }
-      return `<td class="turno-cell">${contenido}</td>`;
-    }).join('');
+  const hoyStr = new Date().toISOString().split('T')[0];
+  const sectores = {};
+  planillaEmpleados.forEach(pe => {
+    const sector = pe.rol || 'Sin sector';
+    if (!sectores[sector]) sectores[sector] = [];
+    sectores[sector].push(pe);
+  });
 
-    return `
-      <tr>
-        <td class="td-nombre">${e.nombre} ${e.apellido}</td>
+  let html = '';
+  for (const [sector, emps] of Object.entries(sectores)) {
+    html += `<tr class="sector-row"><td colspan="9">${sector}</td></tr>`;
+    emps.forEach(pe => {
+      const celdas = semanaActual.map(fecha => {
+        const h = (horariosSemana[pe.id] || {})[fecha];
+        const esHoy = fecha === hoyStr;
+        let innerClass = esHoy ? 'cell-inner is-hoy' : 'cell-inner';
+        let contenido = `<span class="cell-add">+</span>`;
+        if (h) {
+          if (h.estado === 'franco') {
+            innerClass += ' is-franco';
+            contenido = `<span class="turno-badge franco">Franco</span>`;
+          } else if (h.estado === 'ausente') {
+            innerClass += ' is-ausente';
+            contenido = `<span class="turno-badge ausente">Ausente</span>`;
+          } else if (h.entrada) {
+            innerClass += ' has-turno';
+            const e1 = h.entrada ? h.entrada.substring(0,5) : '';
+            const s1 = h.salida  ? h.salida.substring(0,5)  : '?';
+            contenido = `<span class="turno-hora">${e1}–${s1}</span>`;
+            if (h.entrada2) {
+              const e2 = h.entrada2.substring(0,5);
+              const s2 = h.salida2 ? h.salida2.substring(0,5) : '?';
+              contenido += `<span class="turno-hora2">${e2}–${s2}</span>`;
+            }
+          }
+        }
+        return `<td class="turno-cell" onclick="abrirModal(${pe.id},'${fecha}','${pe.apellido} ${pe.nombre}','${pe.rol||''}')">
+          <div class="${innerClass}">
+            ${contenido}
+            <div class="cell-actions">
+              <button class="cell-btn cell-btn-f" onclick="event.stopPropagation();guardarEstadoRapido(${pe.id},'${fecha}','franco')" title="Franco">F</button>
+              <button class="cell-btn cell-btn-a" onclick="event.stopPropagation();guardarEstadoRapido(${pe.id},'${fecha}','ausente')" title="Ausente">A</button>
+            </div>
+          </div>
+        </td>`;
+      }).join('');
+      html += `<tr>
+        <td class="td-nombre">${pe.apellido} ${pe.nombre}</td>
+        <td class="td-rol">${pe.rol || '—'}</td>
         ${celdas}
-      </tr>
-    `;
-  }).join('');
+      </tr>`;
+    });
+  }
+  tbody.innerHTML = html;
 }
 
 // ── Modal ──
