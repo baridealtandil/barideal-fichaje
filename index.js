@@ -378,10 +378,36 @@ app.get("/api/metricas/hoy", async (c) => {
 // ══════════════════════════════════════════════════
 //  HEALTHCHECK
 // ══════════════════════════════════════════════════
+// Editar empleado de la app
+app.put("/api/empleados/:id", async (c) => {
+  const id = c.req.param("id");
+  const { nombre, apellido, celular } = await c.req.json();
+  await sql`UPDATE empleados SET nombre=${nombre}, apellido=${apellido}, celular=${celular} WHERE id=${id}`;
+  return c.json({ ok: true });
+});
+
+// Eliminar empleado de la app
+app.delete("/api/empleados/:id", async (c) => {
+  const id = c.req.param("id");
+  await sql`DELETE FROM fichajes WHERE empleado_id=${id}`;
+  await sql`UPDATE planilla_empleados SET empleado_id=NULL WHERE empleado_id=${id}`;
+  await sql`DELETE FROM empleados WHERE id=${id}`;
+  return c.json({ ok: true });
+});
+
+// Editar empleado de planilla
+app.put("/api/planilla/empleados/:id", async (c) => {
+  const id = c.req.param("id");
+  const { nombre, apellido, rol } = await c.req.json();
+  await sql`UPDATE planilla_empleados SET nombre=${nombre}, apellido=${apellido}, rol=${rol} WHERE id=${id}`;
+  return c.json({ ok: true });
+});
+
 // Eliminar empleado de planilla
 app.delete("/api/planilla/empleados/:id", async (c) => {
   const id = c.req.param("id");
-  await sql`DELETE FROM planilla_empleados WHERE id = ${id}`;
+  await sql`DELETE FROM horarios WHERE planilla_emp_id=${id}`;
+  await sql`DELETE FROM planilla_empleados WHERE id=${id}`;
   return c.json({ ok: true });
 });
 

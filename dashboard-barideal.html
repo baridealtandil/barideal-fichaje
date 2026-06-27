@@ -292,6 +292,58 @@ canvas { max-height: 240px; }
   display: flex; flex-direction: column; gap: 4px; }
 .bolsa-breakdown span { color: var(--text); font-weight: 600; }
 
+/* ── EDIT / DELETE BUTTONS ── */
+.emp-actions {
+  display: flex; gap: 4px; flex-shrink: 0;
+}
+.emp-action-btn {
+  width: 26px; height: 26px; border-radius: 6px; border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; transition: opacity 0.15s;
+}
+.emp-action-btn:hover { opacity: 0.75; }
+.btn-edit-emp { background: rgba(255,255,255,0.08); color: var(--text2); }
+.btn-del-emp  { background: rgba(255,60,60,0.12); color: #FF6060; }
+
+/* Modal editar empleado */
+.modal-edit-emp {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 14px; width: 340px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.modal-edit-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-edit-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.modal-edit-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+.modal-edit-field label {
+  display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text3); margin-bottom: 5px;
+}
+.modal-edit-input {
+  width: 100%; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 12px; color: var(--text);
+  font-family: inherit; font-size: 14px; outline: none;
+}
+.modal-edit-input:focus { border-color: rgba(255,255,255,0.3); }
+.modal-edit-footer {
+  padding: 12px 20px 16px; display: flex; gap: 8px;
+}
+.modal-edit-danger {
+  padding: 9px 14px; background: rgba(255,60,60,0.12); color: #FF6060;
+  border: 1px solid rgba(255,60,60,0.25); border-radius: 8px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+}
+.modal-edit-save {
+  flex: 1; padding: 9px; background: var(--gold); color: #000;
+  border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;
+}
+.modal-edit-cancel {
+  padding: 9px 14px; background: transparent; color: var(--text3);
+  border: 1px solid var(--border); border-radius: 8px; font-size: 13px; cursor: pointer;
+}
+
 /* ── BUSCADOR DE EMPLEADOS ── */
 .emp-search-wrap {
   position: relative; margin-bottom: 0;
@@ -934,6 +986,41 @@ canvas { max-height: 240px; }
   </div><!-- /content -->
 </main>
 
+<!-- ── MODAL EDITAR EMPLEADO ── -->
+<div class="modal-bg" id="modal-edit-emp">
+  <div class="modal-edit-emp">
+    <div class="modal-edit-header">
+      <div class="modal-edit-title">Editar empleado</div>
+      <button class="modal-close-btn" onclick="cerrarEditarEmp()">×</button>
+    </div>
+    <div class="modal-edit-body">
+      <input type="hidden" id="edit-emp-id"/>
+      <input type="hidden" id="edit-emp-tipo"/> <!-- 'app' o 'planilla' -->
+      <div class="modal-edit-field">
+        <label>Nombre</label>
+        <input class="modal-edit-input" id="edit-emp-nombre" type="text"/>
+      </div>
+      <div class="modal-edit-field">
+        <label>Apellido</label>
+        <input class="modal-edit-input" id="edit-emp-apellido" type="text"/>
+      </div>
+      <div class="modal-edit-field" id="edit-celular-field">
+        <label>Celular</label>
+        <input class="modal-edit-input" id="edit-emp-celular" type="tel"/>
+      </div>
+      <div class="modal-edit-field" id="edit-rol-field">
+        <label>Rol</label>
+        <input class="modal-edit-input" id="edit-emp-rol" type="text"/>
+      </div>
+    </div>
+    <div class="modal-edit-footer">
+      <button class="modal-edit-danger" id="edit-delete-btn" onclick="confirmarEliminar()">🗑 Eliminar</button>
+      <button class="modal-edit-cancel" onclick="cerrarEditarEmp()">Cancelar</button>
+      <button class="modal-edit-save" onclick="guardarEdicion()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── MODAL NUEVO EMPLEADO ── -->
 <div class="modal-bg" id="modal-emp-nuevo">
   <div class="modal-emp-new">
@@ -1338,11 +1425,12 @@ function renderEmpleados() {
             <div class="emp-card-name">${e.nombre} ${e.apellido}</div>
             <div class="emp-card-cel">${e.celular}</div>
           </div>
-          ${!enPlanilla ? `<button onclick="agregarAPlanilla(${e.id}, '${e.nombre}', '${e.apellido}')"
-            title="Agregar a la planilla"
-            style="width:28px;height:28px;border-radius:50%;background:rgba(255,107,0,0.2);
-            border:1px solid rgba(255,107,0,0.4);color:#FF9944;font-size:18px;cursor:pointer;
-            display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1">+</button>` : ''}
+          <div class="emp-actions">
+            ${!enPlanilla ? `<button onclick="agregarAPlanilla(${e.id}, '${e.nombre}', '${e.apellido}')"
+              title="Agregar a la planilla" class="emp-action-btn" style="background:rgba(255,107,0,0.2);color:#FF9944;font-size:16px">+</button>` : ''}
+            <button class="emp-action-btn btn-edit-emp" onclick="abrirEditarEmp(${e.id}, '${e.nombre}', '${e.apellido}', '${e.celular}')" title="Editar">✏️</button>
+            <button class="emp-action-btn btn-del-emp" onclick="eliminarEmp(${e.id}, '${e.nombre} ${e.apellido}')" title="Eliminar">🗑️</button>
+          </div>
         </div>
         <div class="emp-stats">
           <div class="emp-stat">
@@ -1852,6 +1940,102 @@ function encontrarEnPlanilla(nombre, apellido) {
 
 // ── Cargar planilla de empleados ──
 // ══════════════════════════════════
+//  EDITAR / ELIMINAR EMPLEADOS
+// ══════════════════════════════════
+let editContext = {}; // { tipo, id, nombre, apellido, celular, rol }
+
+function abrirEditarEmp(id, nombre, apellido, celular) {
+  editContext = { tipo: 'app', id, nombre, apellido, celular };
+  document.getElementById('edit-emp-id').value = id;
+  document.getElementById('edit-emp-tipo').value = 'app';
+  document.getElementById('edit-emp-nombre').value = nombre;
+  document.getElementById('edit-emp-apellido').value = apellido;
+  document.getElementById('edit-emp-celular').value = celular;
+  document.getElementById('edit-celular-field').style.display = 'block';
+  document.getElementById('edit-rol-field').style.display = 'none';
+  document.getElementById('modal-edit-emp').classList.add('show');
+}
+
+function abrirEditarPlanilla(id, nombre, apellido, rol) {
+  editContext = { tipo: 'planilla', id, nombre, apellido, rol };
+  document.getElementById('edit-emp-id').value = id;
+  document.getElementById('edit-emp-tipo').value = 'planilla';
+  document.getElementById('edit-emp-nombre').value = nombre;
+  document.getElementById('edit-emp-apellido').value = apellido;
+  document.getElementById('edit-emp-rol').value = rol;
+  document.getElementById('edit-celular-field').style.display = 'none';
+  document.getElementById('edit-rol-field').style.display = 'block';
+  document.getElementById('modal-edit-emp').classList.add('show');
+}
+
+function cerrarEditarEmp() {
+  document.getElementById('modal-edit-emp').classList.remove('show');
+}
+
+async function guardarEdicion() {
+  const nombre   = document.getElementById('edit-emp-nombre').value.trim();
+  const apellido = document.getElementById('edit-emp-apellido').value.trim();
+  if (!nombre || !apellido) { alert('Nombre y apellido son obligatorios.'); return; }
+
+  const tipo = document.getElementById('edit-emp-tipo').value;
+  const id   = document.getElementById('edit-emp-id').value;
+
+  try {
+    if (tipo === 'app') {
+      const celular = document.getElementById('edit-emp-celular').value.trim();
+      await fetch(`${API}/api/empleados/${id}`, {
+        method: 'PUT', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ nombre, apellido, celular })
+      });
+      await actualizarTodo();
+    } else {
+      const rol = document.getElementById('edit-emp-rol').value.trim();
+      await fetch(`${API}/api/planilla/empleados/${id}`, {
+        method: 'PUT', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ nombre, apellido, rol })
+      });
+      await cargarPlanillaEmpleados();
+    }
+    cerrarEditarEmp();
+  } catch(e) { alert('Error al guardar: ' + e.message); }
+}
+
+async function confirmarEliminar() {
+  const tipo = document.getElementById('edit-emp-tipo').value;
+  const id   = document.getElementById('edit-emp-id').value;
+  const nombre = `${document.getElementById('edit-emp-nombre').value} ${document.getElementById('edit-emp-apellido').value}`;
+
+  if (!confirm(`¿Seguro que querés eliminar a ${nombre}? Esta acción no se puede deshacer.`)) return;
+
+  try {
+    if (tipo === 'app') {
+      await fetch(`${API}/api/empleados/${id}`, { method: 'DELETE' });
+      await actualizarTodo();
+    } else {
+      await fetch(`${API}/api/planilla/empleados/${id}`, { method: 'DELETE' });
+      await cargarPlanillaEmpleados();
+    }
+    cerrarEditarEmp();
+  } catch(e) { alert('Error al eliminar: ' + e.message); }
+}
+
+async function eliminarEmp(id, nombre) {
+  if (!confirm(`¿Seguro que querés eliminar a ${nombre}?`)) return;
+  try {
+    await fetch(`${API}/api/empleados/${id}`, { method: 'DELETE' });
+    await actualizarTodo();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function eliminarPlanilla(id, nombre) {
+  if (!confirm(`¿Seguro que querés eliminar a ${nombre} de la planilla?`)) return;
+  try {
+    await fetch(`${API}/api/planilla/empleados/${id}`, { method: 'DELETE' });
+    await cargarPlanillaEmpleados();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ══════════════════════════════════
 //  BUSCADOR DE EMPLEADOS
 // ══════════════════════════════════
 
@@ -2144,7 +2328,14 @@ function renderTablaPlanilla() {
          </select>`;
 
     return `<tr>
-      <td>${pe.apellido} ${pe.nombre}</td>
+      <td>${pe.apellido} ${pe.nombre}
+        <span style="margin-left:6px">
+          <button class="emp-action-btn btn-edit-emp" style="display:inline-flex;width:22px;height:22px;font-size:11px"
+            onclick="abrirEditarPlanilla(${pe.id}, '${pe.nombre}', '${pe.apellido}', '${pe.rol||''}')">✏️</button>
+          <button class="emp-action-btn btn-del-emp" style="display:inline-flex;width:22px;height:22px;font-size:11px"
+            onclick="eliminarPlanilla(${pe.id}, '${pe.apellido} ${pe.nombre}')">🗑️</button>
+        </span>
+      </td>
       <td><span style="font-size:11px;color:var(--text3)">${pe.rol || '—'}</span></td>
       <td>${nombre_app}</td>
       <td>${estado}</td>
