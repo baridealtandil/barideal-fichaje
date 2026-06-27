@@ -2040,20 +2040,26 @@ async function cargarPlanillaEmpleados() {
 function renderTablaPlanilla() {
   const tbody = document.getElementById('tabla-planilla');
   if (!tbody) return;
-  if (!planillaEmpleados.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Sin empleados en planilla. Importá la planilla Excel.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = planillaEmpleados.map(pe => {
+
+  // IDs ya vinculados en la planilla
+  const idsVinculados = new Set(planillaEmpleados.filter(pe => pe.empleado_id).map(pe => pe.empleado_id));
+
+  // Empleados de la app que NO están vinculados a ningún registro de planilla
+  const sinPlanilla = todosLosEmpleados.filter(e => !idsVinculados.has(e.id));
+
+  const opcionesEmpleados = todosLosEmpleados.map(e =>
+    `<option value="${e.id}">${e.nombre} ${e.apellido} · ${e.celular}</option>`
+  ).join('');
+
+  let rows = '';
+
+  // Filas de planilla
+  rows += planillaEmpleados.map(pe => {
     const vinculado = pe.empleado_id;
     const nombre_app = vinculado ? `${pe.emp_nombre || ''} ${pe.emp_apellido || ''}`.trim() : '—';
     const estado = vinculado
       ? '<span style="color:#4CAF50">✓ Vinculado</span>'
       : '<span style="color:#FFB400">⚠ Sin vincular</span>';
-
-    const opcionesEmpleados = todosLosEmpleados.map(e =>
-      `<option value="${e.id}">${e.nombre} ${e.apellido}</option>`
-    ).join('');
 
     const accion = vinculado
       ? `<span style="font-size:12px;color:var(--text3)">${nombre_app}</span>`
@@ -2070,6 +2076,80 @@ function renderTablaPlanilla() {
       <td>${accion}</td>
     </tr>`;
   }).join('');
+
+  // Filas de empleados de la app sin planilla
+  if (sinPlanilla.length) {
+    rows += `<tr><td colspan="5" style="padding:8px 16px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);background:rgba(255,100,0,0.05);border-top:1px solid var(--border)">
+      ⚠️ Registrados en la app pero no en la planilla
+    </td></tr>`;
+    rows += sinPlanilla.map(e => {
+      const roles = getRolesDisponibles();
+      const opRoles = roles.map(r => `<option value="${r}">${r}</option>`).join('');
+      return `<tr>
+        <td>${e.apellido} ${e.nombre}</td>
+        <td>
+          <select onchange="agregarAPlanillaConRol(${e.id}, '${e.nombre}', '${e.apellido}', this.value)"
+            style="background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px">
+            <option value="">Asignar rol…</option>
+            ${opRoles}
+            <option value="__nuevo__">+ Nuevo rol</option>
+          </select>
+        </td>
+        <td>${e.celular || '—'}</td>
+        <td><span style="color:#FF6B00">⚠ Sin planilla</span></td>
+        <td><button onclick="agregarAPlanilla(${e.id}, '${e.nombre}', '${e.apellido}')"
+          style="background:rgba(255,107,0,0.15);color:#FF9944;border:1px solid rgba(255,107,0,0.3);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer">
+          + Agregar a planilla
+        </button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  if (!rows) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Sin empleados en planilla. Importá la planilla Excel.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = rows;
+}
+
+async function agregarAPlanillaConRol(empId, nombre, apellido, rol) {
+  if (!rol) return;
+  if (rol === '__nuevo__') {
+    const nuevoRol = prompt('Ingresá el nombre del nuevo rol:');
+    if (!nuevoRol) return;
+    await _agregarAPlanillaAPI(empId, nombre, apellido, nuevoRol.trim());
+  } else {
+    await _agregarAPlanillaAPI(empId, nombre, apellido, rol);
+  }
+}
+
+async function agregarAPlanilla(empId, nombre, apellido) {
+  const rol = prompt(`¿Cuál es el rol de ${nombre} ${apellido}? (ej: Cocina, Salón, Limpieza)`);
+  if (rol === null) return;
+  await _agregarAPlanillaAPI(empId, nombre, apellido, rol.trim());
+}
+
+async function _agregarAPlanillaAPI(empId, nombre, apellido, rol) {
+  try {
+    await fetch(`${API}/api/planilla/empleados/batch`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ empleados: [{ nombre, apellido, rol }] })
+    });
+    // Vincular automáticamente
+    await cargarPlanillaEmpleados();
+    const pe = planillaEmpleados.find(p =>
+      normalizar(p.nombre) === normalizar(nombre) &&
+      normalizar(p.apellido) === normalizar(apellido)
+    );
+    if (pe && !pe.empleado_id) {
+      await fetch(`${API}/api/planilla/empleados/vincular`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ planilla_emp_id: pe.id, empleado_id: empId })
+      });
+    }
+    await cargarPlanillaEmpleados();
+  } catch(e) { alert('Error: ' + e.message); }
 }
 
 async function vincularManual(planillaEmpId, empleadoId) {
