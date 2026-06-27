@@ -294,7 +294,7 @@ canvas { max-height: 240px; }
 
 /* ── BUSCADOR DE EMPLEADOS ── */
 .emp-search-wrap {
-  position: relative; margin-bottom: 16px;
+  position: relative; margin-bottom: 0;
 }
 .emp-search-input {
   width: 100%; background: var(--bg2); border: 1px solid var(--border);
@@ -309,10 +309,10 @@ canvas { max-height: 240px; }
   color: var(--text3); font-size: 16px; pointer-events: none;
 }
 .emp-search-results {
-  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 50;
-  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
-  overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-  display: none;
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 999;
+  background: #1A1A1A; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px;
+  overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  display: none; max-height: 300px; overflow-y: auto;
 }
 .emp-search-results.visible { display: block; }
 .emp-search-item {
@@ -734,12 +734,12 @@ canvas { max-height: 240px; }
     <!-- ── EMPLEADOS ── -->
     <section class="section" id="s-empleados">
       <!-- Buscador global -->
-      <div class="panel" style="margin-bottom:20px">
+      <div class="panel" style="margin-bottom:20px;overflow:visible">
         <div class="panel-header">
           <div class="panel-title">🔍 Buscar empleado</div>
           <span style="font-size:12px;color:var(--text3)" id="emp-total-count"></span>
         </div>
-        <div class="panel-body">
+        <div class="panel-body" style="overflow:visible">
           <div class="emp-search-wrap" id="emp-search-wrap">
             <input class="emp-search-input" id="emp-search-input" type="text"
               placeholder="Escribí nombre o apellido…"
