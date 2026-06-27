@@ -2129,18 +2129,14 @@ function exportarExcel() {
 // ══════════════════════════════════
 //  ARRANQUE
 // ══════════════════════════════════
-(function init() {
-  // Cargar horarios guardados
-  try {
-    const guardados = localStorage.getItem('barideal_horarios');
-    if (guardados) horariosSemana = JSON.parse(guardados);
-  } catch {}
+(async function init() {
+  // Cargar planilla de empleados PRIMERO (necesaria para horarios y búsqueda)
+  await cargarPlanillaEmpleados();
 
-  // Semana actual por defecto
-  const lunes = getLunesDe(null);
-  document.getElementById('semana-inicio').value = lunes.toISOString().split('T')[0];
+  // Luego cargar horarios
   cargarHorarios();
 
+  // Datos generales
   actualizarTodo();
   setInterval(actualizarTodo, 30000);
 })();
