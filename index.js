@@ -378,6 +378,13 @@ app.get("/api/metricas/hoy", async (c) => {
 // ══════════════════════════════════════════════════
 //  HEALTHCHECK
 // ══════════════════════════════════════════════════
+// Eliminar empleado de planilla
+app.delete("/api/planilla/empleados/:id", async (c) => {
+  const id = c.req.param("id");
+  await sql`DELETE FROM planilla_empleados WHERE id = ${id}`;
+  return c.json({ ok: true });
+});
+
 app.get("/", (c) => c.json({ app: "Bar Ideal API", version: "2.1", status: "ok" }));
 
 await migrate();
