@@ -1719,8 +1719,8 @@ async function cargarHorarios() {
         if (!pid || !fecha) return;
         if (!horariosSemana[pid]) horariosSemana[pid] = {};
         horariosSemana[pid][fecha] = {
-          entrada:  h.entrada1,
-          salida:   h.salida1,
+          entrada1: h.entrada1,
+          salida1:  h.salida1,
           entrada2: h.entrada2,
           salida2:  h.salida2,
           estado:   h.estado || 'normal'
@@ -1766,11 +1766,9 @@ function renderTablaHorarios() {
           } else if (h.estado === 'ausente') {
             cls += ' is-ausente';
             contenido = `<span class="turno-badge ausente">Ausente</span>`;
-          } else if (h.entrada1 || h.entrada) {
-            const e1 = h.entrada1||h.entrada;
-            const s1 = h.salida1||h.salida||'?';
+          } else if (h.entrada1) {
             cls += ' has-turno';
-            contenido = `<span class="turno-hora">${e1.substring(0,5)}–${s1.substring(0,5)}</span>`;
+            contenido = `<span class="turno-hora">${h.entrada1.substring(0,5)}–${(h.salida1||'?').substring(0,5)}</span>`;
             if (h.entrada2) contenido += `<span class="turno-hora2">${h.entrada2.substring(0,5)}–${(h.salida2||'?').substring(0,5)}</span>`;
           }
         }
@@ -1866,7 +1864,7 @@ function toggleEstadoModal(estado) {
 }
 
 async function guardarTurno() {
-  const btn = document.querySelector('.btn-guardar-turno');
+  const btn = document.getElementById('btn-guardar-turno');
   if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
 
   const entrada1 = modalEstado === 'normal' ? (document.getElementById('m-entrada').value || null) : null;
@@ -1874,27 +1872,37 @@ async function guardarTurno() {
   const entrada2 = modalEstado === 'normal' ? (document.getElementById('m-entrada2').value || null) : null;
   const salida2  = modalEstado === 'normal' ? (document.getElementById('m-salida2').value  || null) : null;
 
+  // Días seleccionados via checkboxes
+  const diasSeleccionados = semanaActual.filter((f, i) => {
+    const el = document.getElementById('dia-' + i);
+    return el ? el.checked : false;
+  });
+
+  // Empleados seleccionados via checkboxes
+  const empsSeleccionados = planillaEmpleados
+    .filter(pe => { const el = document.getElementById('emp-' + pe.id); return el ? el.checked : false; })
+    .map(pe => pe.id);
+
+  // Fallback: si no hay checkboxes visibles, usar los valores del modal
+  const fechas = diasSeleccionados.length > 0 ? diasSeleccionados : [modalFecha];
+  const empIds = empsSeleccionados.length > 0 ? empsSeleccionados : [modalEmpId];
+
   try {
-    const r = await fetch(`${API}/api/horarios`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        planilla_emp_id: modalEmpId,
-        fecha: modalFecha,
-        entrada1, salida1, entrada2, salida2,
-        estado: modalEstado
-      })
-    });
-    if (!r.ok) {
-      const err = await r.text();
-      alert('Error al guardar: ' + err);
-      return;
+    for (const empId of empIds) {
+      for (const fecha of fechas) {
+        const r = await fetch(`${API}/api/horarios`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ planilla_emp_id: empId, fecha, entrada1, salida1, entrada2, salida2, estado: modalEstado })
+        });
+        if (!r.ok) { console.error('Error guardando', empId, fecha, await r.text()); continue; }
+        // Actualizar estado local con keys correctos
+        if (!horariosSemana[empId]) horariosSemana[empId] = {};
+        horariosSemana[empId][fecha] = { entrada1, salida1, entrada2, salida2, estado: modalEstado };
+      }
     }
-    // Actualizar estado local y recargar grilla
-    if (!horariosSemana[modalEmpId]) horariosSemana[modalEmpId] = {};
-    horariosSemana[modalEmpId][modalFecha] = { entrada: entrada1, salida: salida1, entrada2, salida2, estado: modalEstado };
     cerrarModal();
-    await cargarHorarios();
+    renderTablaHorarios();
   } catch(e) {
     alert('Error de conexión: ' + e.message);
   } finally {
