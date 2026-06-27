@@ -6,282 +6,233 @@
 <meta name="apple-mobile-web-app-title" content="Ideal">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0A0A0A">
-  <link rel="apple-touch-icon" href="/logo-ideal.png"/>
-  <link rel="icon" type="image/png" href="/logo-ideal.png"/>
-  <meta name="apple-mobile-web-app-title" content="ideal"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
+<link rel="apple-touch-icon" href="/logo-ideal.png"/>
+<link rel="icon" type="image/png" href="/logo-ideal.png"/>
+<meta name="apple-mobile-web-app-title" content="ideal"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ideal · Fichaje</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
 :root {
-  --bg:      #0A0A0A;
-  --bg2:     #111111;
-  --card:    #1A1A1A;
-  --border:  #2A2A2A;
-  --border2: #222222;
-  --white:   #FFFFFF;
-  --off:     #B0B0B0;
-  --dim:     #555555;
-  --dim2:    #333333;
-  --success: #4CAF50;
-  --danger:  #E53935;
-  --warning: #FF9800;
-  --info:    #42A5F5;
-  --r:       14px;
+--bg: #0A0A0A;
+--bg2: #111111;
+--card: #1A1A1A;
+--border: #2A2A2A;
+--border2: #222222;
+--white: #FFFFFF;
+--off: #B0B0B0;
+--dim: #555555;
+--dim2: #333333;
+--success: #4CAF50;
+--danger: #E53935;
+--warning: #FF9800;
+--info: #42A5F5;
+--r: 14px;
 }
-
 html, body {
-  height: 100%; background: var(--bg);
-  color: var(--white); font-family: -apple-system, 'Inter', sans-serif;
-  overflow-x: hidden;
+height: 100%; background: var(--bg);
+color: var(--white); font-family: -apple-system, 'Inter', sans-serif;
+overflow-x: hidden;
 }
-
 .screen { display: none; min-height: 100vh; flex-direction: column; }
 .screen.active { display: flex; }
-
-/* ── ONBOARDING ── */
-/* Matching screen */
 .match-opcion {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 10px;
-  padding: 14px 16px;
-  cursor: pointer;
-  transition: background 0.15s;
-  text-align: left;
+background: rgba(255,255,255,0.06);
+border: 1px solid rgba(255,255,255,0.15);
+border-radius: 10px;
+padding: 14px 16px;
+cursor: pointer;
+transition: background 0.15s;
+text-align: left;
 }
 .match-opcion:hover { background: rgba(255,255,255,0.12); }
 .match-opcion .match-nombre { font-size: 15px; font-weight: 600; color: #fff; }
 .match-opcion .match-rol { font-size: 12px; color: var(--off); margin-top: 2px; }
-
 #screen-onboarding {
-  align-items: center; justify-content: center;
-  padding: 40px 28px; gap: 28px;
+align-items: center; justify-content: center;
+padding: 40px 28px; gap: 28px;
 }
-
 .brand { text-align: center; }
 .brand-logo {
-  width: 80px; height: 80px; background: var(--white);
-  border-radius: 18px; display: flex; align-items: center;
-  justify-content: center; margin: 0 auto 20px;
+width: 80px; height: 80px; background: var(--white);
+border-radius: 18px; display: flex; align-items: center;
+justify-content: center; margin: 0 auto 20px;
 }
 .brand-logo svg { width: 60px; height: 60px; color: #0A0A0A; }
-
 .brand-wordmark { color: var(--white); margin-bottom: 2px; }
 .brand-wordmark svg { width: 160px; height: auto; color: var(--white); }
 .brand-sub { font-size: 12px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; }
-
 .onboarding-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 28px 24px;
-  width: 100%; max-width: 360px;
+background: var(--card); border: 1px solid var(--border);
+border-radius: var(--r); padding: 28px 24px;
+width: 100%; max-width: 360px;
 }
 .onboarding-card h2 { font-size: 16px; font-weight: 600; color: var(--white); margin-bottom: 6px; }
 .onboarding-card p { font-size: 13px; color: var(--off); margin-bottom: 22px; line-height: 1.5; }
-
 .form-group { margin-bottom: 14px; }
 .form-group label {
-  display: block; font-size: 11px; font-weight: 700;
-  color: var(--dim); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 7px;
+display: block; font-size: 11px; font-weight: 700;
+color: var(--dim); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 7px;
 }
 .form-group input {
-  width: 100%; background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 9px; padding: 11px 13px;
-  color: var(--white); font-size: 16px; outline: none;
-  transition: border-color 0.15s; -webkit-appearance: none;
+width: 100%; background: var(--bg2); border: 1px solid var(--border);
+border-radius: 9px; padding: 11px 13px;
+color: var(--white); font-size: 16px; outline: none;
+transition: border-color 0.15s; -webkit-appearance: none;
 }
 .form-group input:focus { border-color: var(--white); }
 .form-group input::placeholder { color: var(--dim); }
-
 .btn-primary {
-  width: 100%; padding: 13px; background: var(--white);
-  color: #0A0A0A; font-size: 14px; font-weight: 800;
-  border: none; border-radius: 9px; cursor: pointer;
-  letter-spacing: 0.5px; transition: opacity 0.15s, transform 0.1s;
+width: 100%; padding: 13px; background: var(--white);
+color: #0A0A0A; font-size: 14px; font-weight: 800;
+border: none; border-radius: 9px; cursor: pointer;
+letter-spacing: 0.5px; transition: opacity 0.15s, transform 0.1s;
 }
 .btn-primary:active { opacity: 0.8; transform: scale(0.98); }
 .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
 .disclaimer { font-size: 11px; color: var(--dim); text-align: center; margin-top: 12px; line-height: 1.5; }
-
-/* ── APP PRINCIPAL ── */
 .app-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 52px 20px 14px;
-  background: var(--bg2); border-bottom: 1px solid var(--border);
+display: flex; align-items: center; justify-content: space-between;
+padding: 52px 20px 14px;
+background: var(--bg2); border-bottom: 1px solid var(--border);
 }
 .header-logo svg { width: 90px; height: auto; color: var(--white); }
 .header-user { text-align: right; }
 .header-user .nombre { font-size: 13px; font-weight: 600; color: var(--white); }
 .header-user .id-tag { font-size: 11px; color: var(--dim); margin-top: 2px; }
-
 .app-body {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 24px 28px 48px; gap: 24px;
+flex: 1; display: flex; flex-direction: column;
+align-items: center; justify-content: center;
+padding: 24px 28px 48px; gap: 24px;
 }
-
-/* Clock */
 .clock-display { text-align: center; }
 .clock-display .time {
-  font-size: 56px; font-weight: 100; color: var(--white);
-  letter-spacing: -3px; line-height: 1; font-variant-numeric: tabular-nums;
+font-size: 56px; font-weight: 100; color: var(--white);
+letter-spacing: -3px; line-height: 1; font-variant-numeric: tabular-nums;
 }
 .clock-display .date { font-size: 13px; color: var(--dim); margin-top: 6px; text-transform: capitalize; }
-
-/* Turno */
 .turno-info {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 14px 20px;
-  width: 100%; max-width: 320px; text-align: center;
+background: var(--card); border: 1px solid var(--border);
+border-radius: var(--r); padding: 14px 20px;
+width: 100%; max-width: 320px; text-align: center;
 }
 .turno-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-bottom: 4px; }
 .turno-hora { font-size: 17px; font-weight: 600; color: var(--white); }
 .turno-sub { font-size: 11px; color: var(--dim); margin-top: 3px; }
-
-/* Botón circular con radar */
 .btn-wrap {
-  position: relative; display: flex; align-items: center; justify-content: center;
-  width: 200px; height: 200px; margin: 0 auto;
+position: relative; display: flex; align-items: center; justify-content: center;
+width: 200px; height: 200px; margin: 0 auto;
 }
-
-/* Anillos radar */
 .radar-ring {
-  position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,0.12);
-  pointer-events: none;
+position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,0.12);
+pointer-events: none;
 }
 .radar-ring-1 { width: 200px; height: 200px; }
 .radar-ring-2 { width: 160px; height: 160px; }
-
-/* Pulso radar animado */
 .radar-pulse {
-  position: absolute; border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.5);
-  width: 148px; height: 148px;
-  animation: radar-expand 2.5s ease-out infinite;
-  pointer-events: none; opacity: 0;
+position: absolute; border-radius: 50%;
+border: 1.5px solid rgba(255,255,255,0.5);
+width: 148px; height: 148px;
+animation: radar-expand 2.5s ease-out infinite;
+pointer-events: none; opacity: 0;
 }
 .radar-pulse:nth-child(2) { animation-delay: 0.8s; }
 .radar-pulse:nth-child(3) { animation-delay: 1.6s; }
-
 @keyframes radar-expand {
-  0%   { transform: scale(1);   opacity: 0.6; }
-  100% { transform: scale(1.5); opacity: 0; }
+0% { transform: scale(1); opacity: 0.6; }
+100% { transform: scale(1.5); opacity: 0; }
 }
-
-/* Barrido radar giratorio */
 .radar-sweep {
-  position: absolute; width: 200px; height: 200px; border-radius: 50%;
-  background: conic-gradient(from 0deg, transparent 70%, rgba(255,255,255,0.08) 100%);
-  animation: radar-spin 3s linear infinite;
-  pointer-events: none; opacity: 0; transition: opacity 0.4s;
+position: absolute; width: 200px; height: 200px; border-radius: 50%;
+background: conic-gradient(from 0deg, transparent 70%, rgba(255,255,255,0.08) 100%);
+animation: radar-spin 3s linear infinite;
+pointer-events: none; opacity: 0; transition: opacity 0.4s;
 }
 .radar-sweep.active { opacity: 1; }
 @keyframes radar-spin { to { transform: rotate(360deg); } }
-
-/* Botón principal */
 #btn-fichar {
-  position: relative; z-index: 2;
-  width: 148px; height: 148px; border-radius: 50%;
-  background: var(--card); border: 1.5px solid var(--border);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-  cursor: pointer; transition: border-color 0.2s, transform 0.1s, background 0.2s;
-  outline: none; -webkit-tap-highlight-color: transparent;
+position: relative; z-index: 2;
+width: 148px; height: 148px; border-radius: 50%;
+background: var(--card); border: 1.5px solid var(--border);
+display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+cursor: pointer; transition: border-color 0.2s, transform 0.1s, background 0.2s;
+outline: none; -webkit-tap-highlight-color: transparent;
 }
 #btn-fichar:not(:disabled):active { transform: scale(0.94); }
 #btn-fichar:disabled { opacity: 0.35; cursor: not-allowed; }
-#btn-fichar.entrada  { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.04); }
-#btn-fichar.salida   { border-color: rgba(76,175,80,0.7);  background: rgba(76,175,80,0.05); }
+#btn-fichar.entrada { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.04); }
+#btn-fichar.salida { border-color: rgba(76,175,80,0.7); background: rgba(76,175,80,0.05); }
 #btn-fichar.entrada2 { border-color: rgba(66,165,245,0.7); background: rgba(66,165,245,0.05); }
-#btn-fichar.salida2  { border-color: rgba(156,39,176,0.7); background: rgba(156,39,176,0.05); }
-
-/* SVG pocillo dentro del botón */
-.btn-coffee {
-  width: 42px; height: 42px; flex-shrink: 0;
-}
-
+#btn-fichar.salida2 { border-color: rgba(156,39,176,0.7); background: rgba(156,39,176,0.05); }
 .btn-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--dim); margin-top: 2px; }
-#btn-fichar.entrada  .btn-label { color: rgba(255,255,255,0.9); }
-#btn-fichar.salida   .btn-label { color: var(--success); }
+#btn-fichar.entrada .btn-label { color: rgba(255,255,255,0.9); }
+#btn-fichar.salida .btn-label { color: var(--success); }
 #btn-fichar.entrada2 .btn-label { color: var(--info); }
-#btn-fichar.salida2  .btn-label { color: #CE93D8; }
-
-/* Color del pocillo según estado */
-#btn-fichar.entrada  .coffee-cup { stroke: rgba(255,255,255,0.9); }
-#btn-fichar.salida   .coffee-cup { stroke: var(--success); }
+#btn-fichar.salida2 .btn-label { color: #CE93D8; }
+#btn-fichar.entrada .coffee-cup { stroke: rgba(255,255,255,0.9); }
+#btn-fichar.salida .coffee-cup { stroke: var(--success); }
 #btn-fichar.entrada2 .coffee-cup { stroke: var(--info); }
-#btn-fichar.salida2  .coffee-cup { stroke: #CE93D8; }
+#btn-fichar.salida2 .coffee-cup { stroke: #CE93D8; }
 #btn-fichar:disabled .coffee-cup { stroke: var(--dim); }
-
-/* Geo status */
 .geo-status {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 12px; color: var(--off);
-  padding: 8px 16px; background: var(--card);
-  border-radius: 20px; border: 1px solid var(--border);
+display: flex; align-items: center; gap: 8px;
+font-size: 12px; color: var(--off);
+padding: 8px 16px; background: var(--card);
+border-radius: 20px; border: 1px solid var(--border);
 }
 .geo-dot {
-  width: 7px; height: 7px; border-radius: 50%; background: var(--dim2);
-  flex-shrink: 0; transition: background 0.3s;
+width: 7px; height: 7px; border-radius: 50%; background: var(--dim2);
+flex-shrink: 0; transition: background 0.3s;
 }
 .geo-dot.ok { background: var(--success); }
 .geo-dot.error { background: var(--danger); }
 .geo-dot.warning { background: var(--warning); }
-
-/* Historial */
 .historial { width: 100%; max-width: 320px; }
 .historial-title { font-size: 10px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
 .historial-list { display: flex; flex-direction: column; gap: 5px; }
 .historial-item {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--card); border: 1px solid var(--border2);
-  border-radius: 9px; padding: 9px 13px;
+display: flex; align-items: center; gap: 10px;
+background: var(--card); border: 1px solid var(--border2);
+border-radius: 9px; padding: 9px 13px;
 }
 .hist-badge {
-  font-size: 10px; font-weight: 800; text-transform: uppercase;
-  padding: 3px 8px; border-radius: 5px; flex-shrink: 0; letter-spacing: 0.5px;
+font-size: 10px; font-weight: 800; text-transform: uppercase;
+padding: 3px 8px; border-radius: 5px; flex-shrink: 0; letter-spacing: 0.5px;
 }
-.hist-badge.entrada  { background: rgba(255,255,255,0.1); color: var(--white); }
-.hist-badge.salida   { background: rgba(76,175,80,0.12); color: #81C784; }
+.hist-badge.entrada { background: rgba(255,255,255,0.1); color: var(--white); }
+.hist-badge.salida { background: rgba(76,175,80,0.12); color: #81C784; }
 .hist-badge.entrada2 { background: rgba(66,165,245,0.12); color: #64B5F6; }
-.hist-badge.salida2  { background: rgba(186,104,200,0.12); color: #CE93D8; }
+.hist-badge.salida2 { background: rgba(186,104,200,0.12); color: #CE93D8; }
 .hist-hora { font-size: 14px; font-weight: 600; color: var(--white); flex: 1; }
 .hist-timelabel { font-size: 11px; color: var(--dim); }
-
-/* Overlay éxito */
 #overlay-success {
-  position: fixed; inset: 0; background: rgba(10,10,10,0.97);
-  display: none; flex-direction: column; align-items: center; justify-content: center;
-  z-index: 100; gap: 18px; animation: fadeIn 0.2s ease;
+position: fixed; inset: 0; background: rgba(10,10,10,0.97);
+display: none; flex-direction: column; align-items: center; justify-content: center;
+z-index: 100; gap: 18px; animation: fadeIn 0.2s ease;
 }
 #overlay-success.show { display: flex; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
 .success-logo { margin-bottom: 8px; }
 .success-logo svg { width: 140px; height: auto; color: var(--white); }
-
 .success-ring {
-  width: 100px; height: 100px; border-radius: 50%;
-  border: 1.5px solid var(--white); display: flex; align-items: center;
-  justify-content: center; font-size: 40px;
-  animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+width: 100px; height: 100px; border-radius: 50%;
+border: 1.5px solid var(--white); display: flex; align-items: center;
+justify-content: center; font-size: 40px;
+animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 @keyframes pop { 0% { transform: scale(0.4); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
 .success-tipo { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--dim); }
 .success-hora { font-size: 52px; font-weight: 100; color: var(--white); letter-spacing: -2px; }
 .success-msg { font-size: 14px; color: var(--off); }
 .success-id { font-size: 11px; color: var(--dim); background: var(--card); padding: 5px 14px; border-radius: 7px; }
-
-/* Toast */
 #toast {
-  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
-  background: var(--card); border: 1px solid var(--danger);
-  color: var(--white); padding: 11px 18px;
-  border-radius: 10px; font-size: 13px;
-  opacity: 0; transition: opacity 0.25s;
-  pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
+position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+background: var(--card); border: 1px solid var(--danger);
+color: var(--white); padding: 11px 18px;
+border-radius: 10px; font-size: 13px;
+opacity: 0; transition: opacity 0.25s;
+pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 }
 #toast.show { opacity: 1; }
 </style>
@@ -291,12 +242,10 @@ html, body {
 <!-- ── ONBOARDING ── -->
 <div id="screen-onboarding" class="screen active">
   <div class="brand">
-    <!-- Wordmark completo ideal -->
     <div class="brand-wordmark">
       <img src="/logo-ideal.png" alt="ideal Bar &amp; Restaurant" style="width:220px;height:auto;filter:invert(1)"/>
     </div>
   </div>
-
   <div class="onboarding-card">
     <h2>Bienvenido/a</h2>
     <p>Registrá tus datos una sola vez para empezar a fichar.</p>
@@ -334,16 +283,13 @@ html, body {
 
 <!-- ── APP ── -->
 <div id="screen-app" class="screen">
-
   <div class="app-header">
     <div class="header-user">
       <div class="nombre" id="header-nombre">—</div>
       <div class="id-tag" id="header-id">ID —</div>
     </div>
   </div>
-
   <div class="app-body">
-
     <div class="clock-display">
       <div class="time" id="clock">--:--</div>
       <div class="date" id="clock-date">—</div>
@@ -379,7 +325,6 @@ html, body {
         <div style="font-size:12px;color:var(--dim);text-align:center;padding:14px">Cargando…</div>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -398,43 +343,32 @@ html, body {
 <div id="toast"></div>
 
 <script>
-// ══════════════════════════════════
-//  CONFIGURACIÓN
-// ══════════════════════════════════
-const API = 'https://magnificent-determination-production-1d42.up.railway.app'; // ← actualizar con URL Railway
+const API = 'https://magnificent-determination-production-1d42.up.railway.app';
 
-// Coordenadas Bar ideal — Tandil
 const BAR_LAT = -37.327500;
 const BAR_LNG = -59.135833;
 const RADIO_METROS = 40;
 
-// ══════════════════════════════════
-//  ESTADO
-// ══════════════════════════════════
 let empleado = null;
 let geoOk = false, geoLat = null, geoLng = null;
 let fichajesHoy = [];
 let proximoTipo = 'entrada';
 
-// ══════════════════════════════════
-//  UTILS
-// ══════════════════════════════════
 function haversine(lat1, lng1, lat2, lng2) {
   const R = 6371000, d2r = Math.PI / 180;
   const dLat = (lat2 - lat1) * d2r, dLng = (lng2 - lng1) * d2r;
   const a = Math.sin(dLat/2)**2 + Math.cos(lat1*d2r)*Math.cos(lat2*d2r)*Math.sin(dLng/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
+
 function fmt(dt) { return new Date(dt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false }); }
+
 function toast(msg, dur = 3500) {
   const el = document.getElementById('toast');
   el.textContent = msg; el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), dur);
 }
 
-// ══════════════════════════════════
-//  RELOJ
-// ══════════════════════════════════
 function tickReloj() {
   const n = new Date();
   document.getElementById('clock').textContent = n.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
@@ -442,9 +376,6 @@ function tickReloj() {
 }
 setInterval(tickReloj, 1000); tickReloj();
 
-// ══════════════════════════════════
-//  GEOLOCALIZACIÓN
-// ══════════════════════════════════
 function iniciarGeo() {
   if (!navigator.geolocation) {
     document.getElementById('geo-text').textContent = 'GPS no disponible';
@@ -454,6 +385,7 @@ function iniciarGeo() {
     enableHighAccuracy: true, maximumAge: 5000, timeout: 15000
   });
 }
+
 function onGeoOk(pos) {
   geoLat = pos.coords.latitude; geoLng = pos.coords.longitude;
   const dist = haversine(geoLat, geoLng, BAR_LAT, BAR_LNG);
@@ -464,14 +396,12 @@ function onGeoOk(pos) {
   else { dot.className = 'geo-dot warning'; txt.textContent = `Fuera del local — ${metros}m`; }
   actualizarBoton();
 }
+
 function onGeoError() {
   document.getElementById('geo-dot').className = 'geo-dot error';
   document.getElementById('geo-text').textContent = 'Error al obtener ubicación'; geoOk = false;
 }
 
-// ══════════════════════════════════
-//  TURNO PROGRAMADO
-// ══════════════════════════════════
 async function cargarTurno() {
   const hoy = new Date().toISOString().split('T')[0];
   try {
@@ -482,17 +412,14 @@ async function cargarTurno() {
       const e1 = data.entrada.substring(0,5), s1 = (data.salida||'?').substring(0,5);
       let txt = `${e1} — ${s1}`, sub = 'Turno simple';
       if (data.entrada2) {
-        txt += `  /  ${data.entrada2.substring(0,5)} — ${(data.salida2||'?').substring(0,5)}`;
+        txt += ` / ${data.entrada2.substring(0,5)} — ${(data.salida2||'?').substring(0,5)}`;
         sub = 'Doble turno';
       }
       th.textContent = txt; ts.textContent = sub;
-    } else { th.textContent = 'Sin turno asignado'; ts.textContent = 'Consultá con administración'; }
+    } else { th.textContent = 'Sin turno asignado'; ts.textContent = 'Podés fichar igual'; }
   } catch { document.getElementById('turno-hora').textContent = 'Sin datos'; }
 }
 
-// ══════════════════════════════════
-//  HISTORIAL
-// ══════════════════════════════════
 async function cargarHistorial() {
   const hoy = new Date().toISOString().split('T')[0];
   try {
@@ -501,6 +428,7 @@ async function cargarHistorial() {
   } catch { fichajesHoy = []; }
   renderHistorial(); actualizarBoton();
 }
+
 function renderHistorial() {
   const lista = document.getElementById('historial-list');
   if (!fichajesHoy.length) { lista.innerHTML = `<div style="font-size:12px;color:var(--dim);text-align:center;padding:14px">Sin fichajes hoy</div>`; return; }
@@ -512,38 +440,51 @@ function renderHistorial() {
       <span class="hist-timelabel">${{ entrada:'Entrada 1', salida:'Salida 1', entrada2:'Entrada 2', salida2:'Salida 2' }[f.tipo]||f.tipo}</span>
     </div>`).join('');
 }
+
 function actualizarBoton() {
-  const btn = document.getElementById('btn-fichar'), icon = document.getElementById('btn-icon'), label = document.getElementById('btn-label');
+  const btn = document.getElementById('btn-fichar');
+  const label = document.getElementById('btn-label');
+
   const tipos = fichajesHoy.map(f => f.tipo);
-  if      (!tipos.includes('entrada'))  proximoTipo = 'entrada';
-  else if (!tipos.includes('salida'))   proximoTipo = 'salida';
+
+  if (!tipos.includes('entrada')) proximoTipo = 'entrada';
+  else if (!tipos.includes('salida')) proximoTipo = 'salida';
   else if (!tipos.includes('entrada2')) proximoTipo = 'entrada2';
-  else if (!tipos.includes('salida2'))  proximoTipo = 'salida2';
-  else { btn.disabled = true; btn.className = ''; icon.textContent = '✓'; label.textContent = 'Jornada completa'; return; }
+  else if (!tipos.includes('salida2')) proximoTipo = 'salida2';
+  else {
+    btn.disabled = true;
+    btn.className = '';
+    label.textContent = 'Jornada completa';
+    return;
+  }
+
   const map = {
-    entrada:  { icon:'○', label:'Marcar entrada',    cls:'entrada' },
-    salida:   { icon:'●', label:'Marcar salida',     cls:'salida' },
-    entrada2: { icon:'○', label:'Entrada 2° turno',  cls:'entrada2' },
-    salida2:  { icon:'●', label:'Salida 2° turno',   cls:'salida2' },
+    entrada:  { label: 'Marcar entrada',    cls: 'entrada' },
+    salida:   { label: 'Marcar salida',     cls: 'salida' },
+    entrada2: { label: 'Entrada 2° turno',  cls: 'entrada2' },
+    salida2:  { label: 'Salida 2° turno',   cls: 'salida2' },
   };
+
   const m = map[proximoTipo];
-  btn.className = m.cls; icon.textContent = m.icon; label.textContent = m.label;
+  btn.className = m.cls;
+  label.textContent = m.label;
   btn.disabled = !geoOk;
 }
 
-// ══════════════════════════════════
-//  FICHAJE
-// ══════════════════════════════════
 async function fichar() {
   if (!geoOk || !empleado) return;
   const btn = document.getElementById('btn-fichar'), ring = document.getElementById('btn-ring');
   btn.disabled = true; ring.classList.add('active');
+
   const pos = await new Promise((res, rej) =>
     navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 })
   ).catch(() => null);
+
   if (!pos) { ring.classList.remove('active'); toast('No se pudo verificar la ubicación. Intentá de nuevo.'); actualizarBoton(); return; }
+
   const dist = haversine(pos.coords.latitude, pos.coords.longitude, BAR_LAT, BAR_LNG);
   if (dist > RADIO_METROS) { ring.classList.remove('active'); toast(`Estás a ${Math.round(dist)}m del local. Necesitás estar a menos de ${RADIO_METROS}m.`); actualizarBoton(); return; }
+
   try {
     const r = await fetch(`${API}/api/fichajes`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -555,6 +496,7 @@ async function fichar() {
     mostrarExito(f); await cargarHistorial();
   } catch { ring.classList.remove('active'); toast('Error al registrar. Verificá tu conexión.'); actualizarBoton(); }
 }
+
 function mostrarExito(f) {
   const labels = { entrada:'Entrada', salida:'Salida', entrada2:'2ª Entrada', salida2:'2ª Salida' };
   document.getElementById('success-tipo').textContent = labels[f.tipo] || f.tipo;
@@ -564,10 +506,7 @@ function mostrarExito(f) {
   ov.classList.add('show'); setTimeout(() => ov.classList.remove('show'), 3200);
 }
 
-// ══════════════════════════════════
-//  REGISTRO
-// ══════════════════════════════════
-let matchingPendiente = null; // datos del empleado esperando match
+let matchingPendiente = null;
 
 async function registrar() {
   const nombre = document.getElementById('input-nombre').value.trim();
@@ -577,7 +516,6 @@ async function registrar() {
   const btn = document.getElementById('btn-registrar');
   btn.disabled = true; btn.textContent = 'Registrando…';
   try {
-    // Primero registrar el empleado
     const r = await fetch(`${API}/api/empleados`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nombre, apellido, celular })
@@ -586,15 +524,12 @@ async function registrar() {
     const emp = await r.json();
     localStorage.setItem('barideal_empleado', JSON.stringify(emp));
 
-    // Buscar match en planilla
     const mr = await fetch(`${API}/api/matching/buscar`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nombre, apellido })
     });
     const { matches } = await mr.json();
-
     if (matches && matches.length > 0) {
-      // Mostrar pantalla de matching
       matchingPendiente = emp;
       const container = document.getElementById('matching-opciones');
       container.innerHTML = matches.map(m => `
@@ -606,7 +541,6 @@ async function registrar() {
       document.getElementById('screen-onboarding').classList.remove('active');
       document.getElementById('screen-matching').classList.add('active');
     } else {
-      // Sin match, ir directo a la app
       iniciarApp(emp);
     }
   } catch(e) {
@@ -633,9 +567,6 @@ function matchNoSoyYo() {
   iniciarApp(matchingPendiente);
 }
 
-// ══════════════════════════════════
-//  ARRANQUE
-// ══════════════════════════════════
 function iniciarApp(emp) {
   empleado = emp;
   document.getElementById('header-nombre').textContent = `${emp.nombre} ${emp.apellido}`;
@@ -645,6 +576,7 @@ function iniciarApp(emp) {
   iniciarGeo(); cargarHistorial(); cargarTurno();
   setInterval(cargarHistorial, 30000);
 }
+
 (function() {
   try {
     const emp = JSON.parse(localStorage.getItem('barideal_empleado'));
