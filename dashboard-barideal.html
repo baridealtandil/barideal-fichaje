@@ -1781,7 +1781,7 @@ function abrirModal(empId, fecha, nombre) {
     container.innerHTML = semanaActual.map((f, i) => {
       if (f === fecha) return '';
       const esHoy = f === hoy;
-      return '<div class="dia-chip' + (esHoy ? ' es-hoy' : '') + '" data-fecha="' + f + '" onclick="this.classList.toggle('checked')">' + diasNombres[i] + '</div>';
+      return '<div class="dia-chip' + (esHoy ? ' es-hoy' : '') + '" data-fecha="' + f + '" onclick="this.classList.toggle(&quot;checked&quot;)">' + diasNombres[i] + '</div>';
     }).join('');
   }
   document.getElementById('modal-turno').classList.add('show');
