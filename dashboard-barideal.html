@@ -1057,32 +1057,51 @@ canvas { max-height: 240px; }
 </div>
 
 <!-- ── MODAL TURNO NUEVO ── -->
-<div id="modal-turno" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center">
-  <div style="background:#181818;border:1px solid rgba(255,255,255,0.12);border-radius:14px;width:320px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6)">
+<div id="modal-turno" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#181818;border:1px solid rgba(255,255,255,0.12);border-radius:14px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6);max-height:90vh;overflow-y:auto">
+
     <!-- Header -->
-    <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:flex-start">
+    <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;background:#181818;z-index:1">
       <div>
         <div id="modal-title" style="font-size:15px;font-weight:600;color:#F0F0F0"></div>
         <div id="modal-info" style="font-size:12px;color:#555;margin-top:3px"></div>
       </div>
-      <button onclick="cerrarModal()" style="background:none;border:none;color:#555;font-size:22px;cursor:pointer;line-height:1;padding:0">×</button>
+      <button onclick="cerrarModal()" style="background:none;border:none;color:#555;font-size:24px;cursor:pointer;line-height:1;padding:0;margin-left:12px">×</button>
     </div>
-    <!-- Botones rápidos -->
-    <div style="display:flex;gap:8px;padding:14px 20px 0">
+
+    <!-- Días de la semana -->
+    <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:10px">Aplicar a los días</div>
+      <div style="display:flex;gap:6px;justify-content:space-between" id="dias-checks">
+        <!-- se llena con JS -->
+      </div>
+    </div>
+
+    <!-- Empleados del mismo sector -->
+    <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:10px">Aplicar a los empleados</div>
+      <div id="emp-checks" style="display:flex;flex-direction:column;gap:6px;max-height:120px;overflow-y:auto">
+        <!-- se llena con JS -->
+      </div>
+    </div>
+
+    <!-- Estado Franco / Ausente -->
+    <div style="display:flex;gap:8px;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06)">
       <button id="mqb-franco" onclick="toggleEstadoModal('franco')"
-        style="flex:1;padding:8px;border-radius:8px;border:1.5px solid rgba(100,180,255,0.3);background:rgba(100,180,255,0.08);color:#64B4FF;font-size:12px;font-weight:700;cursor:pointer">
+        style="flex:1;padding:8px;border-radius:8px;border:1.5px solid rgba(100,180,255,0.3);background:rgba(100,180,255,0.08);color:#64B4FF;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s">
         F &nbsp;Franco
       </button>
       <button id="mqb-ausente" onclick="toggleEstadoModal('ausente')"
-        style="flex:1;padding:8px;border-radius:8px;border:1.5px solid rgba(255,80,80,0.3);background:rgba(255,80,80,0.08);color:#FF5050;font-size:12px;font-weight:700;cursor:pointer">
+        style="flex:1;padding:8px;border-radius:8px;border:1.5px solid rgba(255,80,80,0.3);background:rgba(255,80,80,0.08);color:#FF5050;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s">
         A &nbsp;Ausente
       </button>
       <button onclick="borrarTurno()"
         style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#777;font-size:12px;cursor:pointer">
-        ✕
+        ✕ Borrar
       </button>
     </div>
-    <!-- Inputs -->
+
+    <!-- Horarios -->
     <div style="padding:14px 20px">
       <div style="margin-bottom:12px">
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:6px">Turno principal</div>
@@ -1101,11 +1120,13 @@ canvas { max-height: 240px; }
         </div>
       </div>
     </div>
+
     <!-- Footer -->
-    <div style="padding:12px 20px 16px;display:flex;gap:8px">
+    <div style="padding:12px 20px 16px;display:flex;gap:8px;position:sticky;bottom:0;background:#181818;border-top:1px solid rgba(255,255,255,0.06)">
       <button onclick="cerrarModal()" style="padding:10px 16px;background:transparent;color:#777;border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:13px;cursor:pointer">Cancelar</button>
       <button id="btn-guardar-turno" onclick="guardarTurno()" style="flex:1;padding:10px;background:#F0F0F0;color:#000;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Guardar turno</button>
     </div>
+
   </div>
 </div>
 
@@ -1791,7 +1812,32 @@ function abrirModal(empId, fecha, nombre, rol) {
   document.getElementById('m-entrada2').value = h.entrada2 ? h.entrada2.substring(0,5) : '';
   document.getElementById('m-salida2').value  = h.salida2  ? h.salida2.substring(0,5)  : '';
 
-  // Estado botones rápidos
+  // Checkboxes de días — marcar solo el día actual
+  const diasNombres = ['L','M','M','J','V','S','D'];
+  const diasContainer = document.getElementById('dias-checks');
+  diasContainer.innerHTML = semanaActual.map((f, i) => {
+    const checked = f === fecha;
+    const d2 = new Date(f + 'T12:00');
+    return `<label style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+      <input type="checkbox" id="dia-${i}" value="${f}" ${checked ? 'checked' : ''}
+        style="width:16px;height:16px;accent-color:#F0F0F0;cursor:pointer">
+      <span style="font-size:10px;font-weight:700;color:#777">${diasNombres[i]}</span>
+      <span style="font-size:9px;color:#444">${d2.getDate()}/${d2.getMonth()+1}</span>
+    </label>`;
+  }).join('');
+
+  // Checkboxes de empleados del mismo sector
+  const empContainer = document.getElementById('emp-checks');
+  const mismoSector = planillaEmpleados.filter(pe => pe.rol === rol);
+  empContainer.innerHTML = mismoSector.map(pe => {
+    const checked = pe.id === empId;
+    return `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 0">
+      <input type="checkbox" id="emp-${pe.id}" value="${pe.id}" ${checked ? 'checked' : ''}
+        style="width:15px;height:15px;accent-color:#F0F0F0;cursor:pointer">
+      <span style="font-size:13px;color:#DDD">${pe.apellido} ${pe.nombre}</span>
+    </label>`;
+  }).join('');
+
   actualizarBotonesModal();
   document.getElementById('modal-turno').style.display = 'flex';
 }
