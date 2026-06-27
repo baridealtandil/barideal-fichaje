@@ -1057,46 +1057,54 @@ canvas { max-height: 240px; }
 </div>
 
 <!-- ── MODAL TURNO NUEVO ── -->
-<div class="modal-bg" id="modal-turno">
-  <div class="modal-turno-new">
-    <div class="modal-turno-header">
+<div id="modal-turno" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:#181818;border:1px solid rgba(255,255,255,0.12);border-radius:14px;width:320px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6)">
+    <!-- Header -->
+    <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:flex-start">
       <div>
-        <div class="modal-turno-title" id="modal-title">Turno</div>
-        <div class="modal-turno-sub" id="modal-info"></div>
+        <div id="modal-title" style="font-size:15px;font-weight:600;color:#F0F0F0"></div>
+        <div id="modal-info" style="font-size:12px;color:#555;margin-top:3px"></div>
       </div>
-      <button class="modal-close-btn" onclick="cerrarModal()">×</button>
+      <button onclick="cerrarModal()" style="background:none;border:none;color:#555;font-size:22px;cursor:pointer;line-height:1;padding:0">×</button>
     </div>
-
     <!-- Botones rápidos -->
-    <div class="modal-quick-btns">
-      <button class="mqb mqb-franco" id="mqb-franco" onclick="toggleEstadoModal('franco')">F Franco</button>
-      <button class="mqb mqb-ausente" id="mqb-ausente" onclick="toggleEstadoModal('ausente')">A Ausente</button>
-      <button class="mqb mqb-borrar" onclick="borrarTurno()">✕ Borrar</button>
+    <div style="display:flex;gap:8px;padding:14px 20px 0">
+      <button id="mqb-franco" onclick="toggleEstadoModal('franco')"
+        style="flex:1;padding:8px;border-radius:8px;border:1.5px solid rgba(100,180,255,0.3);background:rgba(100,180,255,0.08);color:#64B4FF;font-size:12px;font-weight:700;cursor:pointer">
+        F &nbsp;Franco
+      </button>
+      <button id="mqb-ausente" onclick="toggleEstadoModal('ausente')"
+        style="flex:1;padding:8px;border-radius:8px;border:1.5px solid rgba(255,80,80,0.3);background:rgba(255,80,80,0.08);color:#FF5050;font-size:12px;font-weight:700;cursor:pointer">
+        A &nbsp;Ausente
+      </button>
+      <button onclick="borrarTurno()"
+        style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#777;font-size:12px;cursor:pointer">
+        ✕
+      </button>
     </div>
-
-    <!-- Horarios -->
-    <div class="modal-time-section">
-      <div class="modal-time-group">
-        <div class="modal-time-label">Turno principal</div>
-        <div class="modal-time-row">
-          <input type="time" class="time-input" id="m-entrada" placeholder="09:00">
-          <span class="modal-time-sep">→</span>
-          <input type="time" class="time-input" id="m-salida" placeholder="17:00">
+    <!-- Inputs -->
+    <div style="padding:14px 20px">
+      <div style="margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:6px">Turno principal</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="time" id="m-entrada" style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:14px;text-align:center;outline:none">
+          <span style="color:#555">→</span>
+          <input type="time" id="m-salida" style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:14px;text-align:center;outline:none">
         </div>
       </div>
-      <div class="modal-time-group">
-        <div class="modal-time-label">2º turno <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></div>
-        <div class="modal-time-row">
-          <input type="time" class="time-input" id="m-entrada2" placeholder="—">
-          <span class="modal-time-sep">→</span>
-          <input type="time" class="time-input" id="m-salida2" placeholder="—">
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:6px">2º turno <span style="font-weight:400;text-transform:none">(opcional)</span></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="time" id="m-entrada2" style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:14px;text-align:center;outline:none">
+          <span style="color:#555">→</span>
+          <input type="time" id="m-salida2" style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:14px;text-align:center;outline:none">
         </div>
       </div>
     </div>
-
-    <div class="modal-footer">
-      <button class="btn-cancelar-turno" onclick="cerrarModal()">Cancelar</button>
-      <button class="btn-guardar-turno" onclick="guardarTurno()">Guardar turno</button>
+    <!-- Footer -->
+    <div style="padding:12px 20px 16px;display:flex;gap:8px">
+      <button onclick="cerrarModal()" style="padding:10px 16px;background:transparent;color:#777;border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:13px;cursor:pointer">Cancelar</button>
+      <button id="btn-guardar-turno" onclick="guardarTurno()" style="flex:1;padding:10px;background:#F0F0F0;color:#000;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Guardar turno</button>
     </div>
   </div>
 </div>
@@ -1615,7 +1623,7 @@ function cargarAnalisis() {
 //  HORARIOS SEMANAL
 // ══════════════════════════════════
 // ══════════════════════════════════
-//  MÓDULO HORARIOS — REESCRITO
+//  MÓDULO HORARIOS — v3 LIMPIO
 // ══════════════════════════════════
 
 let semanaOffset = 0;
@@ -1782,33 +1790,31 @@ function abrirModal(empId, fecha, nombre, rol) {
   document.getElementById('m-salida2').value  = h.salida2  ? h.salida2.substring(0,5)  : '';
 
   // Estado botones rápidos
-  document.getElementById('mqb-franco').classList.toggle('active', modalEstado === 'franco');
-  document.getElementById('mqb-ausente').classList.toggle('active', modalEstado === 'ausente');
-
-  const disabled = modalEstado !== 'normal';
-  ['m-entrada','m-salida','m-entrada2','m-salida2'].forEach(id => {
-    const el = document.getElementById(id);
-    el.disabled = disabled;
-    el.style.opacity = disabled ? '0.4' : '1';
-  });
-
-  document.getElementById('modal-turno').classList.add('show');
+  actualizarBotonesModal();
+  document.getElementById('modal-turno').style.display = 'flex';
 }
 
 function cerrarModal() {
-  document.getElementById('modal-turno').classList.remove('show');
+  document.getElementById('modal-turno').style.display = 'none';
+}
+
+function actualizarBotonesModal() {
+  const btnF = document.getElementById('mqb-franco');
+  const btnA = document.getElementById('mqb-ausente');
+  btnF.style.background = modalEstado === 'franco'  ? 'rgba(100,180,255,0.25)' : 'rgba(100,180,255,0.08)';
+  btnA.style.background = modalEstado === 'ausente' ? 'rgba(255,80,80,0.25)'  : 'rgba(255,80,80,0.08)';
+  const disabled = modalEstado !== 'normal';
+  ['m-entrada','m-salida','m-entrada2','m-salida2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.disabled = disabled;
+    el.style.opacity = disabled ? '0.35' : '1';
+  });
 }
 
 function toggleEstadoModal(estado) {
   modalEstado = modalEstado === estado ? 'normal' : estado;
-  document.getElementById('mqb-franco').classList.toggle('active', modalEstado === 'franco');
-  document.getElementById('mqb-ausente').classList.toggle('active', modalEstado === 'ausente');
-  const disabled = modalEstado !== 'normal';
-  ['m-entrada','m-salida','m-entrada2','m-salida2'].forEach(id => {
-    const el = document.getElementById(id);
-    el.disabled = disabled;
-    el.style.opacity = disabled ? '0.4' : '1';
-  });
+  actualizarBotonesModal();
 }
 
 async function guardarTurno() {
