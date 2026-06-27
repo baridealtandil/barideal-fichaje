@@ -1327,14 +1327,22 @@ function renderEmpleados() {
     if (hoyEmp['entrada2'] && hoyEmp['salida2']) minHoy += minutosEntre(hoyEmp['entrada2'].fecha_hora, hoyEmp['salida2'].fecha_hora);
     if (dentro && hayEntrada) minHoy += minutosEntre(hayEntrada.fecha_hora, new Date().toISOString());
 
+    // Verificar si está en planilla
+    const enPlanilla = planillaEmpleados.some(pe => pe.empleado_id === e.id);
+
     return `
-      <div class="emp-card">
+      <div class="emp-card" data-emp-id="${e.id}">
         <div class="emp-card-header">
           <div class="emp-avatar">${avatarLetras(e.nombre, e.apellido)}</div>
-          <div>
+          <div style="flex:1;min-width:0">
             <div class="emp-card-name">${e.nombre} ${e.apellido}</div>
             <div class="emp-card-cel">${e.celular}</div>
           </div>
+          ${!enPlanilla ? `<button onclick="agregarAPlanilla(${e.id}, '${e.nombre}', '${e.apellido}')"
+            title="Agregar a la planilla"
+            style="width:28px;height:28px;border-radius:50%;background:rgba(255,107,0,0.2);
+            border:1px solid rgba(255,107,0,0.4);color:#FF9944;font-size:18px;cursor:pointer;
+            display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1">+</button>` : ''}
         </div>
         <div class="emp-stats">
           <div class="emp-stat">
