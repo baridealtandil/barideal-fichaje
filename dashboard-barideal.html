@@ -1526,6 +1526,8 @@ function cargarAnalisis() {
 // ══════════════════════════════════
 //  HORARIOS SEMANAL
 // ══════════════════════════════════
+let semanaOffset = 0;
+
 function getLunesDe(fecha) {
   const d = fecha ? new Date(fecha + 'T12:00') : new Date();
   const dia = d.getDay();
@@ -1534,14 +1536,30 @@ function getLunesDe(fecha) {
   return d;
 }
 
+function navegarSemana(dir) {
+  semanaOffset += dir;
+  cargarHorarios();
+}
+
+function irAHoy() {
+  semanaOffset = 0;
+  cargarHorarios();
+}
+
 async function cargarHorarios() {
   // Si la planilla no está cargada, cargarla primero
   if (!planillaEmpleados.length) {
     await cargarPlanillaEmpleados();
   }
 
-  const semanaInput = document.getElementById('semana-inicio').value;
-  const lunes = getLunesDe(semanaInput);
+  // Calcular lunes según offset
+  const hoy = new Date();
+  const diaHoy = hoy.getDay();
+  const diffHoy = diaHoy === 0 ? -6 : 1 - diaHoy;
+  const lunesBase = new Date(hoy);
+  lunesBase.setDate(hoy.getDate() + diffHoy + semanaOffset * 7);
+  lunesBase.setHours(0,0,0,0);
+  const lunes = lunesBase;
   semanaActual = [];
   for (let i = 0; i < 7; i++) {
     const d = new Date(lunes);
