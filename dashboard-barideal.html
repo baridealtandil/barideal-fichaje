@@ -292,6 +292,94 @@ canvas { max-height: 240px; }
   display: flex; flex-direction: column; gap: 4px; }
 .bolsa-breakdown span { color: var(--text); font-weight: 600; }
 
+/* ── BUSCADOR DE EMPLEADOS ── */
+.emp-search-wrap {
+  position: relative; margin-bottom: 16px;
+}
+.emp-search-input {
+  width: 100%; background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 44px 10px 16px;
+  color: var(--text); font-family: inherit; font-size: 14px; outline: none;
+  transition: border-color 0.15s;
+}
+.emp-search-input:focus { border-color: rgba(255,255,255,0.3); }
+.emp-search-input::placeholder { color: var(--text3); }
+.emp-search-icon {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--text3); font-size: 16px; pointer-events: none;
+}
+.emp-search-results {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 50;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+  overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  display: none;
+}
+.emp-search-results.visible { display: block; }
+.emp-search-item {
+  padding: 10px 16px; cursor: pointer; display: flex; align-items: center;
+  gap: 10px; transition: background 0.1s;
+}
+.emp-search-item:hover { background: rgba(255,255,255,0.06); }
+.emp-search-item-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); display: flex; align-items: center;
+  justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+.emp-search-item-name { font-size: 13px; color: var(--text); font-weight: 500; }
+.emp-search-item-rol { font-size: 11px; color: var(--text3); }
+.emp-search-add {
+  padding: 10px 16px; cursor: pointer; display: flex; align-items: center;
+  gap: 10px; color: var(--gold); font-size: 13px; font-weight: 600;
+  border-top: 1px solid var(--border); transition: background 0.1s;
+}
+.emp-search-add:hover { background: rgba(255,200,0,0.06); }
+
+/* Modal agregar empleado */
+.modal-emp-new {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 0; width: 360px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.modal-emp-header {
+  padding: 18px 20px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-emp-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.modal-emp-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+.modal-emp-field label {
+  display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text3); margin-bottom: 6px;
+}
+.modal-emp-input {
+  width: 100%; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 9px 12px; color: var(--text);
+  font-family: inherit; font-size: 14px; outline: none; transition: border-color 0.15s;
+}
+.modal-emp-input:focus { border-color: rgba(255,255,255,0.3); }
+.rol-suggestions {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+}
+.rol-chip {
+  padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border);
+  font-size: 11px; color: var(--text2); cursor: pointer; transition: all 0.1s;
+  background: transparent;
+}
+.rol-chip:hover,.rol-chip.active { background: rgba(255,255,255,0.1); color: var(--text); border-color: rgba(255,255,255,0.3); }
+.modal-emp-footer {
+  padding: 12px 20px 18px; display: flex; gap: 8px;
+}
+.btn-guardar-emp {
+  flex: 1; padding: 10px; background: var(--gold); color: #000;
+  border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.btn-guardar-emp:hover { opacity: 0.85; }
+.btn-cancelar-emp {
+  padding: 10px 16px; background: transparent; color: var(--text3);
+  border: 1px solid var(--border); border-radius: 8px; font-size: 13px;
+  cursor: pointer;
+}
+
 /* ── HORARIOS ── */
 .horarios-table { border-collapse: collapse; width: 100%; min-width: 700px; }
 .horarios-table th {
@@ -645,10 +733,29 @@ canvas { max-height: 240px; }
 
     <!-- ── EMPLEADOS ── -->
     <section class="section" id="s-empleados">
+      <!-- Buscador global -->
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header">
+          <div class="panel-title">🔍 Buscar empleado</div>
+          <span style="font-size:12px;color:var(--text3)" id="emp-total-count"></span>
+        </div>
+        <div class="panel-body">
+          <div class="emp-search-wrap" id="emp-search-wrap">
+            <input class="emp-search-input" id="emp-search-input" type="text"
+              placeholder="Escribí nombre o apellido…"
+              oninput="buscarEmpleado(this.value)"
+              autocomplete="off"/>
+            <span class="emp-search-icon">🔍</span>
+            <div class="emp-search-results" id="emp-search-results"></div>
+          </div>
+        </div>
+      </div>
+
       <div class="section-title">Estado actual</div>
       <div class="emp-grid" id="emp-grid">
         <div class="empty-state">Cargando empleados…</div>
       </div>
+
       <!-- Vinculación planilla -->
       <div class="panel" style="margin-top:20px">
         <div class="panel-header">
@@ -826,6 +933,41 @@ canvas { max-height: 240px; }
 
   </div><!-- /content -->
 </main>
+
+<!-- ── MODAL NUEVO EMPLEADO ── -->
+<div class="modal-bg" id="modal-emp-nuevo">
+  <div class="modal-emp-new">
+    <div class="modal-emp-header">
+      <div class="modal-emp-title" id="modal-emp-title">Agregar empleado</div>
+      <button class="modal-close-btn" onclick="cerrarModalEmp()">×</button>
+    </div>
+    <div class="modal-emp-body">
+      <div class="modal-emp-field">
+        <label>Nombre</label>
+        <input class="modal-emp-input" id="new-emp-nombre" type="text" placeholder="Ej: Juan"/>
+      </div>
+      <div class="modal-emp-field">
+        <label>Apellido</label>
+        <input class="modal-emp-input" id="new-emp-apellido" type="text" placeholder="Ej: González"/>
+      </div>
+      <div class="modal-emp-field">
+        <label>Rol / Sector</label>
+        <input class="modal-emp-input" id="new-emp-rol" type="text" placeholder="Ej: Cocina, Salón…"/>
+        <div class="rol-suggestions" id="rol-suggestions"></div>
+      </div>
+      <div class="modal-emp-field" id="vincular-field" style="display:none">
+        <label>Vincular con empleado de la app (opcional)</label>
+        <select class="modal-emp-input" id="new-emp-vincular">
+          <option value="">Sin vincular por ahora</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-emp-footer">
+      <button class="btn-cancelar-emp" onclick="cerrarModalEmp()">Cancelar</button>
+      <button class="btn-guardar-emp" onclick="guardarNuevoEmp()">Agregar</button>
+    </div>
+  </div>
+</div>
 
 <!-- ── MODAL TURNO NUEVO ── -->
 <div class="modal-bg" id="modal-turno">
@@ -1170,6 +1312,9 @@ function renderEmpleados() {
     return;
   }
 
+  // Update total count
+  const countEl = document.getElementById('emp-total-count');
+  if (countEl) countEl.textContent = `${todosLosEmpleados.length} empleados registrados`;
   grid.innerHTML = todosLosEmpleados.map(e => {
     const hoyEmp = empHoy[e.id] || {};
     const hayEntrada = hoyEmp['entrada'] || hoyEmp['entrada2'];
@@ -1638,6 +1783,241 @@ function encontrarEnPlanilla(nombre, apellido) {
 }
 
 // ── Cargar planilla de empleados ──
+// ══════════════════════════════════
+//  BUSCADOR DE EMPLEADOS
+// ══════════════════════════════════
+
+// Roles existentes en la planilla
+function getRolesDisponibles() {
+  const roles = new Set();
+  planillaEmpleados.forEach(pe => { if (pe.rol) roles.add(pe.rol); });
+  todosLosEmpleados.forEach(e => { if (e.rol) roles.add(e.rol); });
+  return [...roles].sort();
+}
+
+function normalizar(s) {
+  return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();
+}
+
+function buscarEmpleado(q) {
+  const results = document.getElementById('emp-search-results');
+  if (!q || q.length < 2) { results.classList.remove('visible'); return; }
+
+  const nq = normalizar(q);
+
+  // Buscar en empleados de la app
+  const matchesApp = todosLosEmpleados.filter(e =>
+    normalizar(`${e.nombre} ${e.apellido}`).includes(nq) ||
+    normalizar(e.apellido).includes(nq)
+  ).slice(0, 5);
+
+  // Buscar en planilla
+  const matchesPlan = planillaEmpleados.filter(pe =>
+    normalizar(`${pe.nombre} ${pe.apellido}`).includes(nq) ||
+    normalizar(pe.apellido).includes(nq)
+  ).slice(0, 5);
+
+  // Combinar sin duplicados
+  const shown = new Set();
+  let html = '';
+
+  matchesApp.forEach(e => {
+    shown.add(e.id);
+    const initials = `${e.nombre?.[0]||''}${e.apellido?.[0]||''}`;
+    html += `<div class="emp-search-item" onclick="seleccionarEmpBusqueda(${e.id}, '${e.nombre} ${e.apellido}')">
+      <div class="emp-search-item-avatar">${initials}</div>
+      <div>
+        <div class="emp-search-item-name">${e.nombre} ${e.apellido}</div>
+        <div class="emp-search-item-rol">App · ${e.celular || '—'}</div>
+      </div>
+    </div>`;
+  });
+
+  matchesPlan.forEach(pe => {
+    const initials = `${pe.nombre?.[0]||''}${pe.apellido?.[0]||''}`;
+    html += `<div class="emp-search-item" onclick="seleccionarPlanillaBusqueda(${pe.id}, '${pe.apellido} ${pe.nombre}')">
+      <div class="emp-search-item-avatar" style="background:rgba(255,200,0,0.1);color:#FFD700">${initials}</div>
+      <div>
+        <div class="emp-search-item-name">${pe.apellido} ${pe.nombre}</div>
+        <div class="emp-search-item-rol">Planilla · ${pe.rol || '—'}</div>
+      </div>
+    </div>`;
+  });
+
+  // Opción agregar si no hay match exacto
+  html += `<div class="emp-search-add" onclick="abrirModalNuevoEmp('${q}')">
+    ➕ Agregar "<strong>${q}</strong>" como nuevo empleado
+  </div>`;
+
+  results.innerHTML = html;
+  results.classList.add('visible');
+}
+
+function seleccionarEmpBusqueda(id, nombre) {
+  document.getElementById('emp-search-input').value = nombre;
+  document.getElementById('emp-search-results').classList.remove('visible');
+  // Scroll al empleado en la grilla
+  const card = document.querySelector(`[data-emp-id="${id}"]`);
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function seleccionarPlanillaBusqueda(id, nombre) {
+  document.getElementById('emp-search-input').value = nombre;
+  document.getElementById('emp-search-results').classList.remove('visible');
+}
+
+// Cerrar dropdown al hacer clic afuera
+document.addEventListener('click', e => {
+  if (!e.target.closest('#emp-search-wrap') && !e.target.closest('#hor-search-wrap')) {
+    document.querySelectorAll('.emp-search-results').forEach(r => r.classList.remove('visible'));
+  }
+});
+
+// Buscador en horarios
+function buscarEnHorarios(q) {
+  const results = document.getElementById('hor-search-results');
+  if (!q || q.length < 2) { results.classList.remove('visible'); return; }
+  const nq = normalizar(q);
+
+  const matches = planillaEmpleados.filter(pe =>
+    normalizar(`${pe.nombre} ${pe.apellido}`).includes(nq) ||
+    normalizar(pe.apellido).includes(nq)
+  ).slice(0, 6);
+
+  let html = matches.map(pe => {
+    const initials = `${pe.nombre?.[0]||''}${pe.apellido?.[0]||''}`;
+    return `<div class="emp-search-item" onclick="scrollAEmpleadoHorario(${pe.id}, '${pe.apellido} ${pe.nombre}')">
+      <div class="emp-search-item-avatar">${initials}</div>
+      <div>
+        <div class="emp-search-item-name">${pe.apellido} ${pe.nombre}</div>
+        <div class="emp-search-item-rol">${pe.rol || '—'}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  html += `<div class="emp-search-add" onclick="abrirModalNuevoEmpPlanilla('${q}')">
+    ➕ Agregar "<strong>${q}</strong>" a la planilla
+  </div>`;
+
+  results.innerHTML = html;
+  results.classList.add('visible');
+}
+
+function scrollAEmpleadoHorario(id, nombre) {
+  document.getElementById('hor-search-input').value = nombre;
+  document.getElementById('hor-search-results').classList.remove('visible');
+  // Filtrar tabla de horarios
+  filtrarTablaHorarios(nombre);
+}
+
+function filtrarTablaHorarios(q) {
+  const nq = normalizar(q);
+  const rows = document.querySelectorAll('#tabla-horarios tr:not(.sector-row)');
+  rows.forEach(row => {
+    const nombre = normalizar(row.querySelector('.td-nombre')?.textContent || '');
+    row.style.display = (!q || nombre.includes(nq)) ? '' : 'none';
+  });
+}
+
+// ══════════════════════════════════
+//  MODAL NUEVO EMPLEADO
+// ══════════════════════════════════
+let nuevoEmpContext = 'planilla'; // 'planilla' o 'horarios'
+
+function abrirModalNuevoEmp(nombrePrefill) {
+  nuevoEmpContext = 'planilla';
+  _abrirModalNuevo(nombrePrefill);
+}
+
+function abrirModalNuevoEmpPlanilla(nombrePrefill) {
+  nuevoEmpContext = 'horarios';
+  _abrirModalNuevo(nombrePrefill);
+}
+
+function _abrirModalNuevo(nombrePrefill) {
+  // Prepoblar nombre si viene del buscador
+  const partes = (nombrePrefill || '').trim().split(' ');
+  document.getElementById('new-emp-nombre').value = partes[0] || '';
+  document.getElementById('new-emp-apellido').value = partes.slice(1).join(' ') || '';
+  document.getElementById('new-emp-rol').value = '';
+
+  // Chips de roles disponibles
+  const roles = getRolesDisponibles();
+  document.getElementById('rol-suggestions').innerHTML = roles.map(r =>
+    `<button class="rol-chip" onclick="seleccionarRol('${r}')">${r}</button>`
+  ).join('');
+
+  // Selector de empleados de la app para vincular
+  const sel = document.getElementById('new-emp-vincular');
+  sel.innerHTML = '<option value="">Sin vincular por ahora</option>' +
+    todosLosEmpleados.map(e => `<option value="${e.id}">${e.nombre} ${e.apellido} · ${e.celular}</option>`).join('');
+  document.getElementById('vincular-field').style.display = todosLosEmpleados.length ? 'block' : 'none';
+
+  document.getElementById('emp-search-results').classList.remove('visible');
+  document.getElementById('hor-search-results')?.classList.remove('visible');
+  document.getElementById('modal-emp-nuevo').classList.add('show');
+}
+
+function seleccionarRol(rol) {
+  document.getElementById('new-emp-rol').value = rol;
+  document.querySelectorAll('.rol-chip').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function cerrarModalEmp() {
+  document.getElementById('modal-emp-nuevo').classList.remove('show');
+}
+
+async function guardarNuevoEmp() {
+  const nombre   = document.getElementById('new-emp-nombre').value.trim();
+  const apellido = document.getElementById('new-emp-apellido').value.trim();
+  const rol      = document.getElementById('new-emp-rol').value.trim();
+  const vincularId = document.getElementById('new-emp-vincular').value;
+
+  if (!nombre || !apellido) { alert('Nombre y apellido son obligatorios.'); return; }
+
+  try {
+    // Agregar a planilla_empleados
+    const r = await fetch(`${API}/api/planilla/empleados/batch`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ empleados: [{ nombre, apellido, rol }] })
+    });
+    const d = await r.json();
+
+    // Si hay vinculación, buscar el ID recién creado y vincular
+    if (vincularId) {
+      await cargarPlanillaEmpleados(); // refresh para obtener IDs
+      const pe = planillaEmpleados.find(p =>
+        normalizar(p.nombre) === normalizar(nombre) &&
+        normalizar(p.apellido) === normalizar(apellido)
+      );
+      if (pe) {
+        await fetch(`${API}/api/planilla/empleados/vincular`, {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ planilla_emp_id: pe.id, empleado_id: parseInt(vincularId) })
+        });
+      }
+    }
+
+    cerrarModalEmp();
+    await cargarPlanillaEmpleados();
+    renderTablaHorarios();
+
+    // Limpiar buscadores
+    document.getElementById('emp-search-input').value = '';
+    if (document.getElementById('hor-search-input'))
+      document.getElementById('hor-search-input').value = '';
+
+    alert(`✅ ${apellido} ${nombre} agregado correctamente.`);
+  } catch(e) {
+    alert('Error al agregar: ' + e.message);
+  }
+}
+
+// ══════════════════════════════════
+//  UPDATE emp-grid to add data-emp-id
+// ══════════════════════════════════
+
 async function cargarPlanillaEmpleados() {
   try {
     const res = await fetch(`${API}/api/planilla/empleados`);
