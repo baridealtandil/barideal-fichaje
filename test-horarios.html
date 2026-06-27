@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Horarios</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0A0A0A; color: #F0F0F0; font-family: -apple-system, sans-serif; padding: 20px; }
+
+/* GRILLA */
+.grilla-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 700px; }
+th {
+  padding: 10px 8px; font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: #555; border-bottom: 2px solid rgba(255,255,255,0.1);
+  text-align: center; background: #0A0A0A; position: sticky; top: 0;
+}
+th.th-nombre { text-align: left; min-width: 160px; padding-left: 12px; }
+td { border-bottom: 1px solid rgba(255,255,255,0.04); }
+.td-nombre { padding: 6px 8px 6px 12px; font-size: 13px; white-space: nowrap; }
+.td-rol { padding: 6px 8px; font-size: 11px; color: #555; white-space: nowrap; }
+
+/* CELDA */
+.celda {
+  padding: 4px 3px; text-align: center; cursor: pointer; min-width: 90px;
+}
+.celda-inner {
+  border: 1.5px dashed rgba(255,255,255,0.1); border-radius: 7px;
+  padding: 6px 4px; min-height: 46px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; transition: background 0.1s;
+}
+.celda:hover .celda-inner { background: rgba(255,255,255,0.05); }
+.celda-inner.turno { border: 1.5px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+.celda-inner.franco { border: 1.5px solid rgba(100,180,255,0.4); background: rgba(100,180,255,0.08); }
+.celda-inner.ausente { border: 1.5px solid rgba(255,80,80,0.4); background: rgba(255,80,80,0.08); }
+.celda-inner.hoy { border-color: rgba(255,200,0,0.4); }
+.hora { font-size: 11px; color: #DDD; font-weight: 500; line-height: 1.4; }
+.hora2 { font-size: 10px; color: #555; line-height: 1.4; }
+.badge-f { font-size: 11px; font-weight: 700; color: #64B4FF; }
+.badge-a { font-size: 11px; font-weight: 700; color: #FF5050; }
+.plus { font-size: 18px; color: rgba(255,255,255,0.15); }
+
+/* NAVEGACIÓN */
+.nav { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.nav-btn {
+  background: #181818; border: 1px solid rgba(255,255,255,0.12); color: #F0F0F0;
+  border-radius: 8px; padding: 7px 14px; cursor: pointer; font-size: 14px;
+}
+.nav-btn:hover { background: #222; }
+.semana-label { font-size: 14px; color: #909090; min-width: 180px; text-align: center; }
+
+/* MODAL */
+#modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75); z-index: 100;
+  align-items: center; justify-content: center;
+}
+#modal-overlay.visible { display: flex; }
+#modal-box {
+  background: #181818; border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px; width: 320px; overflow: hidden;
+}
+.modal-head {
+  padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.modal-nombre { font-size: 15px; font-weight: 600; }
+.modal-fecha { font-size: 12px; color: #555; margin-top: 3px; }
+.modal-close { background: none; border: none; color: #555; font-size: 24px; cursor: pointer; line-height: 1; }
+.modal-btns { display: flex; gap: 8px; padding: 14px 20px 0; }
+.mbtn {
+  flex: 1; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: background 0.15s; border: 1.5px solid;
+}
+.mbtn-f { color: #64B4FF; border-color: rgba(100,180,255,0.3); background: rgba(100,180,255,0.08); }
+.mbtn-f.on { background: rgba(100,180,255,0.25); }
+.mbtn-a { color: #FF5050; border-color: rgba(255,80,80,0.3); background: rgba(255,80,80,0.08); }
+.mbtn-a.on { background: rgba(255,80,80,0.25); }
+.mbtn-x { color: #777; border-color: rgba(255,255,255,0.1); background: transparent; flex: 0; padding: 8px 12px; }
+.modal-inputs { padding: 14px 20px; }
+.input-group { margin-bottom: 12px; }
+.input-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #555; margin-bottom: 6px; }
+.input-row { display: flex; align-items: center; gap: 8px; }
+.input-row input[type=time] {
+  flex: 1; background: #0A0A0A; border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px; padding: 8px 10px; color: #F0F0F0; font-size: 14px;
+  text-align: center; outline: none; transition: border-color 0.15s;
+}
+.input-row input[type=time]:focus { border-color: rgba(255,255,255,0.3); }
+.input-sep { color: #555; }
+.modal-footer { padding: 12px 20px 16px; display: flex; gap: 8px; }
+.btn-cancelar {
+  padding: 10px 16px; background: transparent; color: #777;
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; font-size: 13px; cursor: pointer;
+}
+.btn-guardar {
+  flex: 1; padding: 10px; background: #F0F0F0; color: #000;
+  border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;
+}
+.btn-guardar:disabled { opacity: 0.5; }
+
+.sector-row td {
+  padding: 6px 12px; font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: #555; background: rgba(255,255,255,0.02);
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.leyenda { display: flex; gap: 16px; font-size: 11px; color: #555; margin-bottom: 12px; }
+.leyenda span { display: flex; align-items: center; gap: 4px; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <button class="nav-btn" onclick="navegar(-1)">◀</button>
+  <span class="semana-label" id="label-semana">—</span>
+  <button class="nav-btn" onclick="navegar(1)">▶</button>
+  <button class="nav-btn" onclick="irHoy()">Hoy</button>
+</div>
+
+<div class="leyenda">
+  <span><span style="color:#64B4FF">■</span> Franco</span>
+  <span><span style="color:#FF5050">■</span> Ausente</span>
+  <span><span style="color:#DDD">■</span> Turno</span>
+  <span style="color:#909090">Clic en celda para editar</span>
+</div>
+
+<div class="grilla-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th class="th-nombre">Empleado</th>
+        <th>Rol</th>
+        <th id="h0">Lun</th>
+        <th id="h1">Mar</th>
+        <th id="h2">Mié</th>
+        <th id="h3">Jue</th>
+        <th id="h4">Vie</th>
+        <th id="h5">Sáb</th>
+        <th id="h6">Dom</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div id="modal-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-nombre" id="m-nombre"></div>
+        <div class="modal-fecha" id="m-fecha"></div>
+      </div>
+      <button class="modal-close" onclick="cerrar()">×</button>
+    </div>
+    <div class="modal-btns">
+      <button class="mbtn mbtn-f" id="mbtn-f" onclick="toggleEstado('franco')">F &nbsp;Franco</button>
+      <button class="mbtn mbtn-a" id="mbtn-a" onclick="toggleEstado('ausente')">A &nbsp;Ausente</button>
+      <button class="mbtn mbtn-x" onclick="borrar()">✕</button>
+    </div>
+    <div class="modal-inputs">
+      <div class="input-group">
+        <div class="input-label">Turno principal</div>
+        <div class="input-row">
+          <input type="time" id="m-e1">
+          <span class="input-sep">→</span>
+          <input type="time" id="m-s1">
+        </div>
+      </div>
+      <div class="input-group">
+        <div class="input-label">2º turno <span style="font-weight:400;text-transform:none">(opcional)</span></div>
+        <div class="input-row">
+          <input type="time" id="m-e2">
+          <span class="input-sep">→</span>
+          <input type="time" id="m-s2">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="cerrar()">Cancelar</button>
+      <button class="btn-guardar" id="btn-guardar" onclick="guardar()">Guardar turno</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://magnificent-determination-production-1d42.up.railway.app';
+
+// ── ESTADO ──
+let offset = 0;
+let semana = []; // array de 7 fechas YYYY-MM-DD
+let horarios = {}; // { planilla_emp_id: { 'YYYY-MM-DD': { entrada1, salida1, entrada2, salida2, estado } } }
+let empleados = []; // planilla_empleados
+let mEmpId = null;
+let mFecha = null;
+let mEstado = 'normal';
+
+// ── SEMANA ──
+function calcularSemana() {
+  const hoy = new Date();
+  const dia = hoy.getDay();
+  const diff = dia === 0 ? -6 : 1 - dia;
+  const lunes = new Date(hoy);
+  lunes.setDate(hoy.getDate() + diff + offset * 7);
+  lunes.setHours(0,0,0,0);
+  semana = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(lunes);
+    d.setDate(lunes.getDate() + i);
+    semana.push(d.toISOString().split('T')[0]);
+  }
+}
+
+function actualizarHeaders() {
+  const nombres = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const hoy = new Date().toISOString().split('T')[0];
+  const ini = new Date(semana[0] + 'T12:00');
+  const fin = new Date(semana[6] + 'T12:00');
+  document.getElementById('label-semana').textContent =
+    `${ini.getDate()}/${ini.getMonth()+1} – ${fin.getDate()}/${fin.getMonth()+1}/${fin.getFullYear()}`;
+  semana.forEach((f, i) => {
+    const d = new Date(f + 'T12:00');
+    const esHoy = f === hoy;
+    document.getElementById('h'+i).innerHTML =
+      `<span style="color:${esHoy?'#FFD700':''}">${nombres[i]}</span><br>
+       <span style="font-size:10px;font-weight:400;color:${esHoy?'#FFD700':'#555'}">${d.getDate()}/${d.getMonth()+1}</span>`;
+  });
+}
+
+function navegar(dir) { offset += dir; cargar(); }
+function irHoy() { offset = 0; cargar(); }
+
+// ── CARGAR DATOS ──
+async function cargar() {
+  calcularSemana();
+  actualizarHeaders();
+
+  // Cargar empleados si no están
+  if (!empleados.length) {
+    const r = await fetch(`${API}/api/planilla/empleados`);
+    empleados = await r.json();
+  }
+
+  // Cargar horarios de la semana
+  const r = await fetch(`${API}/api/horarios?semana=${semana[0]}`);
+  const data = await r.json();
+  horarios = {};
+  data.forEach(h => {
+    const pid = h.planilla_emp_id;
+    const fecha = h.fecha ? h.fecha.substring(0, 10) : null;
+    if (!pid || !fecha) return;
+    if (!horarios[pid]) horarios[pid] = {};
+    horarios[pid][fecha] = {
+      entrada1: h.entrada1, salida1: h.salida1,
+      entrada2: h.entrada2, salida2: h.salida2,
+      estado: h.estado || 'normal'
+    };
+  });
+
+  renderGrilla();
+}
+
+// ── RENDER ──
+function renderGrilla() {
+  const tbody = document.getElementById('tbody');
+  if (!empleados.length) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#555">Sin empleados en la planilla</td></tr>';
+    return;
+  }
+
+  const hoy = new Date().toISOString().split('T')[0];
+  const sectores = {};
+  empleados.forEach(e => {
+    const s = e.rol || 'Sin sector';
+    if (!sectores[s]) sectores[s] = [];
+    sectores[s].push(e);
+  });
+
+  let html = '';
+  for (const [sector, emps] of Object.entries(sectores)) {
+    html += `<tr class="sector-row"><td colspan="9">${sector}</td></tr>`;
+    emps.forEach(e => {
+      const celdas = semana.map(fecha => {
+        const h = (horarios[e.id] || {})[fecha];
+        const esHoy = fecha === hoy;
+        let cls = 'celda-inner' + (esHoy ? ' hoy' : '');
+        let contenido = '<span class="plus">+</span>';
+
+        if (h) {
+          if (h.estado === 'franco') {
+            cls += ' franco';
+            contenido = '<span class="badge-f">Franco</span>';
+          } else if (h.estado === 'ausente') {
+            cls += ' ausente';
+            contenido = '<span class="badge-a">Ausente</span>';
+          } else if (h.entrada1) {
+            cls += ' turno';
+            const e1 = h.entrada1.substring(0,5);
+            const s1 = (h.salida1||'?').substring(0,5);
+            contenido = `<span class="hora">${e1}–${s1}</span>`;
+            if (h.entrada2) {
+              const e2 = h.entrada2.substring(0,5);
+              const s2 = (h.salida2||'?').substring(0,5);
+              contenido += `<span class="hora2">${e2}–${s2}</span>`;
+            }
+          }
+        }
+
+        const nombre = `${e.apellido} ${e.nombre}`.replace(/'/g, "\\'");
+        return `<td class="celda" onclick="abrir(${e.id},'${fecha}','${nombre}','${e.rol||''}')">
+          <div class="${cls}">${contenido}</div>
+        </td>`;
+      }).join('');
+
+      html += `<tr>
+        <td class="td-nombre">${e.apellido} ${e.nombre}</td>
+        <td class="td-rol">${e.rol || '—'}</td>
+        ${celdas}
+      </tr>`;
+    });
+  }
+  tbody.innerHTML = html;
+}
+
+// ── MODAL ──
+function abrir(empId, fecha, nombre, rol) {
+  mEmpId = empId;
+  mFecha = fecha;
+  const h = (horarios[empId] || {})[fecha] || {};
+  mEstado = h.estado || 'normal';
+
+  document.getElementById('m-nombre').textContent = nombre;
+  const d = new Date(fecha + 'T12:00');
+  document.getElementById('m-fecha').textContent =
+    d.toLocaleDateString('es-AR', {weekday:'long', day:'numeric', month:'long'}) + (rol ? ` · ${rol}` : '');
+
+  document.getElementById('m-e1').value = h.entrada1 ? h.entrada1.substring(0,5) : '';
+  document.getElementById('m-s1').value = h.salida1  ? h.salida1.substring(0,5)  : '';
+  document.getElementById('m-e2').value = h.entrada2 ? h.entrada2.substring(0,5) : '';
+  document.getElementById('m-s2').value = h.salida2  ? h.salida2.substring(0,5)  : '';
+
+  actualizarModal();
+  document.getElementById('modal-overlay').classList.add('visible');
+}
+
+function cerrar() {
+  document.getElementById('modal-overlay').classList.remove('visible');
+}
+
+function actualizarModal() {
+  document.getElementById('mbtn-f').classList.toggle('on', mEstado === 'franco');
+  document.getElementById('mbtn-a').classList.toggle('on', mEstado === 'ausente');
+  const dis = mEstado !== 'normal';
+  ['m-e1','m-s1','m-e2','m-s2'].forEach(id => {
+    const el = document.getElementById(id);
+    el.disabled = dis;
+    el.style.opacity = dis ? '0.3' : '1';
+  });
+}
+
+function toggleEstado(estado) {
+  mEstado = mEstado === estado ? 'normal' : estado;
+  actualizarModal();
+}
+
+async function guardar() {
+  const btn = document.getElementById('btn-guardar');
+  btn.disabled = true;
+  btn.textContent = 'Guardando…';
+
+  const e1 = mEstado === 'normal' ? (document.getElementById('m-e1').value || null) : null;
+  const s1 = mEstado === 'normal' ? (document.getElementById('m-s1').value || null) : null;
+  const e2 = mEstado === 'normal' ? (document.getElementById('m-e2').value || null) : null;
+  const s2 = mEstado === 'normal' ? (document.getElementById('m-s2').value || null) : null;
+
+  try {
+    const r = await fetch(`${API}/api/horarios`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        planilla_emp_id: mEmpId,
+        fecha: mFecha,
+        entrada1: e1, salida1: s1,
+        entrada2: e2, salida2: s2,
+        estado: mEstado
+      })
+    });
+
+    if (!r.ok) {
+      const err = await r.text();
+      alert('Error: ' + err);
+      return;
+    }
+
+    // Actualizar local
+    if (!horarios[mEmpId]) horarios[mEmpId] = {};
+    horarios[mEmpId][mFecha] = { entrada1: e1, salida1: s1, entrada2: e2, salida2: s2, estado: mEstado };
+    cerrar();
+    renderGrilla();
+  } catch(e) {
+    alert('Error de conexión: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Guardar turno';
+  }
+}
+
+async function borrar() {
+  try {
+    await fetch(`${API}/api/horarios`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        planilla_emp_id: mEmpId, fecha: mFecha,
+        entrada1: null, salida1: null, entrada2: null, salida2: null,
+        estado: 'normal'
+      })
+    });
+    if (horarios[mEmpId]) delete horarios[mEmpId][mFecha];
+    cerrar();
+    renderGrilla();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ── INIT ──
+cargar();
+</script>
+</body>
+</html>
