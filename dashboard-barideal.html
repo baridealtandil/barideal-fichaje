@@ -534,6 +534,14 @@ canvas { max-height: 240px; }
 }
 .time-input:focus { border-color: rgba(255,255,255,0.3); }
 .modal-footer { padding: 12px 20px 16px; display: flex; gap: 8px; }
+.modal-dias-section { padding: 0 20px 14px; }
+.modal-dias-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 8px; }
+.dias-checkboxes { display: flex; gap: 6px; flex-wrap: wrap; }
+.dia-chip { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--border); cursor: pointer; font-size: 11px; font-weight: 700; color: var(--text3); transition: all 0.15s; user-select: none; }
+.dia-chip:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
+.dia-chip.checked { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.12); color: var(--text); }
+.dia-chip.es-hoy { border-color: rgba(255,200,0,0.5); color: #FFD740; }
+.dia-chip.es-hoy.checked { background: rgba(255,200,0,0.12); }
 .btn-guardar-turno {
   flex: 1; padding: 10px; background: var(--gold); color: #000;
   border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
