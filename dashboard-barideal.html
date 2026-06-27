@@ -534,6 +534,22 @@ canvas { max-height: 240px; }
 }
 .time-input:focus { border-color: rgba(255,255,255,0.3); }
 .modal-footer { padding: 12px 20px 16px; display: flex; gap: 8px; }
+
+/* ── Selector de días en modal turno ── */
+.modal-dias-section { padding: 0 20px 14px; }
+.modal-dias-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 8px; }
+.dias-checkboxes { display: flex; gap: 6px; flex-wrap: wrap; }
+.dia-chip {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 8px;
+  border: 1.5px solid var(--border); cursor: pointer;
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  transition: all 0.15s; user-select: none;
+}
+.dia-chip:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
+.dia-chip.checked { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.12); color: var(--text); }
+.dia-chip.es-hoy { border-color: rgba(255,200,0,0.5); color: #FFD740; }
+.dia-chip.es-hoy.checked { background: rgba(255,200,0,0.12); }
 .btn-guardar-turno {
   flex: 1; padding: 10px; background: var(--gold); color: #000;
   border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
@@ -1092,6 +1108,12 @@ canvas { max-height: 240px; }
           <input type="time" class="time-input" id="m-salida2" placeholder="—">
         </div>
       </div>
+    </div>
+
+    <!-- Aplicar a otros días -->
+    <div class="modal-dias-section">
+      <div class="modal-dias-label">Aplicar también a</div>
+      <div class="dias-checkboxes" id="dias-checkboxes"></div>
     </div>
 
     <div class="modal-footer">
@@ -1741,7 +1763,24 @@ function abrirModal(empId, fecha, nombre) {
   document.getElementById('m-salida').value = h.salida || '';
   document.getElementById('m-entrada2').value = h.entrada2 || '';
   document.getElementById('m-salida2').value = h.salida2 || '';
+
+  // Renderizar checkboxes de días (todos menos el día actual)
+  const diasNombres = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const hoy = fechaHoy();
+  const container = document.getElementById('dias-checkboxes');
+  container.innerHTML = semanaActual.map((fecha2, i) => {
+    if (fecha2 === fecha) return ''; // no mostrar el día actual
+    const esHoy = fecha2 === hoy;
+    return `<div class="dia-chip${esHoy ? ' es-hoy' : ''}" data-fecha="${fecha2}" onclick="toggleDiaChip(this)">
+      ${diasNombres[i]}
+    </div>`;
+  }).join('');
+
   document.getElementById('modal-turno').classList.add('show');
+}
+
+function toggleDiaChip(el) {
+  el.classList.toggle('checked');
 }
 
 function cerrarModal() {
@@ -1754,14 +1793,22 @@ function guardarTurno() {
   const entrada2 = document.getElementById('m-entrada2').value;
   const salida2  = document.getElementById('m-salida2').value;
 
-  if (!horariosSemana[modalEmpId]) horariosSemana[modalEmpId] = {};
-  horariosSemana[modalEmpId][modalFecha] = { entrada: entrada1, salida: salida1, entrada2, salida2 };
+  // Recolectar días seleccionados (checkboxes marcados) + el día actual siempre
+  const diasSeleccionados = [modalFecha];
+  document.querySelectorAll('#dias-checkboxes .dia-chip.checked').forEach(el => {
+    diasSeleccionados.push(el.dataset.fecha);
+  });
 
-  // Enviar a la API usando planilla_emp_id
-  fetch(`${API}/api/horarios`, {
-    method: 'POST', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ planilla_emp_id: modalEmpId, fecha: modalFecha, entrada1, salida1, entrada2, salida2 })
-  }).catch(() => {});
+  // Guardar en estado local y enviar a la API para cada día
+  diasSeleccionados.forEach(fecha => {
+    if (!horariosSemana[modalEmpId]) horariosSemana[modalEmpId] = {};
+    horariosSemana[modalEmpId][fecha] = { entrada: entrada1, salida: salida1, entrada2, salida2 };
+
+    fetch(`${API}/api/horarios`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ planilla_emp_id: modalEmpId, fecha, entrada1, salida1, entrada2, salida2 })
+    }).catch(() => {});
+  });
 
   cerrarModal();
   renderTablaHorarios();
