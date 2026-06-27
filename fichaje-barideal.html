@@ -359,9 +359,22 @@ html, body {
     </div>
 
     <div class="btn-wrap">
-      <div class="btn-ring" id="btn-ring"></div>
+      <div class="radar-ring radar-ring-1"></div>
+      <div class="radar-ring radar-ring-2"></div>
+      <div class="radar-pulse"></div>
+      <div class="radar-pulse"></div>
+      <div class="radar-pulse"></div>
+      <div class="radar-sweep" id="btn-ring"></div>
       <button id="btn-fichar" class="entrada" onclick="fichar()" disabled>
-        <span class="btn-icon" id="btn-icon">⏳</span>
+        <svg class="btn-coffee" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 8 C13 6 15 4 14 2" stroke-width="1.5" stroke-linecap="round" class="coffee-cup" opacity="0.6"/>
+          <path d="M21 8 C20 6 22 4 21 2" stroke-width="1.5" stroke-linecap="round" class="coffee-cup" opacity="0.6"/>
+          <path d="M28 8 C27 6 29 4 28 2" stroke-width="1.5" stroke-linecap="round" class="coffee-cup" opacity="0.6"/>
+          <path d="M9 12 L10 28 Q10 30 12 30 L30 30 Q32 30 32 28 L33 12 Z" stroke-width="1.5" stroke-linejoin="round" class="coffee-cup"/>
+          <path d="M11 16 L31 16" stroke-width="1" class="coffee-cup" opacity="0.35"/>
+          <path d="M32 16 Q38 16 38 22 Q38 28 32 28" stroke-width="1.5" stroke-linecap="round" class="coffee-cup"/>
+          <path d="M6 32 Q21 35 36 32" stroke-width="1.5" stroke-linecap="round" class="coffee-cup"/>
+        </svg>
         <span class="btn-label" id="btn-label">Cargando</span>
       </button>
     </div>
