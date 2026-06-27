@@ -48,8 +48,8 @@ async function migrate() {
       id               SERIAL PRIMARY KEY,
       planilla_emp_id  INTEGER REFERENCES planilla_empleados(id),
       fecha            DATE NOT NULL,
-      entrada          TIME,
-      salida           TIME,
+      entrada1         TIME,
+      salida1          TIME,
       entrada2         TIME,
       salida2          TIME,
       estado           TEXT DEFAULT 'normal' CHECK (estado IN ('normal','franco','ausente')),
@@ -60,6 +60,21 @@ async function migrate() {
   await sql`CREATE INDEX IF NOT EXISTS idx_fichajes_fecha ON fichajes(fecha_hora)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_horarios_fecha ON horarios(fecha)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_planilla_empleado ON planilla_empleados(empleado_id)`;
+
+  // Migración: renombrar columnas entrada→entrada1, salida→salida1 si existen con nombre viejo
+  try {
+    await sql`ALTER TABLE horarios RENAME COLUMN entrada TO entrada1`;
+    console.log("✅ Columna entrada renombrada a entrada1");
+  } catch(e) { /* ya existe con el nombre correcto */ }
+  try {
+    await sql`ALTER TABLE horarios RENAME COLUMN salida TO salida1`;
+    console.log("✅ Columna salida renombrada a salida1");
+  } catch(e) { /* ya existe con el nombre correcto */ }
+
+  // Migración: agregar columna empleado_id a horarios si no existe (versión vieja)
+  try {
+    await sql`ALTER TABLE horarios DROP COLUMN IF EXISTS empleado_id`;
+  } catch(e) {}
 
   console.log("✅ Migración completada");
 }
@@ -306,17 +321,17 @@ app.get("/api/horarios", async (c) => {
 
 // Guardar/actualizar horario de un empleado en una fecha
 app.post("/api/horarios", async (c) => {
-  const { planilla_emp_id, fecha, entrada, salida, entrada2, salida2, estado } = await c.req.json();
+  const { planilla_emp_id, fecha, entrada1, salida1, entrada2, salida2, estado } = await c.req.json();
   if (!planilla_emp_id || !fecha)
     return c.json({ error: "planilla_emp_id y fecha son requeridos" }, 400);
 
   const t = v => (v && v.trim()) ? v.trim() : null;
 
   const [horario] = await sql`
-    INSERT INTO horarios (planilla_emp_id, fecha, entrada, salida, entrada2, salida2, estado)
+    INSERT INTO horarios (planilla_emp_id, fecha, entrada1, salida1, entrada2, salida2, estado)
     VALUES (${planilla_emp_id}, ${fecha}::date, ${t(entrada1)}, ${t(salida1)}, ${t(entrada2)}, ${t(salida2)}, ${estado || 'normal'})
     ON CONFLICT (planilla_emp_id, fecha) DO UPDATE SET
-      entrada1 = EXCLUDED.entrada, salida = EXCLUDED.salida1,
+      entrada1 = EXCLUDED.entrada1, salida1 = EXCLUDED.salida1,
       entrada2 = EXCLUDED.entrada2, salida2 = EXCLUDED.salida2,
       estado   = EXCLUDED.estado
     RETURNING *`;
@@ -326,17 +341,17 @@ app.post("/api/horarios", async (c) => {
 // Importar semana completa desde Excel
 app.post("/api/horarios/batch", async (c) => {
   const { semana, horarios } = await c.req.json();
-  // horarios: [{ planilla_emp_id, fecha, entrada, salida, entrada2, salida2, estado }]
+  // horarios: [{ planilla_emp_id, fecha, entrada1, salida1, entrada2, salida2, estado }]
   let count = 0;
   const t = v => (v && String(v).trim()) ? String(v).trim() : null;
 
   for (const h of horarios) {
     try {
       await sql`
-        INSERT INTO horarios (planilla_emp_id, fecha, entrada, salida, entrada2, salida2, estado)
+        INSERT INTO horarios (planilla_emp_id, fecha, entrada1, salida1, entrada2, salida2, estado)
         VALUES (${h.planilla_emp_id}, ${h.fecha}::date, ${t(h.entrada1)}, ${t(h.salida1)}, ${t(h.entrada2)}, ${t(h.salida2)}, ${h.estado || 'normal'})
         ON CONFLICT (planilla_emp_id, fecha) DO UPDATE SET
-          entrada1 = EXCLUDED.entrada, salida = EXCLUDED.salida1,
+          entrada1 = EXCLUDED.entrada1, salida1 = EXCLUDED.salida1,
           entrada2 = EXCLUDED.entrada2, salida2 = EXCLUDED.salida2,
           estado   = EXCLUDED.estado`;
       count++;
