@@ -1873,46 +1873,53 @@ function buscarEmpleado(q) {
 
   const nq = normalizar(q);
 
-  // Buscar en empleados de la app
-  const matchesApp = todosLosEmpleados.filter(e =>
-    normalizar(`${e.nombre} ${e.apellido}`).includes(nq) ||
-    normalizar(e.apellido).includes(nq)
-  ).slice(0, 5);
-
-  // Buscar en planilla
+  // Buscar primero en planilla (fuente principal)
   const matchesPlan = planillaEmpleados.filter(pe =>
     normalizar(`${pe.nombre} ${pe.apellido}`).includes(nq) ||
     normalizar(pe.apellido).includes(nq)
-  ).slice(0, 5);
+  ).slice(0, 6);
 
-  // Combinar sin duplicados
-  const shown = new Set();
+  // IDs de empleados app ya mostrados via planilla
+  const idsEnPlanilla = new Set(matchesPlan.filter(pe => pe.empleado_id).map(pe => pe.empleado_id));
+
+  // Empleados de la app que NO están en planilla y coinciden
+  const matchesAppSolo = todosLosEmpleados.filter(e =>
+    !idsEnPlanilla.has(e.id) &&
+    !planillaEmpleados.some(pe => pe.empleado_id === e.id) &&
+    (normalizar(`${e.nombre} ${e.apellido}`).includes(nq) ||
+     normalizar(e.apellido).includes(nq))
+  ).slice(0, 3);
+
   let html = '';
 
-  matchesApp.forEach(e => {
-    shown.add(e.id);
-    const initials = `${e.nombre?.[0]||''}${e.apellido?.[0]||''}`;
-    html += `<div class="emp-search-item" onclick="seleccionarEmpBusqueda(${e.id}, '${e.nombre} ${e.apellido}')">
+  matchesPlan.forEach(pe => {
+    const nombre = pe.empleado_id
+      ? `${pe.emp_nombre || pe.nombre} ${pe.emp_apellido || pe.apellido}`
+      : `${pe.apellido} ${pe.nombre}`;
+    const initials = `${(pe.nombre||'')[0]||''}${(pe.apellido||'')[0]||''}`;
+    const info = pe.empleado_id
+      ? `${pe.rol || '—'} · ${pe.celular || 'Sin celular'}`
+      : `${pe.rol || '—'} · Sin vincular`;
+    html += `<div class="emp-search-item" onclick="seleccionarPlanillaBusqueda(${pe.id}, '${nombre}')">
       <div class="emp-search-item-avatar">${initials}</div>
       <div>
-        <div class="emp-search-item-name">${e.nombre} ${e.apellido}</div>
-        <div class="emp-search-item-rol">App · ${e.celular || '—'}</div>
+        <div class="emp-search-item-name">${nombre}</div>
+        <div class="emp-search-item-rol">${info}</div>
       </div>
     </div>`;
   });
 
-  matchesPlan.forEach(pe => {
-    const initials = `${pe.nombre?.[0]||''}${pe.apellido?.[0]||''}`;
-    html += `<div class="emp-search-item" onclick="seleccionarPlanillaBusqueda(${pe.id}, '${pe.apellido} ${pe.nombre}')">
-      <div class="emp-search-item-avatar" style="background:rgba(255,200,0,0.1);color:#FFD700">${initials}</div>
+  matchesAppSolo.forEach(e => {
+    const initials = `${(e.nombre||'')[0]||''}${(e.apellido||'')[0]||''}`;
+    html += `<div class="emp-search-item" onclick="seleccionarEmpBusqueda(${e.id}, '${e.nombre} ${e.apellido}')">
+      <div class="emp-search-item-avatar" style="background:rgba(255,100,0,0.15);color:#FF9944">${initials}</div>
       <div>
-        <div class="emp-search-item-name">${pe.apellido} ${pe.nombre}</div>
-        <div class="emp-search-item-rol">Planilla · ${pe.rol || '—'}</div>
+        <div class="emp-search-item-name">${e.nombre} ${e.apellido}</div>
+        <div class="emp-search-item-rol">App · Sin planilla</div>
       </div>
     </div>`;
   });
 
-  // Opción agregar si no hay match exacto
   html += `<div class="emp-search-add" onclick="abrirModalNuevoEmp('${q}')">
     ➕ Agregar "<strong>${q}</strong>" como nuevo empleado
   </div>`;
