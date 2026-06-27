@@ -1106,17 +1106,17 @@ canvas { max-height: 240px; }
       <div style="margin-bottom:12px">
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:6px">Turno principal</div>
         <div style="display:flex;align-items:center;gap:8px">
-          <input type="time" id="m-entrada" style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:14px;text-align:center;outline:none">
+          <input type="time" id="m-entrada" step="60" style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:14px;text-align:center;outline:none;color-scheme:dark">
           <span style="color:#555">→</span>
-          <input type="time" id="m-salida" style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:14px;text-align:center;outline:none">
+          <input type="time" id="m-salida" step="60" style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:14px;text-align:center;outline:none;color-scheme:dark">
         </div>
       </div>
       <div>
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:6px">2º turno <span style="font-weight:400;text-transform:none">(opcional)</span></div>
         <div style="display:flex;align-items:center;gap:8px">
-          <input type="time" id="m-entrada2" style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:14px;text-align:center;outline:none">
+          <input type="time" id="m-entrada2" step="60" style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:14px;text-align:center;outline:none;color-scheme:dark">
           <span style="color:#555">→</span>
-          <input type="time" id="m-salida2" style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:14px;text-align:center;outline:none">
+          <input type="time" id="m-salida2" step="60" style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:14px;text-align:center;outline:none;color-scheme:dark">
         </div>
       </div>
     </div>
@@ -1869,10 +1869,15 @@ async function guardarTurno() {
   const btn = document.getElementById('btn-guardar-turno');
   if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
 
-  const entrada1 = modalEstado === 'normal' ? (document.getElementById('m-entrada').value || null) : null;
-  const salida1  = modalEstado === 'normal' ? (document.getElementById('m-salida').value  || null) : null;
-  const entrada2 = modalEstado === 'normal' ? (document.getElementById('m-entrada2').value || null) : null;
-  const salida2  = modalEstado === 'normal' ? (document.getElementById('m-salida2').value  || null) : null;
+  const _e1 = document.getElementById('m-entrada').value;
+  const _s1 = document.getElementById('m-salida').value;
+  const _e2 = document.getElementById('m-entrada2').value;
+  const _s2 = document.getElementById('m-salida2').value;
+  console.log('Horario a guardar:', {modalEstado, _e1, _s1, _e2, _s2, modalEmpId, modalFecha});
+  const entrada1 = modalEstado === 'normal' ? (_e1 || null) : null;
+  const salida1  = modalEstado === 'normal' ? (_s1 || null) : null;
+  const entrada2 = modalEstado === 'normal' ? (_e2 || null) : null;
+  const salida2  = modalEstado === 'normal' ? (_s2 || null) : null;
 
   // Días seleccionados via checkboxes
   const diasSeleccionados = semanaActual.filter((f, i) => {
