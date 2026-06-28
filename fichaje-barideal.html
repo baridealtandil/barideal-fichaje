@@ -235,6 +235,28 @@ opacity: 0; transition: opacity 0.25s;
 pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 }
 #toast.show { opacity: 1; }
+
+#overlay-confirm {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 300; gap: 16px; padding: 32px;
+}
+#overlay-confirm.show { display: flex; }
+.confirm-title {
+  font-size: 20px; font-weight: 700; color: var(--white); text-align: center;
+}
+.confirm-icon { font-size: 48px; }
+.confirm-btns { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 300px; margin-top: 8px; }
+.confirm-btn-cancel {
+  width: 100%; padding: 14px; background: transparent;
+  border: 1.5px solid rgba(255,255,255,0.3); border-radius: 10px;
+  color: var(--white); font-size: 15px; font-weight: 600; cursor: pointer;
+}
+.confirm-btn-ok {
+  width: 100%; padding: 14px; background: var(--white);
+  border: none; border-radius: 10px;
+  color: #0A0A0A; font-size: 15px; font-weight: 800; cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -338,6 +360,15 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
   <div class="success-hora" id="success-hora">--:--</div>
   <div class="success-msg" id="success-msg">Fichaje registrado</div>
   <div class="success-id" id="success-id">ID #—</div>
+</div>
+
+<div id="overlay-confirm">
+  <div class="confirm-icon">⚠️</div>
+  <div class="confirm-title">¿Estás seguro?</div>
+  <div class="confirm-btns">
+    <button class="confirm-btn-cancel" onclick="cancelarSalida()">Cancelar mi salida</button>
+    <button class="confirm-btn-ok" onclick="confirmarSalida()">Confirmar mi salida</button>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -471,6 +502,9 @@ function actualizarBoton() {
   btn.disabled = !geoOk;
 }
 
+// Guarda la posición GPS verificada para usarla al confirmar
+let _posConfirmada = null;
+
 async function fichar() {
   if (!geoOk || !empleado) return;
   const btn = document.getElementById('btn-fichar'), ring = document.getElementById('btn-ring');
@@ -485,6 +519,41 @@ async function fichar() {
   const dist = haversine(pos.coords.latitude, pos.coords.longitude, BAR_LAT, BAR_LNG);
   if (dist > RADIO_METROS) { ring.classList.remove('active'); toast(`Estás a ${Math.round(dist)}m del local. Necesitás estar a menos de ${RADIO_METROS}m.`); actualizarBoton(); return; }
 
+  // Si es salida, verificar si pasaron menos de 8 horas desde la entrada
+  if (proximoTipo === 'salida' || proximoTipo === 'salida2') {
+    const tipoEntrada = proximoTipo === 'salida' ? 'entrada' : 'entrada2';
+    const ultimaEntrada = fichajesHoy.find(f => f.tipo === tipoEntrada);
+    if (ultimaEntrada) {
+      const diff = (Date.now() - new Date(ultimaEntrada.fecha_hora).getTime()) / 3600000;
+      if (diff < 8) {
+        // Mostrar confirmación
+        _posConfirmada = pos;
+        ring.classList.remove('active');
+        btn.disabled = false;
+        document.getElementById('overlay-confirm').classList.add('show');
+        return;
+      }
+    }
+  }
+
+  await registrarFichaje(pos);
+}
+
+function cancelarSalida() {
+  document.getElementById('overlay-confirm').classList.remove('show');
+  _posConfirmada = null;
+  actualizarBoton();
+}
+
+async function confirmarSalida() {
+  document.getElementById('overlay-confirm').classList.remove('show');
+  if (_posConfirmada) await registrarFichaje(_posConfirmada);
+  _posConfirmada = null;
+}
+
+async function registrarFichaje(pos) {
+  const btn = document.getElementById('btn-fichar'), ring = document.getElementById('btn-ring');
+  btn.disabled = true; ring.classList.add('active');
   try {
     const r = await fetch(`${API}/api/fichajes`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
