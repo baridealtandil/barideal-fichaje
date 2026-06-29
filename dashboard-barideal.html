@@ -647,6 +647,104 @@ canvas { max-height: 240px; }
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
 .live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%;
   background: #4CAF50; margin-right: 6px; animation: pulse 2s infinite; }
+
+/* ── Drawer ficha empleado ── */
+#drawer-emp {
+  position: fixed; top: 0; right: -480px; width: 460px; height: 100vh;
+  background: var(--bg2); border-left: 1px solid var(--border);
+  z-index: 500; transition: right 0.3s ease; overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+#drawer-emp.open { right: 0; }
+.drawer-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 499; display: none;
+}
+.drawer-overlay.show { display: block; }
+.drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--bg2); z-index: 1;
+}
+.drawer-title { font-size: 16px; font-weight: 700; color: var(--text); }
+.drawer-close { background: none; border: none; color: var(--text3); font-size: 22px; cursor: pointer; }
+.drawer-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; }
+.drawer-avatar {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--gold); color: #000; font-size: 22px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.drawer-emp-info { display: flex; align-items: center; gap: 16px; }
+.drawer-emp-name { font-size: 18px; font-weight: 700; color: var(--text); }
+.drawer-emp-sub { font-size: 13px; color: var(--text3); margin-top: 2px; }
+.drawer-stat-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.drawer-stat-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 16px;
+}
+.drawer-stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.drawer-stat-val { font-size: 22px; font-weight: 700; color: var(--text); }
+.drawer-stat-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.drawer-period-select {
+  background: var(--bg); border: 1px solid var(--border);
+  color: var(--text); border-radius: 8px; padding: 6px 10px;
+  font-size: 13px; cursor: pointer;
+}
+.drawer-section-title {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text3); margin-bottom: 10px;
+}
+.drawer-tardanzas-list { display: flex; flex-direction: column; gap: 6px; }
+.drawer-tardanza-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 12px; background: var(--bg); border-radius: 8px;
+  border: 1px solid var(--border); font-size: 13px;
+}
+.emp-card { cursor: pointer; transition: border-color 0.15s; }
+.emp-card:hover { border-color: var(--gold); }
+
+/* ── Popup puntualidad ── */
+#popup-puntualidad {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: none; align-items: center; justify-content: center; z-index: 600;
+}
+#popup-puntualidad.show { display: flex; }
+.popup-puntualidad-box {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 24px; width: 380px; max-width: 95vw;
+}
+.popup-punt-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 16px;
+}
+.popup-punt-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.popup-punt-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.popup-punt-close { background: none; border: none; color: var(--text3); font-size: 20px; cursor: pointer; }
+.popup-punt-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.popup-punt-row:last-child { border-bottom: none; }
+.popup-punt-key { font-size: 13px; color: var(--text3); }
+.popup-punt-val { font-size: 14px; font-weight: 600; color: var(--text); }
+.popup-punt-val.verde { color: var(--success); }
+.popup-punt-val.rojo { color: var(--danger); }
+.popup-punt-val.amarillo { color: var(--warning); }
+
+/* ── Botón grilla WhatsApp ── */
+.btn-wsp {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; background: #25D366; color: #fff;
+  border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.btn-wsp:hover { opacity: 0.85; }
+#preview-grilla-wsp {
+  display: none; margin-top: 16px;
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+}
 </style>
 </head>
 <body>
@@ -955,6 +1053,7 @@ canvas { max-height: 240px; }
             </div>
             <input type="date" id="semana-inicio" onchange="cargarHorarios()" style="display:none">
             <button class="btn btn-outline" onclick="irAHoy()" style="font-size:12px">Hoy</button>
+            <button class="btn-wsp" onclick="generarGrillaWsp()" title="Generar imagen para WhatsApp">📲 WhatsApp</button>
             <button class="btn btn-outline" onclick="document.getElementById('file-horarios').click()" style="font-size:12px">
               📁 Importar Excel
             </button>
@@ -1441,8 +1540,10 @@ function renderTablaFichajes() {
       estado += ` <span class="badge-incompleto">⚠️ Incompleto</span>`;
     }
 
+    const horarioAsig = horario ? (horario.entrada1 || horario.entrada || '?') : null;
+    const diffMin = (horario && e1) ? Math.round((new Date(e1.fecha_hora) - new Date(`${g.fecha}T${horario.entrada1 || horario.entrada}`)) / 60000) : null;
     return `
-      <tr>
+      <tr style="cursor:pointer" onclick="abrirPopupPunt('${g.nombre} ${g.apellido}', '${g.fecha}', '${horarioAsig || ''}', '${e1 ? fmt(e1.fecha_hora) : ''}', ${diffMin})">
         <td class="td-nombre">${g.nombre} ${g.apellido}</td>
         <td>${fmtFecha(g.fecha + 'T12:00')}</td>
         <td>${fmt(e1?.fecha_hora)}</td>
@@ -1498,7 +1599,7 @@ function renderEmpleados() {
     const enPlanilla = planillaEmpleados.some(pe => pe.empleado_id === e.id);
 
     return `
-      <div class="emp-card" data-emp-id="${e.id}">
+      <div class="emp-card" data-emp-id="${e.id}" onclick="abrirDrawerEmp(${e.id})">
         <div class="emp-card-header">
           <div class="emp-avatar">${avatarLetras(e.nombre, e.apellido)}</div>
           <div style="flex:1;min-width:0">
@@ -2715,6 +2816,329 @@ function exportarExcel() {
 
 // Cargar horarios desde la API al arrancar
 // cargarHorariosAPI reemplazado por cargarHorarios()
+
+// ══════════════════════════════════
+//  DRAWER FICHA EMPLEADO
+// ══════════════════════════════════
+let drawerEmpId = null;
+
+function abrirDrawerEmp(empId) {
+  drawerEmpId = empId;
+  const emp = todosLosEmpleados.find(e => e.id === empId);
+  if (!emp) return;
+  document.getElementById('drawer-avatar').textContent = avatarLetras(emp.nombre, emp.apellido);
+  document.getElementById('drawer-emp-name').textContent = `${emp.nombre} ${emp.apellido}`;
+  const pe = planillaEmpleados.find(p => p.empleado_id === empId);
+  document.getElementById('drawer-emp-sub').textContent = (pe?.rol || '') + (emp.celular ? ' · ' + emp.celular : '');
+  actualizarDrawer();
+  document.getElementById('drawer-emp').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('show');
+}
+
+function cerrarDrawer() {
+  document.getElementById('drawer-emp').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('show');
+  drawerEmpId = null;
+}
+
+function actualizarDrawer() {
+  if (!drawerEmpId) return;
+  const periodo = document.getElementById('drawer-period').value;
+  const hoy = new Date();
+  let inicio, fin = new Date();
+
+  if (periodo === 'semana') {
+    inicio = new Date(hoy);
+    const dow = hoy.getDay() || 7;
+    inicio.setDate(hoy.getDate() - dow + 1);
+    inicio.setHours(0,0,0,0);
+  } else if (periodo === 'mes') {
+    inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  } else {
+    inicio = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+    fin = new Date(hoy.getFullYear(), hoy.getMonth(), 0, 23, 59, 59);
+  }
+
+  // Fichajes del período para este empleado
+  const fichajes = todosLosFichajes.filter(f =>
+    f.empleado_id === drawerEmpId &&
+    new Date(f.fecha_hora) >= inicio &&
+    new Date(f.fecha_hora) <= fin
+  );
+
+  // Agrupar por fecha
+  const grupos = {};
+  fichajes.forEach(f => {
+    const fecha = f.fecha_hora.split('T')[0];
+    if (!grupos[fecha]) grupos[fecha] = {};
+    grupos[fecha][f.tipo] = f;
+  });
+
+  // Calcular horas trabajadas
+  let minTrabajados = 0;
+  let tardanzas = [];
+  Object.entries(grupos).forEach(([fecha, g]) => {
+    if (g.entrada && g.salida) minTrabajados += minutosEntre(g.entrada.fecha_hora, g.salida.fecha_hora);
+    if (g.entrada2 && g.salida2) minTrabajados += minutosEntre(g.entrada2.fecha_hora, g.salida2.fecha_hora);
+
+    // Tardanzas
+    const pe = planillaEmpleados.find(p => p.empleado_id === drawerEmpId);
+    const horario = pe ? (horariosSemana[pe.id] || {})[fecha] : null;
+    if (horario && g.entrada) {
+      const entradaRef = horario.entrada1 || horario.entrada;
+      if (entradaRef) {
+        const prog = new Date(`${fecha}T${entradaRef}`);
+        const real = new Date(g.entrada.fecha_hora);
+        const diff = Math.round((real - prog) / 60000);
+        if (diff > TOLERANCIA_MINUTOS) {
+          tardanzas.push({ fecha, diff, hora: fmt(g.entrada.fecha_hora), asignado: entradaRef.substring(0,5) });
+        }
+      }
+    }
+  });
+
+  // Calcular horas asignadas
+  const pe = planillaEmpleados.find(p => p.empleado_id === drawerEmpId);
+  let minAsignados = 0;
+  if (pe) {
+    const diasPeriodo = [];
+    const cur = new Date(inicio);
+    while (cur <= fin) {
+      diasPeriodo.push(cur.toISOString().split('T')[0]);
+      cur.setDate(cur.getDate() + 1);
+    }
+    diasPeriodo.forEach(fecha => {
+      const h = (horariosSemana[pe.id] || {})[fecha];
+      if (!h || h.estado === 'franco' || h.estado === 'ausente') return;
+      const e = h.entrada1 || h.entrada;
+      const s = h.salida1 || h.salida;
+      if (e && s) {
+        const prog = new Date(`${fecha}T${e}`);
+        let fin2 = new Date(`${fecha}T${s}`);
+        if (fin2 < prog) fin2.setDate(fin2.getDate() + 1);
+        minAsignados += Math.round((fin2 - prog) / 60000);
+      }
+      if (h.entrada2 && h.salida2) {
+        const prog2 = new Date(`${fecha}T${h.entrada2}`);
+        let fin3 = new Date(`${fecha}T${h.salida2}`);
+        if (fin3 < prog2) fin3.setDate(fin3.getDate() + 1);
+        minAsignados += Math.round((fin3 - prog2) / 60000);
+      }
+    });
+  }
+
+  const balance = minTrabajados - minAsignados;
+  document.getElementById('drawer-hs-trabajadas').textContent = horasStr(minTrabajados);
+  document.getElementById('drawer-hs-asignadas').textContent = minAsignados > 0 ? horasStr(minAsignados) : '—';
+  document.getElementById('drawer-balance').textContent = balance === 0 ? '0h' : (balance > 0 ? '+' : '') + horasStr(Math.abs(balance));
+  document.getElementById('drawer-balance').className = 'drawer-stat-val ' + (balance > 0 ? 'verde' : balance < 0 ? 'rojo' : '');
+  document.getElementById('drawer-balance-sub').textContent = balance > 0 ? 'empresa debe' : balance < 0 ? 'empleado debe' : 'exacto';
+  document.getElementById('drawer-tardanzas').textContent = tardanzas.length;
+
+  const lista = document.getElementById('drawer-tardanzas-list');
+  if (!tardanzas.length) {
+    lista.innerHTML = '<div style="font-size:13px;color:var(--text3)">Sin tardanzas en el período</div>';
+  } else {
+    lista.innerHTML = tardanzas.map(t => `
+      <div class="drawer-tardanza-item">
+        <span>${fmtFecha(t.fecha + 'T12:00')}</span>
+        <span style="color:var(--text3)">Asignado: ${t.asignado} · Entró: ${t.hora}</span>
+        <span style="color:var(--warning);font-weight:700">+${t.diff}m</span>
+      </div>`).join('');
+  }
+}
+
+// ══════════════════════════════════
+//  POPUP PUNTUALIDAD
+// ══════════════════════════════════
+function abrirPopupPunt(nombre, fecha, asignado, real, diffMin) {
+  document.getElementById('popup-punt-nombre').textContent = nombre;
+  document.getElementById('popup-punt-fecha').textContent = fmtFecha(fecha + 'T12:00');
+  document.getElementById('popup-punt-asignado').textContent = asignado ? asignado.substring(0,5) : 'Sin horario asignado';
+
+  const realEl = document.getElementById('popup-punt-real');
+  const diffEl = document.getElementById('popup-punt-diff');
+  const estadoEl = document.getElementById('popup-punt-estado');
+
+  if (!real) {
+    realEl.textContent = 'No fichó';
+    diffEl.textContent = '—';
+    estadoEl.textContent = 'Ausente';
+    estadoEl.className = 'popup-punt-val rojo';
+  } else {
+    realEl.textContent = real;
+    if (diffMin === null || diffMin === undefined || asignado === '') {
+      diffEl.textContent = 'Sin horario asignado';
+      estadoEl.textContent = 'Fichó';
+      estadoEl.className = 'popup-punt-val';
+    } else if (diffMin > TOLERANCIA_MINUTOS) {
+      diffEl.textContent = `${diffMin} min tarde`;
+      diffEl.className = 'popup-punt-val rojo';
+      estadoEl.textContent = 'Tardanza';
+      estadoEl.className = 'popup-punt-val rojo';
+    } else if (diffMin < -5) {
+      diffEl.textContent = `${Math.abs(diffMin)} min antes`;
+      diffEl.className = 'popup-punt-val verde';
+      estadoEl.textContent = 'Puntual (adelantado)';
+      estadoEl.className = 'popup-punt-val verde';
+    } else {
+      diffEl.textContent = `${diffMin > 0 ? '+' : ''}${diffMin} min`;
+      diffEl.className = 'popup-punt-val verde';
+      estadoEl.textContent = 'Puntual';
+      estadoEl.className = 'popup-punt-val verde';
+    }
+  }
+  document.getElementById('popup-puntualidad').classList.add('show');
+}
+
+function cerrarPopupPunt() {
+  document.getElementById('popup-puntualidad').classList.remove('show');
+}
+
+// ══════════════════════════════════
+//  GRILLA WHATSAPP
+// ══════════════════════════════════
+function generarGrillaWsp() {
+  const diasNombres = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const ini = new Date(semanaActual[0] + 'T12:00');
+  const fin = new Date(semanaActual[6] + 'T12:00');
+  const semLabel = `Semana ${ini.getDate()}/${ini.getMonth()+1} al ${fin.getDate()}/${fin.getMonth()+1}`;
+
+  // Construir HTML de la grilla
+  let filas = '';
+  planillaEmpleados.forEach(pe => {
+    let celdas = '';
+    semanaActual.forEach(fecha => {
+      const h = (horariosSemana[pe.id] || {})[fecha];
+      if (!h) { celdas += '<td style="color:#555">—</td>'; return; }
+      if (h.estado === 'franco') { celdas += '<td style="color:#4472C4;font-weight:700">FRANCO</td>'; return; }
+      if (h.estado === 'ausente') { celdas += '<td style="color:#E53935;font-weight:700">AUSENTE</td>'; return; }
+      const e = (h.entrada1 || h.entrada || '').substring(0,5);
+      const s = (h.salida1 || h.salida || '').substring(0,5);
+      celdas += `<td>${e}${s ? '–'+s : ''}</td>`;
+    });
+    filas += `<tr><td style="text-align:left;font-weight:600">${pe.apellido} ${pe.nombre}</td><td style="color:#888">${pe.rol||''}</td>${celdas}</tr>`;
+  });
+
+  const html = `
+    <div style="font-family:Arial,sans-serif;background:#fff;padding:16px;border-radius:8px;color:#111">
+      <div style="font-size:15px;font-weight:800;margin-bottom:12px;text-align:center">🍺 BAR IDEAL — ${semLabel}</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="background:#1A1A2E;color:#fff">
+            <th style="padding:6px 8px;text-align:left">Empleado</th>
+            <th style="padding:6px 4px;text-align:left">Rol</th>
+            ${diasNombres.map((d,i) => `<th style="padding:6px 4px;text-align:center">${d}<br>${new Date(semanaActual[i]+'T12:00').getDate()}/${new Date(semanaActual[i]+'T12:00').getMonth()+1}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody style="text-align:center">
+          ${filas}
+        </tbody>
+      </table>
+    </div>`;
+
+  // Mostrar preview
+  let preview = document.getElementById('preview-grilla-wsp');
+  if (!preview) {
+    preview = document.createElement('div');
+    preview.id = 'preview-grilla-wsp';
+    document.querySelector('#s-horarios .panel').appendChild(preview);
+  }
+  preview.style.display = 'block';
+  preview.innerHTML = html + `
+    <div style="padding:12px 16px;display:flex;gap:10px;align-items:center">
+      <span style="font-size:12px;color:var(--text3)">Copiá esta imagen con ⌘+Shift+4 (Mac) o la herramienta de captura</span>
+      <button onclick="document.getElementById('preview-grilla-wsp').style.display='none'"
+        style="padding:6px 12px;background:transparent;border:1px solid var(--border);color:var(--text3);border-radius:6px;cursor:pointer;font-size:12px">Cerrar</button>
+    </div>`;
+
+  preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 </script>
+
+<!-- ── DRAWER FICHA EMPLEADO ── -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="cerrarDrawer()"></div>
+<div id="drawer-emp">
+  <div class="drawer-header">
+    <div class="drawer-title" id="drawer-emp-title">Ficha del empleado</div>
+    <button class="drawer-close" onclick="cerrarDrawer()">×</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-emp-info">
+      <div class="drawer-avatar" id="drawer-avatar">—</div>
+      <div>
+        <div class="drawer-emp-name" id="drawer-emp-name">—</div>
+        <div class="drawer-emp-sub" id="drawer-emp-sub">—</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div class="drawer-section-title">Estadísticas</div>
+      <select class="drawer-period-select" id="drawer-period" onchange="actualizarDrawer()">
+        <option value="semana">Esta semana</option>
+        <option value="mes" selected>Este mes</option>
+        <option value="mes_anterior">Mes anterior</option>
+      </select>
+    </div>
+    <div class="drawer-stat-grid">
+      <div class="drawer-stat-card">
+        <div class="drawer-stat-label">Horas trabajadas</div>
+        <div class="drawer-stat-val" id="drawer-hs-trabajadas">—</div>
+        <div class="drawer-stat-sub" id="drawer-hs-trabajadas-sub"></div>
+      </div>
+      <div class="drawer-stat-card">
+        <div class="drawer-stat-label">Horas asignadas</div>
+        <div class="drawer-stat-val" id="drawer-hs-asignadas">—</div>
+        <div class="drawer-stat-sub" id="drawer-hs-asignadas-sub"></div>
+      </div>
+      <div class="drawer-stat-card">
+        <div class="drawer-stat-label">Balance</div>
+        <div class="drawer-stat-val" id="drawer-balance">—</div>
+        <div class="drawer-stat-sub" id="drawer-balance-sub"></div>
+      </div>
+      <div class="drawer-stat-card">
+        <div class="drawer-stat-label">Tardanzas</div>
+        <div class="drawer-stat-val" id="drawer-tardanzas">—</div>
+        <div class="drawer-stat-sub">en el período</div>
+      </div>
+    </div>
+    <div>
+      <div class="drawer-section-title">Detalle de tardanzas</div>
+      <div class="drawer-tardanzas-list" id="drawer-tardanzas-list">
+        <div style="font-size:13px;color:var(--text3)">Sin tardanzas en el período</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── POPUP PUNTUALIDAD ── -->
+<div id="popup-puntualidad">
+  <div class="popup-puntualidad-box">
+    <div class="popup-punt-header">
+      <div>
+        <div class="popup-punt-title" id="popup-punt-nombre">—</div>
+        <div class="popup-punt-sub" id="popup-punt-fecha">—</div>
+      </div>
+      <button class="popup-punt-close" onclick="cerrarPopupPunt()">×</button>
+    </div>
+    <div class="popup-punt-row">
+      <span class="popup-punt-key">Horario asignado</span>
+      <span class="popup-punt-val" id="popup-punt-asignado">—</span>
+    </div>
+    <div class="popup-punt-row">
+      <span class="popup-punt-key">Hora real de entrada</span>
+      <span class="popup-punt-val" id="popup-punt-real">—</span>
+    </div>
+    <div class="popup-punt-row">
+      <span class="popup-punt-key">Diferencia</span>
+      <span class="popup-punt-val" id="popup-punt-diff">—</span>
+    </div>
+    <div class="popup-punt-row">
+      <span class="popup-punt-key">Estado</span>
+      <span class="popup-punt-val" id="popup-punt-estado">—</span>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
