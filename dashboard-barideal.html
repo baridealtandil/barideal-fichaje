@@ -3046,7 +3046,7 @@ function generarGrillaWsp(rolFiltro = 'todos') {
     let celdas = '';
     semanaActual.forEach(fecha => {
       const h = (horariosSemana[pe.id] || {})[fecha];
-      const tdStyle = 'padding:5px 4px;border-right:1px solid #ddd;text-align:center';
+      const tdStyle = 'padding:5px 4px;border-right:1px solid #ccc;border-bottom:1px solid #ccc;text-align:center';
       if (!h) { celdas += `<td style="${tdStyle};color:#aaa">—</td>`; return; }
       if (h.estado === 'franco') { celdas += `<td style="${tdStyle};color:#4472C4;font-weight:700">FRANCO</td>`; return; }
       if (h.estado === 'ausente') { celdas += `<td style="${tdStyle};color:#E53935;font-weight:700">AUSENTE</td>`; return; }
@@ -3054,7 +3054,7 @@ function generarGrillaWsp(rolFiltro = 'todos') {
       const s = (h.salida1 || h.salida || '').substring(0,5);
       celdas += `<td style="${tdStyle}">${e}${s ? '–'+s : ''}</td>`;
     });
-    filas += `<tr style="border-bottom:1px solid #ddd"><td style="text-align:left;font-weight:600;padding:5px 8px;border-right:1px solid #ddd">${pe.apellido} ${pe.nombre}</td><td style="color:#888;padding:5px 8px;border-right:1px solid #ddd">${pe.rol||''}</td>${celdas}</tr>`;
+    filas += `<tr><td style="text-align:left;font-weight:600;padding:5px 8px;border-right:1px solid #ccc;border-bottom:1px solid #ccc">${pe.apellido} ${pe.nombre}</td><td style="color:#888;padding:5px 8px;border-right:1px solid #ccc;border-bottom:1px solid #ccc">${pe.rol||''}</td>${celdas}</tr>`;
   });
 
   const html = `
