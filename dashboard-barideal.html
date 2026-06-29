@@ -3030,9 +3030,12 @@ function toggleMenuWsp(e) {
   const isOpen = m.style.display === 'block';
   m.style.display = isOpen ? 'none' : 'block';
   if (!isOpen) {
-    setTimeout(() => document.addEventListener('click', function h() {
-      document.getElementById('menu-wsp').style.display = 'none';
-      document.removeEventListener('click', h);
+    setTimeout(() => document.addEventListener('click', function h(ev) {
+      // Solo cerrar si el clic fue FUERA del menú
+      if (!document.getElementById('menu-wsp').contains(ev.target)) {
+        document.getElementById('menu-wsp').style.display = 'none';
+        document.removeEventListener('click', h);
+      }
     }), 10);
   }
 }
