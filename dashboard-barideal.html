@@ -752,6 +752,14 @@ canvas { max-height: 240px; }
   display: none; margin-top: 16px;
   border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
 }
+
+.wsp-check-label {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 4px; font-size: 13px; color: var(--text);
+  cursor: pointer; border-radius: 6px; transition: background 0.1s;
+}
+.wsp-check-label:hover { background: rgba(255,255,255,0.06); }
+.wsp-check-label input[type="checkbox"] { accent-color: #25D366; width: 15px; height: 15px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -1062,14 +1070,14 @@ canvas { max-height: 240px; }
             <button class="btn btn-outline" onclick="irAHoy()" style="font-size:12px">Hoy</button>
             <div style="position:relative;display:inline-block">
               <button class="btn-wsp" onclick="toggleMenuWsp(event)" title="Generar imagen para WhatsApp">📲 WhatsApp ▾</button>
-              <div id="menu-wsp" style="display:none;position:absolute;top:38px;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px;z-index:200;min-width:180px;box-shadow:0 8px 24px rgba(0,0,0,0.5)">
-                <div style="font-size:10px;color:var(--text3);padding:4px 8px 6px;text-transform:uppercase;letter-spacing:0.5px">Filtrar por rol</div>
-                <button onclick="generarGrillaWsp('todos')" class="menu-wsp-btn">📋 Todos</button>
-                <button onclick="generarGrillaWsp('Salón')" class="menu-wsp-btn">🍽️ Salón</button>
-                <button onclick="generarGrillaWsp('Cocina')" class="menu-wsp-btn">👨‍🍳 Cocina</button>
-                <button onclick="generarGrillaWsp('Encargado')" class="menu-wsp-btn">👔 Encargado</button>
-                <button onclick="generarGrillaWsp('Limpieza')" class="menu-wsp-btn">🧹 Limpieza</button>
-                <button onclick="generarGrillaWsp('Administración')" class="menu-wsp-btn">📊 Administración</button>
+              <div id="menu-wsp" style="display:none;position:absolute;top:38px;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;z-index:200;min-width:200px;box-shadow:0 8px 24px rgba(0,0,0,0.5)">
+                <div style="font-size:10px;color:var(--text3);padding:0 0 8px;text-transform:uppercase;letter-spacing:0.5px">Seleccioná los roles</div>
+                <label class="wsp-check-label"><input type="checkbox" value="Salón" class="wsp-rol-check" checked> 🍽️ Salón</label>
+                <label class="wsp-check-label"><input type="checkbox" value="Cocina" class="wsp-rol-check" checked> 👨‍🍳 Cocina</label>
+                <label class="wsp-check-label"><input type="checkbox" value="Encargado" class="wsp-rol-check"> 👔 Encargado</label>
+                <label class="wsp-check-label"><input type="checkbox" value="Limpieza" class="wsp-rol-check"> 🧹 Limpieza</label>
+                <label class="wsp-check-label"><input type="checkbox" value="Administración" class="wsp-rol-check"> 📊 Administración</label>
+                <button onclick="generarGrillaWsp()" class="menu-wsp-btn" style="margin-top:8px;background:#25D366;color:#fff;font-weight:700;width:100%;border-radius:6px">📲 Generar grilla</button>
               </div>
             </div>
             <button class="btn btn-outline" onclick="document.getElementById('file-horarios').click()" style="font-size:12px">
@@ -3029,18 +3037,20 @@ function toggleMenuWsp(e) {
   }
 }
 
-function generarGrillaWsp(rolFiltro = 'todos') {
+function generarGrillaWsp() {
   document.getElementById('menu-wsp').style.display = 'none';
+  const checks = document.querySelectorAll('.wsp-rol-check:checked');
+  const rolesSeleccionados = Array.from(checks).map(c => c.value);
   const diasNombres = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
   const ini = new Date(semanaActual[0] + 'T12:00');
   const fin = new Date(semanaActual[6] + 'T12:00');
   const semLabel = `Semana ${ini.getDate()}/${ini.getMonth()+1} al ${fin.getDate()}/${fin.getMonth()+1}`;
 
   // Construir HTML de la grilla
-  const empsFiltrados = rolFiltro === 'todos'
+  const empsFiltrados = rolesSeleccionados.length === 0
     ? planillaEmpleados
-    : planillaEmpleados.filter(pe => pe.rol === rolFiltro);
-  const rolLabel = rolFiltro === 'todos' ? 'Todos los roles' : rolFiltro;
+    : planillaEmpleados.filter(pe => rolesSeleccionados.includes(pe.rol));
+  const rolLabel = rolesSeleccionados.length === 0 ? 'Todos' : rolesSeleccionados.join(' · ');
   let filas = '';
   empsFiltrados.forEach(pe => {
     let celdas = '';
