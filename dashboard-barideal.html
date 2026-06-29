@@ -1053,18 +1053,7 @@ canvas { max-height: 240px; }
             </div>
             <input type="date" id="semana-inicio" onchange="cargarHorarios()" style="display:none">
             <button class="btn btn-outline" onclick="irAHoy()" style="font-size:12px">Hoy</button>
-            <div style="position:relative;display:inline-block">
-              <button class="btn-wsp" onclick="toggleMenuWsp()" title="Generar imagen para WhatsApp">📲 WhatsApp ▾</button>
-              <div id="menu-wsp" style="display:none;position:absolute;top:36px;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px;z-index:100;min-width:180px;box-shadow:0 8px 24px rgba(0,0,0,0.4)">
-                <div style="font-size:10px;color:var(--text3);padding:4px 8px;text-transform:uppercase;letter-spacing:0.5px">Filtrar por rol</div>
-                <button onclick="generarGrillaWsp('todos')" style="display:block;width:100%;text-align:left;padding:8px 12px;background:none;border:none;color:var(--text);cursor:pointer;border-radius:6px;font-size:13px" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">📋 Todos</button>
-                <button onclick="generarGrillaWsp('Salón')" style="display:block;width:100%;text-align:left;padding:8px 12px;background:none;border:none;color:var(--text);cursor:pointer;border-radius:6px;font-size:13px" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">🍽️ Salón</button>
-                <button onclick="generarGrillaWsp('Cocina')" style="display:block;width:100%;text-align:left;padding:8px 12px;background:none;border:none;color:var(--text);cursor:pointer;border-radius:6px;font-size:13px" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">👨‍🍳 Cocina</button>
-                <button onclick="generarGrillaWsp('Encargado')" style="display:block;width:100%;text-align:left;padding:8px 12px;background:none;border:none;color:var(--text);cursor:pointer;border-radius:6px;font-size:13px" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">👔 Encargado</button>
-                <button onclick="generarGrillaWsp('Limpieza')" style="display:block;width:100%;text-align:left;padding:8px 12px;background:none;border:none;color:var(--text);cursor:pointer;border-radius:6px;font-size:13px" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">🧹 Limpieza</button>
-                <button onclick="generarGrillaWsp('Administración')" style="display:block;width:100%;text-align:left;padding:8px 12px;background:none;border:none;color:var(--text);cursor:pointer;border-radius:6px;font-size:13px" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">📊 Administración</button>
-              </div>
-            </div>
+            <button class="btn-wsp" onclick="generarGrillaWsp()" title="Generar imagen para WhatsApp">📲 WhatsApp</button>
             <button class="btn btn-outline" onclick="document.getElementById('file-horarios').click()" style="font-size:12px">
               📁 Importar Excel
             </button>
@@ -3009,56 +2998,38 @@ function cerrarPopupPunt() {
 // ══════════════════════════════════
 //  GRILLA WHATSAPP
 // ══════════════════════════════════
-function toggleMenuWsp() {
-  const m = document.getElementById('menu-wsp');
-  m.style.display = m.style.display === 'none' ? 'block' : 'none';
-  // Cerrar al hacer clic afuera
-  setTimeout(() => document.addEventListener('click', function h(e) {
-    if (!e.target.closest('#menu-wsp') && !e.target.closest('.btn-wsp')) {
-      document.getElementById('menu-wsp').style.display = 'none';
-    }
-    document.removeEventListener('click', h);
-  }), 10);
-}
-
-function generarGrillaWsp(rolFiltro = 'todos') {
+function generarGrillaWsp() {
   const diasNombres = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
   const ini = new Date(semanaActual[0] + 'T12:00');
   const fin = new Date(semanaActual[6] + 'T12:00');
   const semLabel = `Semana ${ini.getDate()}/${ini.getMonth()+1} al ${fin.getDate()}/${fin.getMonth()+1}`;
 
-  document.getElementById('menu-wsp').style.display = 'none';
-
   // Construir HTML de la grilla
-  const empsFiltrados = rolFiltro === 'todos'
-    ? planillaEmpleados
-    : planillaEmpleados.filter(pe => pe.rol === rolFiltro);
-
-  const rolLabel = rolFiltro === 'todos' ? 'Todos los roles' : rolFiltro;
   let filas = '';
-  empsFiltrados.forEach(pe => {
+  planillaEmpleados.forEach(pe => {
     let celdas = '';
     semanaActual.forEach(fecha => {
       const h = (horariosSemana[pe.id] || {})[fecha];
-      if (!h) { celdas += '<td style="color:#555">—</td>'; return; }
-      if (h.estado === 'franco') { celdas += '<td style="color:#4472C4;font-weight:700">FRANCO</td>'; return; }
-      if (h.estado === 'ausente') { celdas += '<td style="color:#E53935;font-weight:700">AUSENTE</td>'; return; }
+      const tdStyle = 'padding:5px 4px;border-right:1px solid #ddd;text-align:center';
+      if (!h) { celdas += `<td style="${tdStyle};color:#aaa">—</td>`; return; }
+      if (h.estado === 'franco') { celdas += `<td style="${tdStyle};color:#4472C4;font-weight:700">FRANCO</td>`; return; }
+      if (h.estado === 'ausente') { celdas += `<td style="${tdStyle};color:#E53935;font-weight:700">AUSENTE</td>`; return; }
       const e = (h.entrada1 || h.entrada || '').substring(0,5);
       const s = (h.salida1 || h.salida || '').substring(0,5);
-      celdas += `<td>${e}${s ? '–'+s : ''}</td>`;
+      celdas += `<td style="${tdStyle}">${e}${s ? '–'+s : ''}</td>`;
     });
-    filas += `<tr><td style="text-align:left;font-weight:600">${pe.apellido} ${pe.nombre}</td><td style="color:#888">${pe.rol||''}</td>${celdas}</tr>`;
+    filas += `<tr style="border-bottom:1px solid #ddd"><td style="text-align:left;font-weight:600;padding:5px 8px;border-right:1px solid #ddd">${pe.apellido} ${pe.nombre}</td><td style="color:#888;padding:5px 8px;border-right:1px solid #ddd">${pe.rol||''}</td>${celdas}</tr>`;
   });
 
   const html = `
     <div style="font-family:Arial,sans-serif;background:#fff;padding:16px;border-radius:8px;color:#111">
-      <div style="font-size:15px;font-weight:800;margin-bottom:12px;text-align:center">🍺 BAR IDEAL — ${semLabel} · ${rolLabel}</div>
-      <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <div style="font-size:15px;font-weight:800;margin-bottom:12px;text-align:center">🍺 BAR IDEAL — ${semLabel}</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;border:1px solid #ccc">
         <thead>
           <tr style="background:#1A1A2E;color:#fff">
-            <th style="padding:6px 8px;text-align:left">Empleado</th>
-            <th style="padding:6px 4px;text-align:left">Rol</th>
-            ${diasNombres.map((d,i) => `<th style="padding:6px 4px;text-align:center">${d}<br>${new Date(semanaActual[i]+'T12:00').getDate()}/${new Date(semanaActual[i]+'T12:00').getMonth()+1}</th>`).join('')}
+            <th style="padding:6px 8px;text-align:left;border-right:1px solid #444">Empleado</th>
+            <th style="padding:6px 4px;text-align:left;border-right:1px solid #444">Rol</th>
+            ${diasNombres.map((d,i) => `<th style="padding:6px 4px;text-align:center;border-right:1px solid #444">${d}<br>${new Date(semanaActual[i]+'T12:00').getDate()}/${new Date(semanaActual[i]+'T12:00').getMonth()+1}</th>`).join('')}
           </tr>
         </thead>
         <tbody style="text-align:center">
