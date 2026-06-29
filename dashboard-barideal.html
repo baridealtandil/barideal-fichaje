@@ -119,7 +119,9 @@ body {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--r); padding: 18px 20px;
+  cursor: pointer; transition: border-color 0.15s;
 }
+.kpi-card:hover { border-color: rgba(255,255,255,0.3); }
 .kpi-label { font-size: 11px; font-weight: 600; text-transform: uppercase;
   letter-spacing: 0.5px; color: var(--text3); margin-bottom: 8px; }
 .kpi-value { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; }
@@ -467,6 +469,7 @@ canvas { max-height: 240px; }
 .cell-inner.has-turno { border-style: solid; border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.05); }
 .cell-inner.is-franco { border-color: rgba(100,180,255,0.3); background: rgba(100,180,255,0.06); }
 .cell-inner.is-ausente { border-color: rgba(255,80,80,0.3); background: rgba(255,80,80,0.06); }
+.cell-inner.is-nt { border-color: rgba(120,120,120,0.3); background: rgba(120,120,120,0.06); }
 .cell-inner.is-hoy { border-color: rgba(255,200,0,0.4); background: rgba(255,200,0,0.05); }
 
 .turno-hora { font-size: 11px; color: #DDD; font-weight: 500; line-height: 1.3; white-space: nowrap; }
@@ -838,22 +841,22 @@ canvas { max-height: 240px; }
     <!-- ── PRINCIPAL ── -->
     <section class="section active" id="s-principal">
       <div class="kpi-grid">
-        <div class="kpi-card">
+        <div class="kpi-card" onclick="abrirPopupKpi('fichajes-hoy')">
           <div class="kpi-label">Fichajes hoy</div>
           <div class="kpi-value" id="kpi-hoy">—</div>
           <div class="kpi-sub" id="kpi-hoy-sub">registros de hoy</div>
         </div>
-        <div class="kpi-card">
+        <div class="kpi-card" onclick="abrirPopupKpi('empleados')">
           <div class="kpi-label">Empleados</div>
           <div class="kpi-value" id="kpi-empleados">—</div>
           <div class="kpi-sub">registrados</div>
         </div>
-        <div class="kpi-card">
+        <div class="kpi-card" onclick="abrirPopupKpi('dentro')">
           <div class="kpi-label">Dentro ahora</div>
           <div class="kpi-value" id="kpi-dentro">—</div>
           <div class="kpi-sub" id="kpi-dentro-sub">con entrada activa</div>
         </div>
-        <div class="kpi-card">
+        <div class="kpi-card" onclick="abrirPopupKpi('total')">
           <div class="kpi-label">Total fichajes</div>
           <div class="kpi-value" id="kpi-total">—</div>
           <div class="kpi-sub">histórico</div>
@@ -1264,6 +1267,10 @@ canvas { max-height: 240px; }
         style="flex:1;padding:8px;border-radius:8px;border:1.5px solid rgba(255,80,80,0.3);background:rgba(255,80,80,0.08);color:#FF5050;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s">
         A &nbsp;Ausente
       </button>
+      <button id="mqb-nt" onclick="toggleEstadoModal('nt')"
+        style="flex:1;padding:8px;border-radius:8px;border:1.5px solid rgba(120,120,120,0.3);background:rgba(120,120,120,0.08);color:#aaa;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s">
+        NT
+      </button>
       <button onclick="borrarTurno()"
         style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#777;font-size:12px;cursor:pointer">
         ✕ Borrar
@@ -1454,8 +1461,11 @@ function calcularAlertasHoy(fichajesHoy) {
     const horario = (horariosSemana[e.id] || {})[hoy];
     if (!horario) return;
 
+    // Ignorar si tiene franco o NT hoy
+    if (horario.estado === 'franco' || horario.estado === 'nt') return;
+
     if (!empIds.has(e.id)) {
-      ausentes.push(e.nombre);
+      ausentes.push(e.nombre + ' ' + e.apellido);
     } else {
       // Llegada tarde
       const entrada = fichajesHoy.filter(f => f.empleado_id === e.id && f.tipo === 'entrada')[0];
@@ -1464,14 +1474,14 @@ function calcularAlertasHoy(fichajesHoy) {
         const real = new Date(entrada.fecha_hora);
         const diff = Math.round((real - prog) / 60000);
         if (diff > TOLERANCIA_MINUTOS) {
-          tardes.push(e.nombre);
+          tardes.push(e.nombre + ' ' + e.apellido);
           _alertaData.tardes.push({
-            nombre: e.nombre,
+            nombre: e.nombre + ' ' + e.apellido,
             detalle: `Asignado: ${horario.entrada.substring(0,5)} · Entró: ${fmt(entrada.fecha_hora)}`,
             diff
           });
         } else {
-          puntuales.push(e.nombre);
+          puntuales.push(e.nombre + ' ' + e.apellido);
         }
       }
     }
@@ -1992,6 +2002,9 @@ function renderTablaHorarios() {
           } else if (h.estado === 'ausente') {
             cls += ' is-ausente';
             contenido = `<span class="turno-badge ausente">Ausente</span>`;
+          } else if (h.estado === 'nt') {
+            cls += ' is-nt';
+            contenido = `<span class="turno-badge" style="background:rgba(120,120,120,0.2);color:#888">NT</span>`;
           } else if (h.entrada1) {
             cls += ' has-turno';
             contenido = `<span class="turno-hora">${h.entrada1.substring(0,5)}–${(h.salida1||'?').substring(0,5)}</span>`;
@@ -3111,9 +3124,14 @@ function generarGrillaWsp() {
       if (!h) { celdas += `<td style="${tdStyle};color:#aaa">—</td>`; return; }
       if (h.estado === 'franco') { celdas += `<td style="${tdStyle};color:#4472C4;font-weight:700">FRANCO</td>`; return; }
       if (h.estado === 'ausente') { celdas += `<td style="${tdStyle};color:#E53935;font-weight:700">AUSENTE</td>`; return; }
+      if (h.estado === 'nt') { celdas += `<td style="${tdStyle};color:#888;font-weight:700">NT</td>`; return; }
       const e = (h.entrada1 || h.entrada || '').substring(0,5);
       const s = (h.salida1 || h.salida || '').substring(0,5);
-      celdas += `<td style="${tdStyle}">${e}${s ? '–'+s : ''}</td>`;
+      const e2 = h.entrada2 ? h.entrada2.substring(0,5) : '';
+      const s2 = h.salida2 ? h.salida2.substring(0,5) : '';
+      const t1 = `${e}${s ? '–'+s : ''}`;
+      const t2 = e2 ? `${e2}${s2 ? '–'+s2 : ''}` : '';
+      celdas += `<td style="${tdStyle}">${t1}${t2 ? '<br><span style="font-size:10px;color:#888">'+t2+'</span>' : ''}</td>`;
     });
     filas += `<tr><td style="text-align:left;font-weight:600;padding:5px 8px;border-right:1px solid #ccc;border-bottom:1px solid #ccc">${pe.apellido} ${pe.nombre}</td><td style="color:#888;padding:5px 8px;border-right:1px solid #ccc;border-bottom:1px solid #ccc">${pe.rol||''}</td>${celdas}</tr>`;
   });
@@ -3200,6 +3218,80 @@ function abrirPopupAlerta(tipo) {
 
 function cerrarPopupAlerta() {
   document.getElementById('popup-alerta').classList.remove('show');
+}
+
+
+// ══════════════════════════════════
+//  POPUP KPI CARDS
+// ══════════════════════════════════
+function abrirPopupKpi(tipo) {
+  const hoy = fechaHoy();
+  const fichajesHoy = todosLosFichajes.filter(f => f.fecha_hora && f.fecha_hora.startsWith(hoy));
+
+  const titulos = {
+    'fichajes-hoy': '📋 Fichajes de hoy',
+    'empleados':    '👥 Empleados registrados',
+    'dentro':       '🟢 Dentro ahora',
+    'total':        '📊 Total histórico de fichajes',
+  };
+
+  let datos = [];
+
+  if (tipo === 'fichajes-hoy') {
+    // Agrupar por empleado
+    const grupos = {};
+    fichajesHoy.forEach(f => {
+      const key = f.empleado_id;
+      if (!grupos[key]) grupos[key] = { nombre: f.nombre + ' ' + f.apellido, tipos: [] };
+      grupos[key].tipos.push(f.tipo);
+    });
+    datos = Object.values(grupos).map(g => ({
+      nombre: g.nombre,
+      detalle: g.tipos.map(t => ({ entrada:'Entrada', salida:'Salida', entrada2:'Entrada 2', salida2:'Salida 2' }[t] || t)).join(' · ')
+    }));
+  } else if (tipo === 'empleados') {
+    datos = todosLosEmpleados.map(e => ({
+      nombre: e.nombre + ' ' + e.apellido,
+      detalle: planillaEmpleados.find(p => p.empleado_id === e.id)?.rol || 'Sin rol'
+    }));
+  } else if (tipo === 'dentro') {
+    const empHoy = {};
+    fichajesHoy.forEach(f => {
+      if (!empHoy[f.empleado_id]) empHoy[f.empleado_id] = { nombre: f.nombre + ' ' + f.apellido, tipos: new Set() };
+      empHoy[f.empleado_id].tipos.add(f.tipo);
+    });
+    datos = Object.values(empHoy)
+      .filter(e => (e.tipos.has('entrada') && !e.tipos.has('salida')) ||
+                   (e.tipos.has('entrada2') && !e.tipos.has('salida2')))
+      .map(e => ({ nombre: e.nombre }));
+  } else if (tipo === 'total') {
+    // Mostrar resumen por día de los últimos 7 días
+    const porDia = {};
+    todosLosFichajes.forEach(f => {
+      const fecha = f.fecha_hora ? f.fecha_hora.split('T')[0] : null;
+      if (!fecha) return;
+      porDia[fecha] = (porDia[fecha] || 0) + 1;
+    });
+    datos = Object.entries(porDia)
+      .sort((a,b) => b[0].localeCompare(a[0]))
+      .slice(0, 14)
+      .map(([fecha, cant]) => ({ nombre: fmtFecha(fecha + 'T12:00'), detalle: cant + ' fichajes' }));
+  }
+
+  document.getElementById('popup-alerta-title').textContent = titulos[tipo] || tipo;
+  const body = document.getElementById('popup-alerta-body');
+  if (!datos.length) {
+    body.innerHTML = '<div class="popup-alerta-empty">Sin datos</div>';
+  } else {
+    body.innerHTML = datos.map(d => `
+      <div class="popup-alerta-row">
+        <div>
+          <div class="popup-alerta-nombre">${d.nombre}</div>
+          ${d.detalle ? `<div class="popup-alerta-detalle">${d.detalle}</div>` : ''}
+        </div>
+      </div>`).join('');
+  }
+  document.getElementById('popup-alerta').classList.add('show');
 }
 
 </script>
