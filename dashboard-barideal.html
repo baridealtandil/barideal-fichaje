@@ -139,6 +139,8 @@ body {
 .alert-card.danger { border-color: var(--danger); }
 .alert-card.warning { border-color: var(--warning); }
 .alert-card.success { border-color: var(--success); }
+.alert-card.incompleto { border-color: rgba(255,152,0,0.5); background: rgba(255,152,0,0.07); }
+.badge-incompleto { display:inline-block; background: var(--warning); color:#000; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; margin-left:6px; vertical-align:middle; }
 .alert-card .alert-title { font-size: 12px; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.5px; margin-bottom: 6px; }
 .alert-card.danger .alert-title { color: var(--danger); }
@@ -733,6 +735,11 @@ canvas { max-height: 240px; }
           <div class="alert-value" id="alert-puntuales">—</div>
           <div class="alert-sub">entraron a tiempo</div>
         </div>
+        <div class="alert-card incompleto">
+          <div class="alert-title">⚠️ Fichajes incompletos</div>
+          <div class="alert-value" id="alert-incompletos">—</div>
+          <div class="alert-sub" id="alert-incompletos-nombres">Sin datos</div>
+        </div>
       </div>
 
       <div class="section-title">Actividad reciente</div>
@@ -1313,6 +1320,30 @@ function calcularAlertasHoy(fichajesHoy) {
   document.getElementById('alert-tardes').textContent = tardes.length;
   document.getElementById('alert-tardes-nombres').textContent = tardes.length ? tardes.slice(0,3).join(', ') + (tardes.length > 3 ? '…' : '') : 'Sin tardanzas';
   document.getElementById('alert-puntuales').textContent = puntuales.length;
+
+  // Fichajes incompletos: entrada sin salida con más de 12 horas
+  const ahora = Date.now();
+  const incompletos = [];
+  const gruposPorEmp = {};
+  todosLosFichajes.forEach(f => {
+    if (!gruposPorEmp[f.empleado_id]) gruposPorEmp[f.empleado_id] = { nombre: f.nombre + ' ' + f.apellido, fichajes: [] };
+    gruposPorEmp[f.empleado_id].fichajes.push(f);
+  });
+  Object.values(gruposPorEmp).forEach(emp => {
+    const tieneIncompleto = (tipo_entrada, tipo_salida) => {
+      const entrada = emp.fichajes.find(f => f.tipo === tipo_entrada);
+      const salida  = emp.fichajes.find(f => f.tipo === tipo_salida);
+      if (!entrada || salida) return false;
+      return (ahora - new Date(entrada.fecha_hora).getTime()) / 3600000 > 12;
+    };
+    if (tieneIncompleto('entrada', 'salida') || tieneIncompleto('entrada2', 'salida2')) {
+      incompletos.push(emp.nombre);
+    }
+  });
+  document.getElementById('alert-incompletos').textContent = incompletos.length;
+  document.getElementById('alert-incompletos-nombres').textContent = incompletos.length
+    ? incompletos.slice(0,3).join(', ') + (incompletos.length > 3 ? '…' : '')
+    : 'Sin fichajes incompletos';
 }
 
 // ══════════════════════════════════
@@ -1401,6 +1432,13 @@ function renderTablaFichajes() {
       else estado = `<span class="badge badge-puntual">Puntual</span>`;
     } else if (!e1) {
       estado = `<span class="badge badge-ausente">Ausente</span>`;
+    }
+    // Detectar fichaje incompleto: entrada sin salida > 12hs
+    const ahoraDash = Date.now();
+    const esIncompletoE1 = e1 && !s1 && (ahoraDash - new Date(e1.fecha_hora).getTime()) / 3600000 > 12;
+    const esIncompletoE2 = e2 && !s2 && (ahoraDash - new Date(e2.fecha_hora).getTime()) / 3600000 > 12;
+    if (esIncompletoE1 || esIncompletoE2) {
+      estado += ` <span class="badge-incompleto">⚠️ Incompleto</span>`;
     }
 
     return `
@@ -1779,9 +1817,9 @@ function renderTablaHorarios() {
           } else if (h.estado === 'ausente') {
             cls += ' is-ausente';
             contenido = `<span class="turno-badge ausente">Ausente</span>`;
-          } else if (h.entrada1 || h.salida1) {
+          } else if (h.entrada1) {
             cls += ' has-turno';
-            contenido = `<span class="turno-hora">${(h.entrada1||'?').substring(0,5)}–${(h.salida1||'?').substring(0,5)}</span>`;
+            contenido = `<span class="turno-hora">${h.entrada1.substring(0,5)}–${(h.salida1||'?').substring(0,5)}</span>`;
             if (h.entrada2) contenido += `<span class="turno-hora2">${h.entrada2.substring(0,5)}–${(h.salida2||'?').substring(0,5)}</span>`;
           }
         }

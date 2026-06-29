@@ -236,6 +236,22 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 }
 #toast.show { opacity: 1; }
 
+#overlay-incompleto {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 400; gap: 14px; padding: 32px;
+}
+#overlay-incompleto.show { display: flex; }
+.incompleto-icon { font-size: 52px; }
+.incompleto-title { font-size: 18px; font-weight: 700; color: var(--white); text-align: center; }
+.incompleto-sub { font-size: 13px; color: var(--off); text-align: center; line-height: 1.5; max-width: 280px; }
+.incompleto-btn {
+  margin-top: 8px; width: 100%; max-width: 300px;
+  padding: 14px; background: var(--warning);
+  border: none; border-radius: 10px;
+  color: #000; font-size: 15px; font-weight: 800; cursor: pointer;
+}
+
 #overlay-confirm {
   position: fixed; inset: 0; background: rgba(0,0,0,0.85);
   display: none; flex-direction: column; align-items: center; justify-content: center;
@@ -371,6 +387,13 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
   </div>
 </div>
 
+<div id="overlay-incompleto">
+  <div class="incompleto-icon">⚠️</div>
+  <div class="incompleto-title">Fichaje incompleto</div>
+  <div class="incompleto-sub" id="incompleto-msg">Tenés una entrada sin salida registrada. Reportate con el encargado.</div>
+  <button class="incompleto-btn" onclick="cerrarIncompleto()">Entendido</button>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -458,6 +481,42 @@ async function cargarHistorial() {
     fichajesHoy = r.ok ? await r.json() : [];
   } catch { fichajesHoy = []; }
   renderHistorial(); actualizarBoton();
+  await verificarFichajeIncompleto();
+}
+
+async function verificarFichajeIncompleto() {
+  try {
+    // Traer fichajes de los últimos 2 días para detectar entradas sin salida > 12hs
+    const ayer = new Date();
+    ayer.setDate(ayer.getDate() - 1);
+    const fechaAyer = ayer.toISOString().split('T')[0];
+    const r = await fetch(`${API}/api/fichajes?empleado_id=${empleado.id}&fecha=${fechaAyer}`);
+    const fichajesAyer = r.ok ? await r.json() : [];
+
+    // Combinar ayer + hoy para buscar entradas huérfanas
+    const todos = [...fichajesAyer, ...fichajesHoy];
+    const ahora = Date.now();
+
+    // Buscar entrada sin salida correspondiente con más de 12 horas
+    const tieneEntradaSinSalida = (tipo_entrada, tipo_salida) => {
+      const entrada = todos.find(f => f.tipo === tipo_entrada);
+      const salida  = todos.find(f => f.tipo === tipo_salida);
+      if (!entrada || salida) return false;
+      const hs = (ahora - new Date(entrada.fecha_hora).getTime()) / 3600000;
+      return hs > 12;
+    };
+
+    const incompleto = tieneEntradaSinSalida('entrada', 'salida') ||
+                       tieneEntradaSinSalida('entrada2', 'salida2');
+
+    if (incompleto) {
+      document.getElementById('overlay-incompleto').classList.add('show');
+    }
+  } catch { /* silencioso */ }
+}
+
+function cerrarIncompleto() {
+  document.getElementById('overlay-incompleto').classList.remove('show');
 }
 
 function renderHistorial() {
