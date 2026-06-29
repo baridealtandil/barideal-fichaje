@@ -760,6 +760,35 @@ canvas { max-height: 240px; }
 }
 .wsp-check-label:hover { background: rgba(255,255,255,0.06); }
 .wsp-check-label input[type="checkbox"] { accent-color: #25D366; width: 15px; height: 15px; cursor: pointer; }
+
+/* ── Popup alertas ── */
+#popup-alerta {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  display: none; align-items: center; justify-content: center; z-index: 600;
+}
+#popup-alerta.show { display: flex; }
+.popup-alerta-box {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 0; width: 420px; max-width: 95vw;
+  max-height: 80vh; display: flex; flex-direction: column;
+}
+.popup-alerta-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+}
+.popup-alerta-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.popup-alerta-close { background: none; border: none; color: var(--text3); font-size: 22px; cursor: pointer; line-height: 1; }
+.popup-alerta-body { padding: 8px 0; overflow-y: auto; flex: 1; }
+.popup-alerta-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 14px;
+}
+.popup-alerta-row:last-child { border-bottom: none; }
+.popup-alerta-nombre { font-weight: 600; color: var(--text); }
+.popup-alerta-detalle { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.popup-alerta-badge { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
+.popup-alerta-empty { padding: 24px 20px; text-align: center; color: var(--text3); font-size: 13px; }
 </style>
 </head>
 <body>
@@ -833,22 +862,22 @@ canvas { max-height: 240px; }
 
       <div class="section-title">Alertas del día</div>
       <div class="alert-grid">
-        <div class="alert-card danger">
+        <div class="alert-card danger" style="cursor:pointer" onclick="abrirPopupAlerta('ausentes')">
           <div class="alert-title">⛔ Ausentes hoy</div>
           <div class="alert-value" id="alert-ausentes">—</div>
           <div class="alert-sub" id="alert-ausentes-nombres">Sin datos</div>
         </div>
-        <div class="alert-card warning">
+        <div class="alert-card warning" style="cursor:pointer" onclick="abrirPopupAlerta('tardes')">
           <div class="alert-title">⏰ Llegadas tarde hoy</div>
           <div class="alert-value" id="alert-tardes">—</div>
           <div class="alert-sub" id="alert-tardes-nombres">Sin datos</div>
         </div>
-        <div class="alert-card success">
+        <div class="alert-card success" style="cursor:pointer" onclick="abrirPopupAlerta('puntuales')">
           <div class="alert-title">✅ Puntuales</div>
           <div class="alert-value" id="alert-puntuales">—</div>
           <div class="alert-sub">entraron a tiempo</div>
         </div>
-        <div class="alert-card incompleto">
+        <div class="alert-card incompleto" style="cursor:pointer" onclick="abrirPopupAlerta('incompletos')">
           <div class="alert-title">⚠️ Fichajes incompletos</div>
           <div class="alert-value" id="alert-incompletos">—</div>
           <div class="alert-sub" id="alert-incompletos-nombres">Sin datos</div>
@@ -1434,17 +1463,30 @@ function calcularAlertasHoy(fichajesHoy) {
         const prog = new Date(`${hoy}T${horario.entrada}`);
         const real = new Date(entrada.fecha_hora);
         const diff = Math.round((real - prog) / 60000);
-        if (diff > TOLERANCIA_MINUTOS) tardes.push(e.nombre);
-        else puntuales.push(e.nombre);
+        if (diff > TOLERANCIA_MINUTOS) {
+          tardes.push(e.nombre);
+          _alertaData.tardes.push({
+            nombre: e.nombre,
+            detalle: `Asignado: ${horario.entrada.substring(0,5)} · Entró: ${fmt(entrada.fecha_hora)}`,
+            diff
+          });
+        } else {
+          puntuales.push(e.nombre);
+        }
       }
     }
   });
 
+  _alertaData.tardes = [];
   document.getElementById('alert-ausentes').textContent = ausentes.length;
   document.getElementById('alert-ausentes-nombres').textContent = ausentes.length ? ausentes.slice(0,3).join(', ') + (ausentes.length > 3 ? '…' : '') : 'Nadie ausente';
   document.getElementById('alert-tardes').textContent = tardes.length;
   document.getElementById('alert-tardes-nombres').textContent = tardes.length ? tardes.slice(0,3).join(', ') + (tardes.length > 3 ? '…' : '') : 'Sin tardanzas';
   document.getElementById('alert-puntuales').textContent = puntuales.length;
+
+  // Poblar datos para los popups
+  _alertaData.ausentes  = ausentes.map(n => ({ nombre: n, detalle: 'No fichó hoy' }));
+  _alertaData.puntuales = puntuales.map(n => ({ nombre: n }));
 
   // Fichajes incompletos: entrada sin salida con más de 12 horas
   const ahora = Date.now();
@@ -1469,6 +1511,12 @@ function calcularAlertasHoy(fichajesHoy) {
   document.getElementById('alert-incompletos-nombres').textContent = incompletos.length
     ? incompletos.slice(0,3).join(', ') + (incompletos.length > 3 ? '…' : '')
     : 'Sin fichajes incompletos';
+  _alertaData.incompletos = incompletos.map(nombre => {
+    const emp = Object.values(gruposPorEmp).find(g => g.nombre === nombre);
+    const entrada = emp ? emp.fichajes.find(f => f.tipo === 'entrada') : null;
+    const hs = entrada ? Math.floor((Date.now() - new Date(entrada.fecha_hora).getTime()) / 3600000) : null;
+    return { nombre, desde: hs ? hs + 'h sin salida' : 'Sin salida' };
+  });
 }
 
 // ══════════════════════════════════
@@ -3105,6 +3153,55 @@ function generarGrillaWsp() {
   preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+
+// ══════════════════════════════════
+//  POPUP ALERTAS
+// ══════════════════════════════════
+let _alertaData = { ausentes: [], tardes: [], puntuales: [], incompletos: [] };
+
+function abrirPopupAlerta(tipo) {
+  const titulos = {
+    ausentes:    '⛔ Ausentes hoy',
+    tardes:      '⏰ Llegadas tarde hoy',
+    puntuales:   '✅ Puntuales',
+    incompletos: '⚠️ Fichajes incompletos',
+  };
+  document.getElementById('popup-alerta-title').textContent = titulos[tipo] || tipo;
+
+  const datos = _alertaData[tipo] || [];
+  const body = document.getElementById('popup-alerta-body');
+
+  if (!datos.length) {
+    body.innerHTML = '<div class="popup-alerta-empty">Sin registros para mostrar</div>';
+  } else {
+    body.innerHTML = datos.map(d => {
+      let badge = '';
+      if (tipo === 'tardes') {
+        badge = `<span class="popup-alerta-badge" style="background:rgba(255,152,0,0.15);color:var(--warning)">+${d.diff}m</span>`;
+      } else if (tipo === 'ausentes') {
+        badge = `<span class="popup-alerta-badge" style="background:rgba(229,57,53,0.15);color:var(--danger)">Ausente</span>`;
+      } else if (tipo === 'puntuales') {
+        badge = `<span class="popup-alerta-badge" style="background:rgba(72,199,116,0.15);color:var(--success)">Puntual</span>`;
+      } else if (tipo === 'incompletos') {
+        badge = `<span class="popup-alerta-badge" style="background:rgba(255,152,0,0.15);color:var(--warning)">${d.desde}</span>`;
+      }
+      return `<div class="popup-alerta-row">
+        <div>
+          <div class="popup-alerta-nombre">${d.nombre}</div>
+          ${d.detalle ? `<div class="popup-alerta-detalle">${d.detalle}</div>` : ''}
+        </div>
+        ${badge}
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('popup-alerta').classList.add('show');
+}
+
+function cerrarPopupAlerta() {
+  document.getElementById('popup-alerta').classList.remove('show');
+}
+
 </script>
 
 <!-- ── DRAWER FICHA EMPLEADO ── -->
@@ -3190,5 +3287,16 @@ function generarGrillaWsp() {
   </div>
 </div>
 
+
+<!-- ── POPUP ALERTAS ── -->
+<div id="popup-alerta">
+  <div class="popup-alerta-box">
+    <div class="popup-alerta-header">
+      <div class="popup-alerta-title" id="popup-alerta-title">—</div>
+      <button class="popup-alerta-close" onclick="cerrarPopupAlerta()">×</button>
+    </div>
+    <div class="popup-alerta-body" id="popup-alerta-body"></div>
+  </div>
+</div>
 </body>
 </html>
