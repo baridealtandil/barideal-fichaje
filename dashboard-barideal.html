@@ -1459,6 +1459,11 @@ function calcularAlertasHoy(fichajesHoy) {
 
   let ausentes = [], tardes = [], puntuales = [];
 
+  // Inicializar arrays de datos para popups ANTES del loop
+  _alertaData.tardes = [];
+  _alertaData.ausentes = [];
+  _alertaData.puntuales = [];
+
   todosLosEmpleados.forEach(e => {
     // Buscar planilla_emp_id para este empleado (horariosSemana usa planilla_emp_id)
     const pe = planillaEmpleados.find(p => p.empleado_id === e.id);
@@ -1471,6 +1476,7 @@ function calcularAlertasHoy(fichajesHoy) {
 
     if (!empIds.has(e.id)) {
       ausentes.push(e.nombre + ' ' + e.apellido);
+      _alertaData.ausentes.push({ nombre: e.nombre + ' ' + e.apellido, detalle: 'No fichó hoy' });
     } else {
       // Llegada tarde
       const entrada = fichajesHoy.filter(f => f.empleado_id === e.id && f.tipo === 'entrada')[0];
@@ -1493,15 +1499,13 @@ function calcularAlertasHoy(fichajesHoy) {
     }
   });
 
-  _alertaData.tardes = [];
   document.getElementById('alert-ausentes').textContent = ausentes.length;
   document.getElementById('alert-ausentes-nombres').textContent = ausentes.length ? ausentes.slice(0,3).join(', ') + (ausentes.length > 3 ? '…' : '') : 'Nadie ausente';
   document.getElementById('alert-tardes').textContent = tardes.length;
   document.getElementById('alert-tardes-nombres').textContent = tardes.length ? tardes.slice(0,3).join(', ') + (tardes.length > 3 ? '…' : '') : 'Sin tardanzas';
   document.getElementById('alert-puntuales').textContent = puntuales.length;
 
-  // Poblar datos para los popups
-  _alertaData.ausentes  = ausentes.map(n => ({ nombre: n, detalle: 'No fichó hoy' }));
+  // Poblar puntuales para el popup (ausentes ya se pobló en el loop)
   _alertaData.puntuales = puntuales.map(n => ({ nombre: n }));
 
   // Fichajes incompletos: entrada sin salida con más de 12 horas
