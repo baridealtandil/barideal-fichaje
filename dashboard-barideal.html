@@ -473,7 +473,7 @@ canvas { max-height: 240px; }
 .cell-inner.is-hoy { border-color: rgba(255,200,0,0.4); background: rgba(255,200,0,0.05); }
 
 .turno-hora { font-size: 11px; color: #DDD; font-weight: 500; line-height: 1.3; white-space: nowrap; }
-.turno-hora2 { font-size: 10px; color: var(--text3); line-height: 1.3; white-space: nowrap; }
+.turno-hora2 { font-size: 11px; color: #DDD; font-weight: 500; line-height: 1.3; white-space: nowrap; }
 .turno-badge {
   font-size: 10px; font-weight: 700; letter-spacing: 0.5px; padding: 1px 6px;
   border-radius: 4px; text-transform: uppercase;
@@ -1355,7 +1355,7 @@ function showSection(id) {
 // ══════════════════════════════════
 function fmt(dt) {
   if (!dt) return '—';
-  return new Date(dt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return new Date(dt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Argentina/Buenos_Aires' });
 }
 function fmtFecha(dt) {
   if (!dt) return '—';
@@ -1624,8 +1624,12 @@ function renderTablaFichajes() {
       estado += ` <span class="badge-incompleto">⚠️ Incompleto</span>`;
     }
 
-    const horarioAsig = horario ? (horario.entrada1 || horario.entrada || '?') : null;
-    const diffMin = (horario && e1) ? Math.round((new Date(e1.fecha_hora) - new Date(`${g.fecha}T${horario.entrada1 || horario.entrada}`)) / 60000) : null;
+    // Buscar horario via planilla_emp_id (horariosSemana usa planilla_emp_id como clave)
+    const pe_match = planillaEmpleados ? planillaEmpleados.find(p => p.empleado_id === (g.items['entrada']?.empleado_id)) : null;
+    const horarioReal = pe_match ? (horariosSemana[pe_match.id] || {})[g.fecha] : horario;
+    const entradaRef = horarioReal ? (horarioReal.entrada1 || horarioReal.entrada || null) : null;
+    const horarioAsig = entradaRef || null;
+    const diffMin = (entradaRef && e1) ? Math.round((new Date(e1.fecha_hora) - new Date(`${g.fecha}T${entradaRef}`)) / 60000) : null;
     return `
       <tr style="cursor:pointer" onclick="abrirPopupPunt('${g.nombre} ${g.apellido}', '${g.fecha}', '${horarioAsig || ''}', '${e1 ? fmt(e1.fecha_hora) : ''}', ${diffMin})">
         <td class="td-nombre">${g.nombre} ${g.apellido}</td>
@@ -2720,9 +2724,11 @@ function renderTablaPlanilla() {
   // Empleados de la app que NO están vinculados a ningún registro de planilla
   const sinPlanilla = todosLosEmpleados.filter(e => !idsVinculados.has(e.id));
 
-  const opcionesEmpleados = todosLosEmpleados.map(e =>
-    `<option value="${e.id}">${e.nombre} ${e.apellido} · ${e.celular}</option>`
-  ).join('');
+  const opcionesEmpleados = todosLosEmpleados.map(e => {
+    const yaVinculado = planillaEmpleados.find(p => p.empleado_id === e.id);
+    const tag = yaVinculado ? ` (vinculado a ${yaVinculado.apellido} ${yaVinculado.nombre})` : '';
+    return `<option value="${e.id}">${e.nombre} ${e.apellido} · ${e.celular}${tag}</option>`;
+  }).join('');
 
   let rows = '';
 
@@ -3054,8 +3060,9 @@ function abrirPopupPunt(nombre, fecha, asignado, real, diffMin) {
     estadoEl.className = 'popup-punt-val rojo';
   } else {
     realEl.textContent = real;
-    if (diffMin === null || diffMin === undefined || asignado === '') {
+    if (diffMin === null || diffMin === undefined || isNaN(diffMin) || asignado === '' || asignado === 'null') {
       diffEl.textContent = 'Sin horario asignado';
+      diffEl.className = 'popup-punt-val';
       estadoEl.textContent = 'Fichó';
       estadoEl.className = 'popup-punt-val';
     } else if (diffMin > TOLERANCIA_MINUTOS) {

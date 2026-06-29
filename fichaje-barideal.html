@@ -226,6 +226,28 @@ animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 .success-hora { font-size: 52px; font-weight: 100; color: var(--white); letter-spacing: -2px; }
 .success-msg { font-size: 14px; color: var(--off); }
 .success-id { font-size: 11px; color: var(--dim); background: var(--card); padding: 5px 14px; border-radius: 7px; }
+
+#overlay-sospechoso {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 450; gap: 14px; padding: 32px;
+}
+#overlay-sospechoso.show { display: flex; }
+.sospechoso-icon { font-size: 52px; }
+.sospechoso-title { font-size: 18px; font-weight: 700; color: var(--white); text-align: center; }
+.sospechoso-sub { font-size: 13px; color: var(--warning); text-align: center; line-height: 1.5; max-width: 280px; }
+.sospechoso-btns { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 300px; margin-top: 8px; }
+.sospechoso-btn-cancel {
+  width: 100%; padding: 14px; background: transparent;
+  border: 1.5px solid rgba(255,255,255,0.3); border-radius: 10px;
+  color: var(--white); font-size: 15px; font-weight: 600; cursor: pointer;
+}
+.sospechoso-btn-ok {
+  width: 100%; padding: 14px; background: var(--warning);
+  border: none; border-radius: 10px;
+  color: #000; font-size: 15px; font-weight: 800; cursor: pointer;
+}
+
 #toast {
 position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
 background: var(--card); border: 1px solid var(--danger);
@@ -378,6 +400,16 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
   <div class="success-id" id="success-id">ID #—</div>
 </div>
 
+<div id="overlay-sospechoso">
+  <div class="sospechoso-icon">⚠️</div>
+  <div class="sospechoso-title">Fichaje sospechoso</div>
+  <div class="sospechoso-sub" id="sospechoso-msg">Pasó menos de 1 hora desde tu último fichaje.</div>
+  <div class="sospechoso-btns">
+    <button class="sospechoso-btn-cancel" onclick="cancelarSospechoso()">Cancelar</button>
+    <button class="sospechoso-btn-ok" onclick="confirmarSospechoso()">Confirmar de todas formas</button>
+  </div>
+</div>
+
 <div id="overlay-confirm">
   <div class="confirm-icon">⚠️</div>
   <div class="confirm-title">¿Estás seguro?</div>
@@ -415,7 +447,7 @@ function haversine(lat1, lng1, lat2, lng2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-function fmt(dt) { return new Date(dt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false }); }
+function fmt(dt) { return new Date(dt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Argentina/Buenos_Aires' }); }
 
 function toast(msg, dur = 3500) {
   const el = document.getElementById('toast');
@@ -578,6 +610,22 @@ async function fichar() {
   const dist = haversine(pos.coords.latitude, pos.coords.longitude, BAR_LAT, BAR_LNG);
   if (dist > RADIO_METROS) { ring.classList.remove('active'); toast(`Estás a ${Math.round(dist)}m del local. Necesitás estar a menos de ${RADIO_METROS}m.`); actualizarBoton(); return; }
 
+  // Verificar fichaje sospechoso: menos de 1 hora desde el último fichaje de cualquier tipo
+  if (fichajesHoy.length > 0) {
+    const ultimo = fichajesHoy[fichajesHoy.length - 1];
+    const minDesdeUltimo = (Date.now() - new Date(ultimo.fecha_hora).getTime()) / 60000;
+    if (minDesdeUltimo < 60) {
+      _posConfirmada = pos;
+      _esSospechoso = true;
+      ring.classList.remove('active');
+      btn.disabled = false;
+      const min = Math.round(minDesdeUltimo);
+      document.getElementById('sospechoso-msg').textContent = `Pasaron solo ${min} minuto${min !== 1 ? 's' : ''} desde tu último fichaje. ¿Estás seguro?`;
+      document.getElementById('overlay-sospechoso').classList.add('show');
+      return;
+    }
+  }
+
   // Si es salida, verificar si pasaron menos de 8 horas desde la entrada
   if (proximoTipo === 'salida' || proximoTipo === 'salida2') {
     const tipoEntrada = proximoTipo === 'salida' ? 'entrada' : 'entrada2';
@@ -585,8 +633,8 @@ async function fichar() {
     if (ultimaEntrada) {
       const diff = (Date.now() - new Date(ultimaEntrada.fecha_hora).getTime()) / 3600000;
       if (diff < 8) {
-        // Mostrar confirmación
         _posConfirmada = pos;
+        _esSospechoso = false;
         ring.classList.remove('active');
         btn.disabled = false;
         document.getElementById('overlay-confirm').classList.add('show');
@@ -596,6 +644,34 @@ async function fichar() {
   }
 
   await registrarFichaje(pos);
+}
+
+let _esSospechoso = false;
+
+function cancelarSospechoso() {
+  document.getElementById('overlay-sospechoso').classList.remove('show');
+  _posConfirmada = null;
+  actualizarBoton();
+}
+
+async function confirmarSospechoso() {
+  document.getElementById('overlay-sospechoso').classList.remove('show');
+  // Después del sospechoso, verificar si también aplica confirmación de salida
+  if (_posConfirmada) {
+    if (proximoTipo === 'salida' || proximoTipo === 'salida2') {
+      const tipoEntrada = proximoTipo === 'salida' ? 'entrada' : 'entrada2';
+      const ultimaEntrada = fichajesHoy.find(f => f.tipo === tipoEntrada);
+      if (ultimaEntrada) {
+        const diff = (Date.now() - new Date(ultimaEntrada.fecha_hora).getTime()) / 3600000;
+        if (diff < 8) {
+          document.getElementById('overlay-confirm').classList.add('show');
+          return;
+        }
+      }
+    }
+    await registrarFichaje(_posConfirmada);
+    _posConfirmada = null;
+  }
 }
 
 function cancelarSalida() {
