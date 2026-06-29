@@ -1460,7 +1460,10 @@ function calcularAlertasHoy(fichajesHoy) {
   let ausentes = [], tardes = [], puntuales = [];
 
   todosLosEmpleados.forEach(e => {
-    const horario = (horariosSemana[e.id] || {})[hoy];
+    // Buscar planilla_emp_id para este empleado (horariosSemana usa planilla_emp_id)
+    const pe = planillaEmpleados.find(p => p.empleado_id === e.id);
+    if (!pe) return;
+    const horario = (horariosSemana[pe.id] || {})[hoy];
     if (!horario) return;
 
     // Ignorar si tiene franco o NT hoy
@@ -1471,15 +1474,16 @@ function calcularAlertasHoy(fichajesHoy) {
     } else {
       // Llegada tarde
       const entrada = fichajesHoy.filter(f => f.empleado_id === e.id && f.tipo === 'entrada')[0];
-      if (entrada && horario.entrada) {
-        const prog = new Date(`${hoy}T${horario.entrada}`);
+      const entradaRef = horario.entrada1 || horario.entrada;
+      if (entrada && entradaRef) {
+        const prog = new Date(`${hoy}T${entradaRef}`);
         const real = new Date(entrada.fecha_hora);
         const diff = Math.round((real - prog) / 60000);
         if (diff > TOLERANCIA_MINUTOS) {
           tardes.push(e.nombre + ' ' + e.apellido);
           _alertaData.tardes.push({
             nombre: e.nombre + ' ' + e.apellido,
-            detalle: `Asignado: ${horario.entrada.substring(0,5)} · Entró: ${fmt(entrada.fecha_hora)}`,
+            detalle: `Asignado: ${entradaRef.substring(0,5)} · Entró: ${fmt(entrada.fecha_hora)}`,
             diff
           });
         } else {
@@ -2726,11 +2730,12 @@ function renderTablaPlanilla() {
   // Empleados de la app que NO están vinculados a ningún registro de planilla
   const sinPlanilla = todosLosEmpleados.filter(e => !idsVinculados.has(e.id));
 
-  const opcionesEmpleados = todosLosEmpleados.map(e => {
-    const yaVinculado = planillaEmpleados.find(p => p.empleado_id === e.id);
-    const tag = yaVinculado ? ` (vinculado a ${yaVinculado.apellido} ${yaVinculado.nombre})` : '';
-    return `<option value="${e.id}">${e.nombre} ${e.apellido} · ${e.celular}${tag}</option>`;
-  }).join('');
+  // Solo mostrar empleados que NO están vinculados a ningún registro de planilla
+  const idsYaVinculados = new Set(planillaEmpleados.filter(pe => pe.empleado_id).map(pe => pe.empleado_id));
+  const opcionesEmpleados = todosLosEmpleados
+    .filter(e => !idsYaVinculados.has(e.id))
+    .map(e => `<option value="${e.id}">${e.nombre} ${e.apellido} · ${e.celular}</option>`)
+    .join('');
 
   let rows = '';
 
@@ -2927,7 +2932,15 @@ function abrirDrawerEmp(empId) {
   document.getElementById('drawer-avatar').textContent = avatarLetras(emp.nombre, emp.apellido);
   document.getElementById('drawer-emp-name').textContent = `${emp.nombre} ${emp.apellido}`;
   const pe = planillaEmpleados.find(p => p.empleado_id === empId);
-  document.getElementById('drawer-emp-sub').textContent = (pe?.rol || '') + (emp.celular ? ' · ' + emp.celular : '');
+  const rolStr = pe?.rol || '';
+  const hoyStr = fechaHoy();
+  const fichajeHoyEmp = todosLosFichajes.filter(f => f.empleado_id === empId && f.fecha_hora && f.fecha_hora.startsWith(hoyStr));
+  const entradaHoy = fichajeHoyEmp.find(f => f.tipo === 'entrada');
+  const salidaHoy = fichajeHoyEmp.find(f => f.tipo === 'salida');
+  let estadoHoyStr = '';
+  if (entradaHoy && !salidaHoy) estadoHoyStr = ' · 🟢 Dentro desde ' + fmt(entradaHoy.fecha_hora);
+  else if (entradaHoy && salidaHoy) estadoHoyStr = ' · Salió ' + fmt(salidaHoy.fecha_hora);
+  document.getElementById('drawer-emp-sub').textContent = rolStr + (emp.celular ? ' · ' + emp.celular : '') + estadoHoyStr;
   actualizarDrawer();
   document.getElementById('drawer-emp').classList.add('open');
   document.getElementById('drawer-overlay').classList.add('show');
@@ -2945,7 +2958,10 @@ function actualizarDrawer() {
   const hoy = new Date();
   let inicio, fin = new Date();
 
-  if (periodo === 'semana') {
+  if (periodo === 'hoy') {
+    inicio = new Date(hoy); inicio.setHours(0,0,0,0);
+    fin = new Date(hoy); fin.setHours(23,59,59,999);
+  } else if (periodo === 'semana') {
     inicio = new Date(hoy);
     const dow = hoy.getDay() || 7;
     inicio.setDate(hoy.getDate() - dow + 1);
@@ -3326,6 +3342,7 @@ function abrirPopupKpi(tipo) {
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div class="drawer-section-title">Estadísticas</div>
       <select class="drawer-period-select" id="drawer-period" onchange="actualizarDrawer()">
+        <option value="hoy">Hoy</option>
         <option value="semana">Esta semana</option>
         <option value="mes" selected>Este mes</option>
         <option value="mes_anterior">Mes anterior</option>
