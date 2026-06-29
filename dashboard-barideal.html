@@ -741,6 +741,13 @@ canvas { max-height: 240px; }
   cursor: pointer; transition: opacity 0.15s;
 }
 .btn-wsp:hover { opacity: 0.85; }
+.menu-wsp-btn {
+  display: block; width: 100%; text-align: left;
+  padding: 8px 12px; background: none; border: none;
+  color: var(--text); cursor: pointer; border-radius: 6px;
+  font-size: 13px; transition: background 0.1s;
+}
+.menu-wsp-btn:hover { background: rgba(255,255,255,0.08); }
 #preview-grilla-wsp {
   display: none; margin-top: 16px;
   border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
@@ -1053,7 +1060,18 @@ canvas { max-height: 240px; }
             </div>
             <input type="date" id="semana-inicio" onchange="cargarHorarios()" style="display:none">
             <button class="btn btn-outline" onclick="irAHoy()" style="font-size:12px">Hoy</button>
-            <button class="btn-wsp" onclick="generarGrillaWsp()" title="Generar imagen para WhatsApp">📲 WhatsApp</button>
+            <div style="position:relative;display:inline-block">
+              <button class="btn-wsp" onclick="toggleMenuWsp(event)" title="Generar imagen para WhatsApp">📲 WhatsApp ▾</button>
+              <div id="menu-wsp" style="display:none;position:absolute;top:38px;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px;z-index:200;min-width:180px;box-shadow:0 8px 24px rgba(0,0,0,0.5)">
+                <div style="font-size:10px;color:var(--text3);padding:4px 8px 6px;text-transform:uppercase;letter-spacing:0.5px">Filtrar por rol</div>
+                <button onclick="generarGrillaWsp('todos')" class="menu-wsp-btn">📋 Todos</button>
+                <button onclick="generarGrillaWsp('Salón')" class="menu-wsp-btn">🍽️ Salón</button>
+                <button onclick="generarGrillaWsp('Cocina')" class="menu-wsp-btn">👨‍🍳 Cocina</button>
+                <button onclick="generarGrillaWsp('Encargado')" class="menu-wsp-btn">👔 Encargado</button>
+                <button onclick="generarGrillaWsp('Limpieza')" class="menu-wsp-btn">🧹 Limpieza</button>
+                <button onclick="generarGrillaWsp('Administración')" class="menu-wsp-btn">📊 Administración</button>
+              </div>
+            </div>
             <button class="btn btn-outline" onclick="document.getElementById('file-horarios').click()" style="font-size:12px">
               📁 Importar Excel
             </button>
@@ -2998,15 +3016,33 @@ function cerrarPopupPunt() {
 // ══════════════════════════════════
 //  GRILLA WHATSAPP
 // ══════════════════════════════════
-function generarGrillaWsp() {
+function toggleMenuWsp(e) {
+  e.stopPropagation();
+  const m = document.getElementById('menu-wsp');
+  const isOpen = m.style.display === 'block';
+  m.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    setTimeout(() => document.addEventListener('click', function h() {
+      document.getElementById('menu-wsp').style.display = 'none';
+      document.removeEventListener('click', h);
+    }), 10);
+  }
+}
+
+function generarGrillaWsp(rolFiltro = 'todos') {
+  document.getElementById('menu-wsp').style.display = 'none';
   const diasNombres = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
   const ini = new Date(semanaActual[0] + 'T12:00');
   const fin = new Date(semanaActual[6] + 'T12:00');
   const semLabel = `Semana ${ini.getDate()}/${ini.getMonth()+1} al ${fin.getDate()}/${fin.getMonth()+1}`;
 
   // Construir HTML de la grilla
+  const empsFiltrados = rolFiltro === 'todos'
+    ? planillaEmpleados
+    : planillaEmpleados.filter(pe => pe.rol === rolFiltro);
+  const rolLabel = rolFiltro === 'todos' ? 'Todos los roles' : rolFiltro;
   let filas = '';
-  planillaEmpleados.forEach(pe => {
+  empsFiltrados.forEach(pe => {
     let celdas = '';
     semanaActual.forEach(fecha => {
       const h = (horariosSemana[pe.id] || {})[fecha];
@@ -3023,7 +3059,7 @@ function generarGrillaWsp() {
 
   const html = `
     <div style="font-family:Arial,sans-serif;background:#fff;padding:16px;border-radius:8px;color:#111">
-      <div style="font-size:15px;font-weight:800;margin-bottom:12px;text-align:center">🍺 BAR IDEAL — ${semLabel}</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:12px;text-align:center">🍺 BAR IDEAL — ${semLabel} · ${rolLabel}</div>
       <table style="width:100%;border-collapse:collapse;font-size:12px;border:1px solid #ccc">
         <thead>
           <tr style="background:#1A1A2E;color:#fff">
