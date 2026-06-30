@@ -779,6 +779,53 @@ function iniciarApp(emp) {
   document.getElementById('screen-app').classList.add('active');
   iniciarGeo(); cargarHistorial(); cargarTurno();
   setInterval(cargarHistorial, 30000);
+  // Registrar push notifications
+  iniciarPushNotifications(emp.id);
+}
+
+// ── PUSH NOTIFICATIONS ──
+const VAPID_PUBLIC_KEY = 'BBw7l6n5jktroTSq8z5xAel5qH4gK5y4n5G4KCUFmmuXQ8jNKAy5gGkn5nuIU_ecETpJo5IfUcPyEI_F96E6cHM';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+async function iniciarPushNotifications(empId) {
+  try {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+
+    // Registrar service worker
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+
+    // Pedir permiso (solo si no está dado o denegado)
+    if (Notification.permission === 'denied') return;
+    const permission = Notification.permission === 'granted'
+      ? 'granted'
+      : await Notification.requestPermission();
+    if (permission !== 'granted') return;
+
+    // Suscribir al push
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+    }
+
+    // Guardar token en el servidor
+    await fetch(`${API}/api/push/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ empleado_id: empId, subscription: sub })
+    });
+  } catch(e) {
+    console.warn('Push notifications no disponibles:', e.message);
+  }
 }
 
 (function() {

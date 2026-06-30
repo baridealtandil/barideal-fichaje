@@ -76,7 +76,29 @@ async function migrate() {
     await sql`ALTER TABLE horarios DROP COLUMN IF EXISTS empleado_id`;
   } catch(e) {}
 
-  console.log("✅ Migración completada");
+  // Tabla push tokens para notificaciones
+  await sql`
+    CREATE TABLE IF NOT EXISTS push_tokens (
+      id          SERIAL PRIMARY KEY,
+      empleado_id INTEGER NOT NULL REFERENCES empleados(id) ON DELETE CASCADE,
+      subscription TEXT NOT NULL,
+      updated_at  TIMESTAMP DEFAULT NOW(),
+      UNIQUE(empleado_id)
+    )`;
+
+  // Tabla para evitar notificaciones duplicadas
+  await sql`
+    CREATE TABLE IF NOT EXISTS notif_enviadas (
+      id          SERIAL PRIMARY KEY,
+      empleado_id INTEGER NOT NULL,
+      tipo        TEXT NOT NULL,
+      fecha       DATE NOT NULL,
+      turno       TEXT NOT NULL,
+      enviada_at  TIMESTAMP DEFAULT NOW(),
+      UNIQUE(empleado_id, tipo, fecha, turno)
+    )`;
+
+  console.log("\u2705 Migraci\u00f3n completada");
 }
 
 // ══════════════════════════════════════════════════
@@ -407,6 +429,174 @@ app.get("/api/metricas/hoy", async (c) => {
 
   return c.json({ ...totales, dentro: dentro.length, empleados_dentro: dentro });
 });
+
+// ══════════════════════════════════════════════════
+//  PUSH NOTIFICATIONS
+// ══════════════════════════════════════════════════
+
+// Guardar/actualizar suscripción push del empleado
+app.post("/api/push/token", async (c) => {
+  try {
+    const { empleado_id, subscription } = await c.req.json();
+    if (!empleado_id || !subscription) return c.json({ error: "Faltan datos" }, 400);
+    const subStr = JSON.stringify(subscription);
+    await sql`
+      INSERT INTO push_tokens (empleado_id, subscription, updated_at)
+      VALUES (${empleado_id}, ${subStr}, NOW())
+      ON CONFLICT (empleado_id) DO UPDATE
+        SET subscription = EXCLUDED.subscription, updated_at = NOW()`;
+    return c.json({ ok: true });
+  } catch(e) {
+    console.error("Error guardando push token:", e.message);
+    return c.json({ error: e.message }, 500);
+  }
+});
+
+// ── CRON DE NOTIFICACIONES ──
+// Genera claves VAPID al iniciar
+import webpush from "web-push";
+
+const VAPID_PUBLIC_KEY  = "BBw7l6n5jktroTSq8z5xAel5qH4gK5y4n5G4KCUFmmuXQ8jNKAy5gGkn5nuIU_ecETpJo5IfUcPyEI_F96E6cHM";
+const VAPID_PRIVATE_KEY = Bun.env.VAPID_PRIVATE_KEY || "";
+
+if (VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails("mailto:barideal@ideal.com", VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+}
+
+const TOLERANCIA_MINUTOS = 10; // minutos tras los cuales se notifica
+
+async function enviarPush(subscription, payload) {
+  try {
+    await webpush.sendNotification(subscription, JSON.stringify(payload));
+    return true;
+  } catch(e) {
+    // Suscripción inválida / expirada → limpiar
+    if (e.statusCode === 410 || e.statusCode === 404) {
+      try {
+        const subStr = JSON.stringify(subscription);
+        await sql`DELETE FROM push_tokens WHERE subscription = ${subStr}`;
+      } catch {}
+    }
+    console.warn("Error enviando push:", e.message);
+    return false;
+  }
+}
+
+async function cronNotificaciones() {
+  if (!VAPID_PRIVATE_KEY) return; // sin configurar, saltar
+
+  // Zona horaria Argentina (UTC-3)
+  const ahora = new Date();
+  const ahoraAR = new Date(ahora.getTime() - 3 * 60 * 60 * 1000);
+  const horaActualMin = ahoraAR.getUTCHours() * 60 + ahoraAR.getUTCMinutes();
+  const fechaHoy = ahoraAR.toISOString().split("T")[0];
+
+  try {
+    // Traer todos los horarios de hoy con empleados vinculados y sus tokens
+    const horarios = await sql`
+      SELECT
+        h.planilla_emp_id, h.entrada1, h.salida1, h.entrada2, h.salida2, h.estado,
+        pe.empleado_id,
+        e.nombre, e.apellido,
+        pt.subscription
+      FROM horarios h
+      JOIN planilla_empleados pe ON h.planilla_emp_id = pe.id
+      JOIN empleados e ON pe.empleado_id = e.id
+      JOIN push_tokens pt ON pt.empleado_id = pe.empleado_id
+      WHERE h.fecha = ${fechaHoy}::date
+        AND h.estado = 'normal'
+        AND pe.empleado_id IS NOT NULL`;
+
+    if (!horarios.length) return;
+
+    // Fichajes de hoy
+    const fichajes = await sql`
+      SELECT empleado_id, tipo FROM fichajes
+      WHERE fecha_hora::date = ${fechaHoy}::date`;
+
+    const fichajesPorEmp = {};
+    fichajes.forEach(f => {
+      if (!fichajesPorEmp[f.empleado_id]) fichajesPorEmp[f.empleado_id] = new Set();
+      fichajesPorEmp[f.empleado_id].add(f.tipo);
+    });
+
+    for (const h of horarios) {
+      const empId = h.empleado_id;
+      const tipos = fichajesPorEmp[empId] || new Set();
+      const sub = JSON.parse(h.subscription);
+      const nombre = h.nombre;
+
+      // Helper: convertir "HH:MM:SS" a minutos
+      const toMin = t => {
+        if (!t) return null;
+        const [hh, mm] = t.split(":").map(Number);
+        return hh * 60 + mm;
+      };
+
+      const checks = [
+        // [tipo_esperado, hora_ref_str, turno_label]
+        { tipo: "entrada",  hora: h.entrada1, turno: "turno1_entrada",  label: `Entrada`,  ref: h.entrada1 },
+        { tipo: "salida",   hora: h.salida1,  turno: "turno1_salida",   label: `Salida`,   ref: h.salida1  },
+        { tipo: "entrada2", hora: h.entrada2, turno: "turno2_entrada",  label: `Entrada 2°`, ref: h.entrada2 },
+        { tipo: "salida2",  hora: h.salida2,  turno: "turno2_salida",   label: `Salida 2°`,  ref: h.salida2  },
+      ];
+
+      for (const chk of checks) {
+        if (!chk.hora) continue;           // no hay ese turno asignado
+        if (tipos.has(chk.tipo)) continue; // ya fichó
+
+        const minRef = toMin(chk.hora);
+        if (minRef === null) continue;
+
+        const minutosPostTurno = horaActualMin - minRef;
+
+        // Notificar si entre 10 y 25 minutos después del horario (ventana)
+        if (minutosPostTurno < TOLERANCIA_MINUTOS || minutosPostTurno > 25) continue;
+
+        // Verificar si ya se envió esta notificación hoy para este turno
+        const yaEnviada = await sql`
+          SELECT id FROM notif_enviadas
+          WHERE empleado_id = ${empId}
+            AND tipo = ${chk.tipo}
+            AND fecha = ${fechaHoy}::date
+            AND turno = ${chk.turno}
+          LIMIT 1`;
+
+        if (yaEnviada.length > 0) continue;
+
+        // Enviar push
+        const horaRef = chk.ref.substring(0, 5);
+        const payload = {
+          title: "🕐 Bar Ideal",
+          body: `No fichaste tu ${chk.label.toLowerCase()}. Turno: ${horaRef}`,
+          icon: "/logo-ideal.png",
+          badge: "/logo-ideal.png",
+          url: "/fichaje-barideal.html"
+        };
+
+        const enviado = await enviarPush(sub, payload);
+
+        if (enviado) {
+          // Marcar como enviada
+          try {
+            await sql`
+              INSERT INTO notif_enviadas (empleado_id, tipo, fecha, turno)
+              VALUES (${empId}, ${chk.tipo}, ${fechaHoy}::date, ${chk.turno})
+              ON CONFLICT DO NOTHING`;
+          } catch {}
+          console.log(`📲 Push enviada a ${nombre} — ${chk.label} ${horaRef}`);
+        }
+      }
+    }
+  } catch(e) {
+    console.error("Error en cronNotificaciones:", e.message);
+  }
+}
+
+// Correr el cron cada 5 minutos
+setInterval(cronNotificaciones, 5 * 60 * 1000);
+// También correr al iniciar (con delay de 30s para que la DB esté lista)
+setTimeout(cronNotificaciones, 30000);
 
 // ══════════════════════════════════════════════════
 //  HEALTHCHECK
