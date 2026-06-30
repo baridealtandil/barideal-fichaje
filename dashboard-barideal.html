@@ -793,6 +793,65 @@ canvas { max-height: 240px; }
 .popup-alerta-badge { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
 .popup-alerta-empty { padding: 24px 20px; text-align: center; color: var(--text3); font-size: 13px; }
 
+/* ── Filas clickeables en popup ── */
+.popup-alerta-row-clickable { transition: background 0.1s; }
+.popup-alerta-row-clickable:hover { background: rgba(255,255,255,0.04); }
+.popup-expand-icon {
+  color: var(--text3); font-size: 18px; font-weight: 300;
+  transition: transform 0.2s; display: inline-block; line-height: 1; flex-shrink: 0;
+}
+.popup-alerta-detalle-expand {
+  background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border);
+  padding: 14px 20px; animation: fadeSlideIn 0.15s ease;
+}
+@keyframes fadeSlideIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+.popup-exp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.popup-exp-item { background: var(--bg); border-radius: 8px; padding: 10px 12px; }
+.popup-exp-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 4px; }
+.popup-exp-val { font-size: 14px; font-weight: 600; color: var(--text); }
+.popup-exp-btn {
+  width: 100%; padding: 9px; background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text2); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.popup-exp-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+
+/* ── Filas clickeables en popup ── */
+.popup-alerta-row-clickable { transition: background 0.1s; border-radius: 0; }
+.popup-alerta-row-clickable:hover { background: rgba(255,255,255,0.04); }
+.popup-expand-icon {
+  color: var(--text3); font-size: 18px; font-weight: 300;
+  transition: transform 0.2s; display: inline-block; line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Panel expandido dentro del popup */
+.popup-alerta-detalle-expand {
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  animation: fadeSlideIn 0.15s ease;
+}
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.popup-exp-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 12px;
+}
+.popup-exp-item { background: var(--bg); border-radius: 8px; padding: 10px 12px; }
+.popup-exp-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 4px; }
+.popup-exp-val { font-size: 14px; font-weight: 600; color: var(--text); }
+.popup-exp-btn {
+  width: 100%; padding: 9px; background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text2); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.popup-exp-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+
 /* ── KPIs NÓMINA GENERAL ── */
 .nomina-kpi-header {
   display: flex; align-items: center; justify-content: space-between;
@@ -1627,7 +1686,7 @@ function calcularAlertasHoy(fichajesHoy) {
     if (!fichajesEmp.length) {
       // No fichó — ausente
       ausentes.push(nombreCompleto);
-      _alertaData.ausentes.push({ nombre: nombreCompleto, detalle: 'No fichó hoy' });
+      _alertaData.ausentes.push({ nombre: nombreCompleto, detalle: 'No fichó hoy', empId: pe.empleado_id, peId: pe.id, horario });
     } else {
       // Verificar puntualidad
       const entrada = fichajesEmp.find(f => f.tipo === 'entrada');
@@ -1641,7 +1700,7 @@ function calcularAlertasHoy(fichajesHoy) {
           _alertaData.tardes.push({
             nombre: nombreCompleto,
             detalle: `Asignado: ${entradaRef.substring(0,5)} · Entró: ${fmt(entrada.fecha_hora)}`,
-            diff
+            diff, empId: pe.empleado_id, entrada
           });
         } else {
           puntuales.push(nombreCompleto);
@@ -1650,7 +1709,7 @@ function calcularAlertasHoy(fichajesHoy) {
       } else if (!entradaRef) {
         // Tiene horario pero sin hora de entrada definida (ej: solo salida)
         puntuales.push(nombreCompleto);
-        _alertaData.puntuales.push({ nombre: nombreCompleto });
+        _alertaData.puntuales.push({ nombre: nombreCompleto, empId: pe.empleado_id, entrada: null, horario, entradaRef: null });
       }
     }
   });
@@ -1687,8 +1746,14 @@ function calcularAlertasHoy(fichajesHoy) {
   _alertaData.incompletos = incompletos.map(nombre => {
     const emp = Object.values(gruposPorEmp).find(g => g.nombre === nombre);
     const entrada = emp ? emp.fichajes.find(f => f.tipo === 'entrada') : null;
+    const entrada2 = emp ? emp.fichajes.find(f => f.tipo === 'entrada2') : null;
+    const salida  = emp ? emp.fichajes.find(f => f.tipo === 'salida') : null;
+    const salida2 = emp ? emp.fichajes.find(f => f.tipo === 'salida2') : null;
     const hs = entrada ? Math.floor((Date.now() - new Date(entrada.fecha_hora).getTime()) / 3600000) : null;
-    return { nombre, desde: hs ? hs + 'h sin salida' : 'Sin salida' };
+    // get empId from fichajes
+    const empFichaje = emp ? emp.fichajes[0] : null;
+    const empIdInc = empFichaje ? empFichaje.empleado_id : null;
+    return { nombre, desde: hs ? hs + 'h sin salida' : 'Sin salida', empId: empIdInc, entrada, entrada2, salida, salida2 };
   });
 }
 
@@ -3762,33 +3827,167 @@ function abrirPopupAlerta(tipo) {
 
   if (!datos.length) {
     body.innerHTML = '<div class="popup-alerta-empty">Sin registros para mostrar</div>';
-  } else {
-    body.innerHTML = datos.map(d => {
-      let badge = '';
-      if (tipo === 'tardes') {
-        badge = `<span class="popup-alerta-badge" style="background:rgba(255,152,0,0.15);color:var(--warning)">+${d.diff}m</span>`;
-      } else if (tipo === 'ausentes') {
-        badge = `<span class="popup-alerta-badge" style="background:rgba(229,57,53,0.15);color:var(--danger)">Ausente</span>`;
-      } else if (tipo === 'puntuales') {
-        badge = `<span class="popup-alerta-badge" style="background:rgba(72,199,116,0.15);color:var(--success)">Puntual</span>`;
-      } else if (tipo === 'incompletos') {
-        badge = `<span class="popup-alerta-badge" style="background:rgba(255,152,0,0.15);color:var(--warning)">${d.desde}</span>`;
-      }
-      return `<div class="popup-alerta-row">
-        <div>
-          <div class="popup-alerta-nombre">${d.nombre}</div>
-          ${d.detalle ? `<div class="popup-alerta-detalle">${d.detalle}</div>` : ''}
-        </div>
-        ${badge}
-      </div>`;
-    }).join('');
+    document.getElementById('popup-alerta').classList.add('show');
+    return;
   }
+
+  body.innerHTML = datos.map((d, i) => {
+    let badge = '';
+    let clickAttr = d.empId ? `onclick="expandirFilaAlerta(this, '${tipo}', ${i})" style="cursor:pointer"` : '';
+
+    if (tipo === 'tardes') {
+      badge = `<span class="popup-alerta-badge" style="background:rgba(255,152,0,0.15);color:var(--warning)">+${d.diff}m</span>`;
+    } else if (tipo === 'ausentes') {
+      badge = `<span class="popup-alerta-badge" style="background:rgba(229,57,53,0.15);color:var(--danger)">Ausente</span>`;
+    } else if (tipo === 'puntuales') {
+      badge = `<span class="popup-alerta-badge" style="background:rgba(72,199,116,0.15);color:var(--success)">Puntual</span>`;
+    } else if (tipo === 'incompletos') {
+      badge = `<span class="popup-alerta-badge" style="background:rgba(255,152,0,0.15);color:var(--warning)">${d.desde}</span>`;
+    }
+
+    return `<div class="popup-alerta-row popup-alerta-row-clickable" data-idx="${i}" data-tipo="${tipo}" ${clickAttr}>
+      <div style="flex:1">
+        <div class="popup-alerta-nombre">${d.nombre}</div>
+        ${d.detalle ? `<div class="popup-alerta-detalle">${d.detalle}</div>` : ''}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${badge}
+        ${d.empId ? '<span class="popup-expand-icon">›</span>' : ''}
+      </div>
+    </div>
+    <div class="popup-alerta-detalle-expand" id="expand-${tipo}-${i}" style="display:none"></div>`;
+  }).join('');
 
   document.getElementById('popup-alerta').classList.add('show');
 }
 
+function expandirFilaAlerta(el, tipo, idx) {
+  const expandId = `expand-${tipo}-${idx}`;
+  const expandEl = document.getElementById(expandId);
+  if (!expandEl) return;
+
+  const isOpen = expandEl.style.display !== 'none';
+
+  // Cerrar todos los otros
+  document.querySelectorAll('.popup-alerta-detalle-expand').forEach(e => { e.style.display = 'none'; });
+  document.querySelectorAll('.popup-expand-icon').forEach(e => { e.textContent = '›'; e.style.transform = ''; });
+
+  if (isOpen) return; // toggle off
+
+  const d = (_alertaData[tipo] || [])[idx];
+  if (!d) return;
+
+  const icon = el.querySelector('.popup-expand-icon');
+  if (icon) { icon.textContent = '›'; icon.style.transform = 'rotate(90deg)'; }
+
+  let html = '';
+  const hoy = fechaHoy();
+
+  if (tipo === 'ausentes') {
+    const pe = planillaEmpleados.find(p => p.empleado_id === d.empId);
+    const h = d.horario || {};
+    const entRef = h.entrada1 || h.entrada || '—';
+    const salRef = h.salida1  || h.salida  || '—';
+    // Historial de ausencias del mes
+    const inicioMes = new Date(); inicioMes.setDate(1); inicioMes.setHours(0,0,0,0);
+    const fichajesMes = todosLosFichajes.filter(f => f.empleado_id === d.empId && new Date(f.fecha_hora) >= inicioMes);
+    const diasConFichaje = new Set(fichajesMes.map(f => f.fecha_hora.split('T')[0])).size;
+    // Días programados del mes
+    let diasProg = 0;
+    if (pe) {
+      Object.entries(horariosSemana[pe.id] || {}).forEach(([f, hh]) => {
+        const fd = new Date(f + 'T12:00');
+        if (fd >= inicioMes && fd <= new Date() && hh.estado !== 'franco' && hh.estado !== 'nt') diasProg++;
+      });
+    }
+    html = `<div class="popup-exp-grid">
+      <div class="popup-exp-item"><div class="popup-exp-label">Turno de hoy</div><div class="popup-exp-val">${entRef !== '—' ? entRef.substring(0,5) + ' – ' + salRef.substring(0,5) : 'Sin horario asignado'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Días trabajados este mes</div><div class="popup-exp-val">${diasConFichaje} de ${diasProg}</div></div>
+    </div>
+    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>`;
+
+  } else if (tipo === 'tardes') {
+    const entrada = d.entrada;
+    const hs = entrada ? fmt(entrada.fecha_hora) : '—';
+    // Historial tardanzas del mes
+    const inicioMes = new Date(); inicioMes.setDate(1); inicioMes.setHours(0,0,0,0);
+    const pe = planillaEmpleados.find(p => p.empleado_id === d.empId);
+    let tardMes = 0;
+    if (pe) {
+      const fichajesMes = todosLosFichajes.filter(f => f.empleado_id === d.empId && new Date(f.fecha_hora) >= inicioMes && f.tipo === 'entrada');
+      fichajesMes.forEach(f => {
+        const fecha = f.fecha_hora.split('T')[0];
+        const hh = (horariosSemana[pe.id] || {})[fecha];
+        if (!hh) return;
+        const entRef = hh.entrada1 || hh.entrada;
+        if (!entRef) return;
+        const diff = Math.round((new Date(f.fecha_hora) - new Date(fecha + 'T' + entRef)) / 60000);
+        if (diff > TOLERANCIA_MINUTOS) tardMes++;
+      });
+    }
+    html = `<div class="popup-exp-grid">
+      <div class="popup-exp-item"><div class="popup-exp-label">Hora de entrada hoy</div><div class="popup-exp-val" style="color:var(--warning)">${hs}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Minutos tarde hoy</div><div class="popup-exp-val" style="color:var(--warning)">+${d.diff} min</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Tardanzas este mes</div><div class="popup-exp-val">${tardMes}</div></div>
+    </div>
+    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver historial completo →</button>`;
+
+  } else if (tipo === 'puntuales') {
+    const entrada = d.entrada;
+    const hs = entrada ? fmt(entrada.fecha_hora) : '—';
+    const entRef = d.entradaRef ? d.entradaRef.substring(0,5) : '—';
+    const diff = (entrada && d.entradaRef)
+      ? Math.round((new Date(entrada.fecha_hora) - new Date(hoy + 'T' + d.entradaRef)) / 60000)
+      : null;
+    // Racha puntualidad
+    const pe = planillaEmpleados.find(p => p.empleado_id === d.empId);
+    let puntMes = 0, totalMes = 0;
+    if (pe) {
+      const inicioMes = new Date(); inicioMes.setDate(1); inicioMes.setHours(0,0,0,0);
+      Object.entries(horariosSemana[pe.id] || {}).forEach(([fecha, hh]) => {
+        const fd = new Date(fecha + 'T12:00');
+        if (fd < inicioMes || fd > new Date()) return;
+        if (hh.estado === 'franco' || hh.estado === 'nt') return;
+        const entRef2 = hh.entrada1 || hh.entrada;
+        if (!entRef2) return;
+        totalMes++;
+        const f = todosLosFichajes.find(fi => fi.empleado_id === d.empId && fi.tipo === 'entrada' && fi.fecha_hora.startsWith(fecha));
+        if (f) {
+          const dif = Math.round((new Date(f.fecha_hora) - new Date(fecha + 'T' + entRef2)) / 60000);
+          if (dif <= TOLERANCIA_MINUTOS) puntMes++;
+        }
+      });
+    }
+    html = `<div class="popup-exp-grid">
+      <div class="popup-exp-item"><div class="popup-exp-label">Hora de entrada hoy</div><div class="popup-exp-val" style="color:var(--success)">${hs}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Horario asignado</div><div class="popup-exp-val">${entRef}</div></div>
+      ${diff !== null ? `<div class="popup-exp-item"><div class="popup-exp-label">Diferencia</div><div class="popup-exp-val" style="color:${diff <= 0 ? 'var(--success)' : 'var(--text)'}">${diff <= 0 ? diff + ' min' : '+' + diff + ' min'}</div></div>` : ''}
+      <div class="popup-exp-item"><div class="popup-exp-label">Puntualidad este mes</div><div class="popup-exp-val">${totalMes > 0 ? Math.round(puntMes/totalMes*100) + '% (' + puntMes + '/' + totalMes + ')' : '—'}</div></div>
+    </div>
+    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>`;
+
+  } else if (tipo === 'incompletos') {
+    const e1 = d.entrada, e2 = d.entrada2, s1 = d.salida, s2 = d.salida2;
+    const faltaS1 = e1 && !s1;
+    const faltaS2 = e2 && !s2;
+    const hsDesde = e1 ? Math.floor((Date.now() - new Date(e1.fecha_hora).getTime()) / 3600000) : null;
+    html = `<div class="popup-exp-grid">
+      <div class="popup-exp-item"><div class="popup-exp-label">Entrada 1</div><div class="popup-exp-val">${e1 ? fmt(e1.fecha_hora) : '—'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Salida 1</div><div class="popup-exp-val" style="${faltaS1 ? 'color:var(--danger)' : ''}">${s1 ? fmt(s1.fecha_hora) : faltaS1 ? '⚠️ Falta' : '—'}</div></div>
+      ${e2 ? `<div class="popup-exp-item"><div class="popup-exp-label">Entrada 2</div><div class="popup-exp-val">${fmt(e2.fecha_hora)}</div></div>` : ''}
+      ${e2 ? `<div class="popup-exp-item"><div class="popup-exp-label">Salida 2</div><div class="popup-exp-val" style="${faltaS2 ? 'color:var(--danger)' : ''}">${s2 ? fmt(s2.fecha_hora) : faltaS2 ? '⚠️ Falta' : '—'}</div></div>` : ''}
+      ${hsDesde !== null ? `<div class="popup-exp-item"><div class="popup-exp-label">Tiempo sin salida registrar</div><div class="popup-exp-val" style="color:var(--warning)">${hsDesde}h</div></div>` : ''}
+    </div>
+    ${d.empId ? `<button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>` : ''}`;
+  }
+
+  expandEl.innerHTML = html;
+  expandEl.style.display = 'block';
+}
+
 function cerrarPopupAlerta() {
   document.getElementById('popup-alerta').classList.remove('show');
+  document.querySelectorAll('.popup-alerta-detalle-expand').forEach(e => { e.style.display = 'none'; });
 }
 
 
@@ -3809,60 +4008,159 @@ function abrirPopupKpi(tipo) {
   let datos = [];
 
   if (tipo === 'fichajes-hoy') {
-    // Agrupar por empleado
     const grupos = {};
     fichajesHoy.forEach(f => {
       const key = f.empleado_id;
-      if (!grupos[key]) grupos[key] = { nombre: f.nombre + ' ' + f.apellido, tipos: [] };
+      if (!grupos[key]) grupos[key] = { empId: f.empleado_id, nombre: f.nombre + ' ' + f.apellido, tipos: [], fichajes: {} };
       grupos[key].tipos.push(f.tipo);
+      grupos[key].fichajes[f.tipo] = f;
     });
     datos = Object.values(grupos).map(g => ({
+      empId: g.empId,
       nombre: g.nombre,
-      detalle: g.tipos.map(t => ({ entrada:'Entrada', salida:'Salida', entrada2:'Entrada 2', salida2:'Salida 2' }[t] || t)).join(' · ')
+      detalle: g.tipos.map(t => ({ entrada:'Entrada', salida:'Salida', entrada2:'Entrada 2', salida2:'Salida 2' }[t] || t)).join(' · '),
+      fichajes: g.fichajes
     }));
   } else if (tipo === 'empleados') {
     datos = todosLosEmpleados.map(e => ({
+      empId: e.id,
       nombre: e.nombre + ' ' + e.apellido,
       detalle: planillaEmpleados.find(p => p.empleado_id === e.id)?.rol || 'Sin rol'
     }));
   } else if (tipo === 'dentro') {
     const empHoy = {};
     fichajesHoy.forEach(f => {
-      if (!empHoy[f.empleado_id]) empHoy[f.empleado_id] = { nombre: f.nombre + ' ' + f.apellido, tipos: new Set() };
+      if (!empHoy[f.empleado_id]) empHoy[f.empleado_id] = { empId: f.empleado_id, nombre: f.nombre + ' ' + f.apellido, tipos: new Set(), fichajes: {} };
       empHoy[f.empleado_id].tipos.add(f.tipo);
+      empHoy[f.empleado_id].fichajes[f.tipo] = f;
     });
     datos = Object.values(empHoy)
       .filter(e => (e.tipos.has('entrada') && !e.tipos.has('salida')) ||
                    (e.tipos.has('entrada2') && !e.tipos.has('salida2')))
-      .map(e => ({ nombre: e.nombre }));
+      .map(e => ({ empId: e.empId, nombre: e.nombre, fichajes: e.fichajes }));
   } else if (tipo === 'total') {
-    // Mostrar resumen por día de los últimos 7 días
     const porDia = {};
     todosLosFichajes.forEach(f => {
       const fecha = f.fecha_hora ? f.fecha_hora.split('T')[0] : null;
       if (!fecha) return;
-      porDia[fecha] = (porDia[fecha] || 0) + 1;
+      if (!porDia[fecha]) porDia[fecha] = { cant: 0, fichajes: [] };
+      porDia[fecha].cant++;
+      porDia[fecha].fichajes.push(f);
     });
     datos = Object.entries(porDia)
       .sort((a,b) => b[0].localeCompare(a[0]))
       .slice(0, 14)
-      .map(([fecha, cant]) => ({ nombre: fmtFecha(fecha + 'T12:00'), detalle: cant + ' fichajes' }));
+      .map(([fecha, val]) => ({ fecha, nombre: fmtFecha(fecha + 'T12:00'), detalle: val.cant + ' fichajes', fichajes: val.fichajes }));
   }
 
   document.getElementById('popup-alerta-title').textContent = titulos[tipo] || tipo;
   const body = document.getElementById('popup-alerta-body');
   if (!datos.length) {
     body.innerHTML = '<div class="popup-alerta-empty">Sin datos</div>';
-  } else {
-    body.innerHTML = datos.map(d => `
-      <div class="popup-alerta-row">
-        <div>
-          <div class="popup-alerta-nombre">${d.nombre}</div>
-          ${d.detalle ? `<div class="popup-alerta-detalle">${d.detalle}</div>` : ''}
-        </div>
-      </div>`).join('');
+    document.getElementById('popup-alerta').classList.add('show');
+    return;
   }
+
+  body.innerHTML = datos.map((d, i) => {
+    const clickable = d.empId || d.fecha;
+    const clickAttr = clickable ? `onclick="expandirFilaKpi(this, '${tipo}', ${i})" style="cursor:pointer"` : '';
+    return `<div class="popup-alerta-row popup-alerta-row-clickable" ${clickAttr}>
+      <div style="flex:1">
+        <div class="popup-alerta-nombre">${d.nombre}</div>
+        ${d.detalle ? `<div class="popup-alerta-detalle">${d.detalle}</div>` : ''}
+      </div>
+      ${clickable ? '<span class="popup-expand-icon">›</span>' : ''}
+    </div>
+    <div class="popup-alerta-detalle-expand" id="expand-kpi-${tipo}-${i}" style="display:none"></div>`;
+  }).join('');
+
+  // Guardar datos para acceso desde expandirFilaKpi
+  body._kpiDatos = datos;
+  body._kpiTipo = tipo;
+
   document.getElementById('popup-alerta').classList.add('show');
+}
+
+function expandirFilaKpi(el, tipo, idx) {
+  const expandId = `expand-kpi-${tipo}-${idx}`;
+  const expandEl = document.getElementById(expandId);
+  if (!expandEl) return;
+
+  const isOpen = expandEl.style.display !== 'none';
+  document.querySelectorAll('.popup-alerta-detalle-expand').forEach(e => { e.style.display = 'none'; });
+  document.querySelectorAll('.popup-expand-icon').forEach(e => { e.textContent = '›'; e.style.transform = ''; });
+  if (isOpen) return;
+
+  const icon = el.querySelector('.popup-expand-icon');
+  if (icon) { icon.textContent = '›'; icon.style.transform = 'rotate(90deg)'; }
+
+  const body = document.getElementById('popup-alerta-body');
+  const d = (body._kpiDatos || [])[idx];
+  if (!d) return;
+
+  const hoy = fechaHoy();
+  let html = '';
+
+  if (tipo === 'fichajes-hoy') {
+    const e1 = d.fichajes?.entrada, s1 = d.fichajes?.salida;
+    const e2 = d.fichajes?.entrada2, s2 = d.fichajes?.salida2;
+    let minHoy = 0;
+    if (e1 && s1) minHoy += minutosEntre(e1.fecha_hora, s1.fecha_hora);
+    if (e2 && s2) minHoy += minutosEntre(e2.fecha_hora, s2.fecha_hora);
+    const dentro = (e1 && !s1) || (e2 && !s2);
+    html = `<div class="popup-exp-grid">
+      <div class="popup-exp-item"><div class="popup-exp-label">Entrada 1</div><div class="popup-exp-val">${e1 ? fmt(e1.fecha_hora) : '—'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Salida 1</div><div class="popup-exp-val">${s1 ? fmt(s1.fecha_hora) : dentro ? '🟢 Dentro' : '—'}</div></div>
+      ${e2 ? `<div class="popup-exp-item"><div class="popup-exp-label">Entrada 2</div><div class="popup-exp-val">${fmt(e2.fecha_hora)}</div></div>` : ''}
+      ${e2 ? `<div class="popup-exp-item"><div class="popup-exp-label">Salida 2</div><div class="popup-exp-val">${s2 ? fmt(s2.fecha_hora) : '🟢 Dentro'}</div></div>` : ''}
+      <div class="popup-exp-item"><div class="popup-exp-label">Horas trabajadas hoy</div><div class="popup-exp-val">${minHoy > 0 ? horasStr(minHoy) : dentro ? 'En curso' : '—'}</div></div>
+    </div>
+    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>`;
+
+  } else if (tipo === 'empleados') {
+    const emp = todosLosEmpleados.find(e => e.id === d.empId);
+    const fichajesEmp = todosLosFichajes.filter(f => f.empleado_id === d.empId);
+    const fechasUnicas = new Set(fichajesEmp.map(f => f.fecha_hora?.split('T')[0]));
+    const ultimoF = fichajesEmp[0];
+    html = `<div class="popup-exp-grid">
+      <div class="popup-exp-item"><div class="popup-exp-label">Rol</div><div class="popup-exp-val">${d.detalle}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Celular</div><div class="popup-exp-val">${emp?.celular || '—'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Días con fichaje</div><div class="popup-exp-val">${fechasUnicas.size}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Último fichaje</div><div class="popup-exp-val">${ultimoF ? fmtFecha(ultimoF.fecha_hora) + ' · ' + fmt(ultimoF.fecha_hora) : '—'}</div></div>
+    </div>
+    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>`;
+
+  } else if (tipo === 'dentro') {
+    const e1 = d.fichajes?.entrada, e2 = d.fichajes?.entrada2;
+    const entradaActiva = (!d.fichajes?.salida && e1) ? e1 : e2;
+    const minDentro = entradaActiva ? minutosEntre(entradaActiva.fecha_hora, new Date().toISOString()) : 0;
+    const pe = planillaEmpleados.find(p => p.empleado_id === d.empId);
+    const horario = pe ? (horariosSemana[pe.id] || {})[hoy] : null;
+    const salRef = horario ? (horario.salida1 || horario.salida) : null;
+    html = `<div class="popup-exp-grid">
+      <div class="popup-exp-item"><div class="popup-exp-label">Entró a las</div><div class="popup-exp-val" style="color:var(--success)">${entradaActiva ? fmt(entradaActiva.fecha_hora) : '—'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Tiempo dentro</div><div class="popup-exp-val">${horasStr(minDentro)}</div></div>
+      ${salRef ? `<div class="popup-exp-item"><div class="popup-exp-label">Sale a las (asignado)</div><div class="popup-exp-val">${salRef.substring(0,5)}</div></div>` : ''}
+    </div>
+    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>`;
+
+  } else if (tipo === 'total') {
+    const fichajesDia = d.fichajes || [];
+    const grupos = {};
+    fichajesDia.forEach(f => {
+      if (!grupos[f.empleado_id]) grupos[f.empleado_id] = { nombre: (f.nombre || '') + ' ' + (f.apellido || ''), tipos: [] };
+      grupos[f.empleado_id].tipos.push(f.tipo);
+    });
+    const tiposLabel = { entrada:'E1', salida:'S1', entrada2:'E2', salida2:'S2' };
+    const filas = Object.values(grupos).slice(0, 8).map(g =>
+      `<div class="popup-exp-item"><div class="popup-exp-label">${g.nombre}</div><div class="popup-exp-val" style="font-size:11px">${g.tipos.map(t => tiposLabel[t] || t).join(' · ')}</div></div>`
+    ).join('');
+    const resto = Object.values(grupos).length > 8 ? `<div style="font-size:11px;color:var(--text3);padding:6px 0">+ ${Object.values(grupos).length - 8} más</div>` : '';
+    html = `<div class="popup-exp-grid">${filas}</div>${resto}`;
+  }
+
+  expandEl.innerHTML = html;
+  expandEl.style.display = 'block';
 }
 
 </script>
