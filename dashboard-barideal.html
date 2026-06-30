@@ -1510,12 +1510,12 @@ function minutosEntre(dt1, dt2) {
   return Math.round((new Date(dt2) - new Date(dt1)) / 60000);
 }
 function fechaHoy() {
-  // Usar la fecha del fichaje más reciente para no depender del reloj del navegador
-  if (todosLosFichajes && todosLosFichajes.length > 0) {
-    const ultimo = todosLosFichajes.reduce((a, b) => a.fecha_hora > b.fecha_hora ? a : b);
-    return ultimo.fecha_hora.split('T')[0];
-  }
-  return new Date().toISOString().split('T')[0];
+  // Usar fecha LOCAL (no UTC) para evitar desfase en horario Argentina (UTC-3)
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function fechaLocalStr(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 function avatarLetras(nombre, apellido) {
   return (nombre?.[0] || '') + (apellido?.[0] || '');
@@ -2208,7 +2208,7 @@ async function cargarHorarios() {
   for (let i = 0; i < 7; i++) {
     const d = new Date(lunes);
     d.setDate(lunes.getDate() + i);
-    semanaActual.push(d.toISOString().split('T')[0]);
+    semanaActual.push(fechaLocalStr(d));
   }
 
   // Label de semana
@@ -2220,7 +2220,7 @@ async function cargarHorarios() {
   // Headers
   const diasNombres = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
   const ids = ['th-lun','th-mar','th-mie','th-jue','th-vie','th-sab','th-dom'];
-  const hoyStr = new Date().toISOString().split('T')[0];
+  const hoyStr = fechaHoy();
   semanaActual.forEach((fecha, i) => {
     const el = document.getElementById(ids[i]);
     if (!el) return;
@@ -2264,7 +2264,7 @@ function renderTablaHorarios() {
     return;
   }
 
-  const hoyStr = new Date().toISOString().split('T')[0];
+  const hoyStr = fechaHoy();
   const sectores = {};
   planillaEmpleados.forEach(pe => {
     const s = pe.rol || 'Sin sector';
@@ -2339,7 +2339,7 @@ function abrirModal(empId, fecha, nombre, rol) {
   // Checkboxes de días — marcar solo el día actual, deshabilitar días pasados
   const diasNombres = ['L','M','M','J','V','S','D'];
   const diasContainer = document.getElementById('dias-checks');
-  const hoyStr2 = new Date().toISOString().split('T')[0];
+  const hoyStr2 = fechaHoy();
   diasContainer.innerHTML = semanaActual.map((f, i) => {
     const checked = f === fecha;
     const pasado = f < hoyStr2;
@@ -2498,7 +2498,7 @@ async function importarHorarios(event) {
   for (let i = 0; i < 7; i++) {
     const d = new Date(lunes);
     d.setDate(lunes.getDate() + i);
-    diasSemana.push(d.toISOString().split('T')[0]);
+    diasSemana.push(fechaLocalStr(d));
   }
 
   // Leer Excel con SheetJS
@@ -3561,7 +3561,7 @@ function actualizarDrawer() {
     const diasPeriodo = [];
     const cur = new Date(inicio);
     while (cur <= fin) {
-      diasPeriodo.push(cur.toISOString().split('T')[0]);
+      diasPeriodo.push(fechaLocalStr(cur));
       cur.setDate(cur.getDate() + 1);
     }
     diasPeriodo.forEach(fecha => {
