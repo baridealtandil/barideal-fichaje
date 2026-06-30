@@ -1458,48 +1458,58 @@ function calcularKPIs() {
 }
 
 function calcularAlertasHoy(fichajesHoy) {
-  // Empleados con turno hoy que no ficharon
-  const empIds = new Set(fichajesHoy.map(f => f.empleado_id));
   const hoy = fechaHoy();
 
   let ausentes = [], tardes = [], puntuales = [];
 
-  // Inicializar arrays de datos para popups ANTES del loop
+  // Inicializar arrays para popups
   _alertaData.tardes = [];
   _alertaData.ausentes = [];
   _alertaData.puntuales = [];
 
-  todosLosEmpleados.forEach(e => {
-    // Buscar planilla_emp_id para este empleado (horariosSemana usa planilla_emp_id)
-    const pe = planillaEmpleados.find(p => p.empleado_id === e.id);
-    if (!pe) return;
-    const horario = (horariosSemana[pe.id] || {})[hoy];
-    if (!horario) return;
+  // Iterar PLANILLA (lo que está en la grilla) en lugar de todosLosEmpleados
+  planillaEmpleados.forEach(pe => {
+    // Solo empleados vinculados a la app
+    if (!pe.empleado_id) return;
 
-    // Ignorar si tiene franco o NT hoy
+    const horario = (horariosSemana[pe.id] || {})[hoy];
+    // Sin horario asignado hoy → ignorar
+    if (!horario) return;
+    // Franco o NT → ignorar
     if (horario.estado === 'franco' || horario.estado === 'nt') return;
 
-    if (!empIds.has(e.id)) {
-      ausentes.push(e.nombre + ' ' + e.apellido);
-      _alertaData.ausentes.push({ nombre: e.nombre + ' ' + e.apellido, detalle: 'No fichó hoy' });
+    const nombreCompleto = pe.apellido + ' ' + pe.nombre;
+
+    // Buscar fichajes de hoy para este empleado
+    const fichajesEmp = fichajesHoy.filter(f => f.empleado_id === pe.empleado_id);
+
+    if (!fichajesEmp.length) {
+      // No fichó — ausente
+      ausentes.push(nombreCompleto);
+      _alertaData.ausentes.push({ nombre: nombreCompleto, detalle: 'No fichó hoy' });
     } else {
-      // Llegada tarde
-      const entrada = fichajesHoy.filter(f => f.empleado_id === e.id && f.tipo === 'entrada')[0];
+      // Verificar puntualidad
+      const entrada = fichajesEmp.find(f => f.tipo === 'entrada');
       const entradaRef = horario.entrada1 || horario.entrada;
       if (entrada && entradaRef) {
         const prog = new Date(`${hoy}T${entradaRef}`);
         const real = new Date(entrada.fecha_hora);
         const diff = Math.round((real - prog) / 60000);
         if (diff > TOLERANCIA_MINUTOS) {
-          tardes.push(e.nombre + ' ' + e.apellido);
+          tardes.push(nombreCompleto);
           _alertaData.tardes.push({
-            nombre: e.nombre + ' ' + e.apellido,
+            nombre: nombreCompleto,
             detalle: `Asignado: ${entradaRef.substring(0,5)} · Entró: ${fmt(entrada.fecha_hora)}`,
             diff
           });
         } else {
-          puntuales.push(e.nombre + ' ' + e.apellido);
+          puntuales.push(nombreCompleto);
+          _alertaData.puntuales.push({ nombre: nombreCompleto });
         }
+      } else if (!entradaRef) {
+        // Tiene horario pero sin hora de entrada definida (ej: solo salida)
+        puntuales.push(nombreCompleto);
+        _alertaData.puntuales.push({ nombre: nombreCompleto });
       }
     }
   });
@@ -1509,9 +1519,6 @@ function calcularAlertasHoy(fichajesHoy) {
   document.getElementById('alert-tardes').textContent = tardes.length;
   document.getElementById('alert-tardes-nombres').textContent = tardes.length ? tardes.slice(0,3).join(', ') + (tardes.length > 3 ? '…' : '') : 'Sin tardanzas';
   document.getElementById('alert-puntuales').textContent = puntuales.length;
-
-  // Poblar puntuales para el popup (ausentes ya se pobló en el loop)
-  _alertaData.puntuales = puntuales.map(n => ({ nombre: n }));
 
   // Fichajes incompletos: entrada sin salida con más de 12 horas
   const ahora = Date.now();
