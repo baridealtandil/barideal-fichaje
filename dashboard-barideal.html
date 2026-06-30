@@ -792,6 +792,41 @@ canvas { max-height: 240px; }
 .popup-alerta-detalle { font-size: 12px; color: var(--text3); margin-top: 2px; }
 .popup-alerta-badge { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
 .popup-alerta-empty { padding: 24px 20px; text-align: center; color: var(--text3); font-size: 13px; }
+
+/* ── KPIs NÓMINA GENERAL ── */
+.nomina-kpi-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.nomina-kpi-title {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text3);
+}
+.nomina-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 12px; margin-bottom: 24px;
+}
+.nomina-kpi-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 16px 18px;
+  cursor: pointer; transition: border-color 0.15s, transform 0.1s;
+  position: relative; overflow: hidden;
+}
+.nomina-kpi-card::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 3px; height: 100%; border-radius: var(--r) 0 0 var(--r);
+  background: var(--nomina-accent, #555);
+}
+.nomina-kpi-card:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-1px); }
+.nomina-kpi-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text3); margin-bottom: 8px;
+}
+.nomina-kpi-value {
+  font-size: 26px; font-weight: 700; color: var(--text); line-height: 1;
+}
+.nomina-kpi-sub { font-size: 11px; color: var(--text2); margin-top: 5px; }
 </style>
 </head>
 <body>
@@ -995,6 +1030,47 @@ canvas { max-height: 240px; }
 
     <!-- ── ANÁLISIS ── -->
     <section class="section" id="s-analisis">
+
+      <!-- ── KPIs NÓMINA — siempre visibles ── -->
+      <div id="nomina-kpis-wrap" style="margin-bottom:20px">
+        <div class="nomina-kpi-header">
+          <div class="nomina-kpi-title">📊 Toda la nómina — hoy</div>
+          <select id="nomina-periodo" onchange="calcularKpisNomina()" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;outline:none">
+            <option value="hoy">Hoy</option>
+            <option value="semana">Esta semana</option>
+            <option value="mes" selected>Este mes</option>
+            <option value="todo">Todo</option>
+          </select>
+        </div>
+        <div class="nomina-kpi-grid">
+          <div class="nomina-kpi-card" style="--nomina-accent:#4CAF50" onclick="abrirPopupNomina('presentes')">
+            <div class="nomina-kpi-label">Tasa de presencia</div>
+            <div class="nomina-kpi-value" id="nkpi-presencia">—%</div>
+            <div class="nomina-kpi-sub" id="nkpi-presencia-sub">empleados vs esperados</div>
+          </div>
+          <div class="nomina-kpi-card" style="--nomina-accent:#E53935" onclick="abrirPopupNomina('ausentes')">
+            <div class="nomina-kpi-label">Ausentes</div>
+            <div class="nomina-kpi-value" id="nkpi-ausentes" style="color:#E53935">—</div>
+            <div class="nomina-kpi-sub" id="nkpi-ausentes-sub">en el período</div>
+          </div>
+          <div class="nomina-kpi-card" style="--nomina-accent:#FF9800" onclick="abrirPopupNomina('tardanzas')">
+            <div class="nomina-kpi-label">Tardanzas</div>
+            <div class="nomina-kpi-value" id="nkpi-tardanzas" style="color:#FF9800">—</div>
+            <div class="nomina-kpi-sub" id="nkpi-tardanzas-sub">promedio — min</div>
+          </div>
+          <div class="nomina-kpi-card" style="--nomina-accent:#4CAF50" onclick="abrirPopupNomina('puntuales')">
+            <div class="nomina-kpi-label">Puntuales</div>
+            <div class="nomina-kpi-value" id="nkpi-puntuales" style="color:#4CAF50">—</div>
+            <div class="nomina-kpi-sub" id="nkpi-puntuales-sub">% del total esperado</div>
+          </div>
+          <div class="nomina-kpi-card" style="--nomina-accent:#FFFFFF" onclick="abrirPopupNomina('horas')">
+            <div class="nomina-kpi-label">Horas trabajadas</div>
+            <div class="nomina-kpi-value" id="nkpi-horas">—</div>
+            <div class="nomina-kpi-sub" id="nkpi-horas-sub">vs programadas</div>
+          </div>
+        </div>
+      </div>
+
       <div class="panel" style="margin-bottom:20px">
         <div class="panel-header">
           <div class="panel-title">Filtrar por empleado</div>
@@ -1408,6 +1484,7 @@ function showSection(id) {
   };
   document.getElementById('topbar-title').textContent = titles[id] || '';
   if (id === 'horarios') cargarHorarios();
+  if (id === 'analisis') calcularKpisNomina();
 }
 
 // ══════════════════════════════════
@@ -1466,6 +1543,10 @@ async function cargarFichajes() {
 
 async function actualizarTodo() {
   await Promise.all([cargarEmpleados(), cargarFichajes()]);
+  // Recalcular KPIs de nómina si la sección está activa o para mantener datos frescos
+  if (document.getElementById('s-analisis')?.classList.contains('active')) {
+    calcularKpisNomina();
+  }
 }
 
 // ══════════════════════════════════
@@ -3093,6 +3174,272 @@ function exportarExcel() {
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(h2data), 'Resumen empleados');
 
   XLSX.writeFile(wb, `Bar_Ideal_Fichajes_${hoy.toISOString().split('T')[0]}.xlsx`);
+}
+
+// ══════════════════════════════════
+//  KPIs GENERALES DE NÓMINA
+// ══════════════════════════════════
+
+let _nominaData = {};   // cache de resultados para popup
+
+function calcularKpisNomina() {
+  const periodoEl = document.getElementById('nomina-periodo');
+  const periodo = periodoEl ? periodoEl.value : 'mes';
+
+  const hoy = new Date(); hoy.setHours(23, 59, 59, 999);
+  let inicio = new Date();
+  if (periodo === 'hoy') {
+    inicio = new Date(); inicio.setHours(0, 0, 0, 0);
+  } else if (periodo === 'semana') {
+    inicio = new Date(); inicio.setDate(inicio.getDate() - 7);
+  } else if (periodo === 'mes') {
+    inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  } else {
+    inicio = new Date('2020-01-01');
+  }
+
+  // Solo empleados vinculados
+  const vinculados = planillaEmpleados.filter(pe => pe.empleado_id);
+  if (!vinculados.length) return;
+
+  // Acumuladores globales
+  let totalPresencias = 0;     // (empleado, día) con entrada registrada
+  let totalAusentes = 0;       // (empleado, día) con horario pero sin entrada
+  let totalProgramados = 0;    // (empleado, día) con horario esperado (no franco/nt)
+  let totalTardanzas = 0;
+  let sumaDiffTardes = 0;
+  let totalPuntuales = 0;
+  let minTrabajadosTotal = 0;
+  let minProgramadosTotal = 0;
+
+  const detallePresentes  = [];
+  const detalleAusentes   = [];
+  const detalleTardanzas  = [];
+  const detallePuntuales  = [];
+  const detalleHoras      = [];
+
+  // Fichajes en rango, agrupados por empleado_id → fecha
+  const fichajesRango = todosLosFichajes.filter(f =>
+    f.fecha_hora && new Date(f.fecha_hora) >= inicio && new Date(f.fecha_hora) <= hoy
+  );
+
+  const fichajesPorEmp = {};
+  fichajesRango.forEach(f => {
+    if (!fichajesPorEmp[f.empleado_id]) fichajesPorEmp[f.empleado_id] = {};
+    const fecha = f.fecha_hora.split('T')[0];
+    if (!fichajesPorEmp[f.empleado_id][fecha]) fichajesPorEmp[f.empleado_id][fecha] = {};
+    fichajesPorEmp[f.empleado_id][fecha][f.tipo] = f;
+  });
+
+  vinculados.forEach(pe => {
+    const horEmp = horariosSemana[pe.id] || {};
+    const nombreDisplay = `${pe.apellido || ''} ${pe.nombre || ''}`.trim()
+      || `${(pe.emp_apellido || '')} ${(pe.emp_nombre || '')}`.trim()
+      || `Empleado #${pe.id}`;
+
+    const fechasHorario = Object.keys(horEmp).filter(f => {
+      const d = new Date(f + 'T12:00');
+      return d >= inicio && d <= hoy;
+    });
+
+    let minTrabEmp = 0, minProgEmp = 0;
+    let ausentesEmp = 0;
+
+    fechasHorario.forEach(fecha => {
+      const h = horEmp[fecha];
+      if (!h || h.estado === 'franco' || h.estado === 'nt') return;
+
+      totalProgramados++;
+      const ficDia = (fichajesPorEmp[pe.empleado_id] || {})[fecha] || {};
+      const e1 = ficDia['entrada'], s1 = ficDia['salida'];
+      const e2 = ficDia['entrada2'], s2 = ficDia['salida2'];
+
+      // Horas programadas
+      const entRef = h.entrada1 || h.entrada;
+      const salRef = h.salida1  || h.salida;
+      if (entRef && salRef) {
+        minProgEmp += Math.abs(
+          (new Date(fecha + 'T' + salRef) - new Date(fecha + 'T' + entRef)) / 60000
+        );
+      }
+
+      if (!e1 && !e2) {
+        // Ausente
+        totalAusentes++;
+        ausentesEmp++;
+        if (!detalleAusentes.find(d => d.id === pe.id)) {
+          detalleAusentes.push({ nombre: nombreDisplay, detalle: `${ausentesEmp} día(s) sin fichar`, id: pe.id, count: 0 });
+        }
+        detalleAusentes.filter(d => d.id === pe.id).forEach(d => { d.count++; d.detalle = `${d.count} día(s) sin fichar`; });
+      } else {
+        // Presente
+        totalPresencias++;
+        let minDia = 0;
+        if (e1 && s1) minDia += minutosEntre(e1.fecha_hora, s1.fecha_hora);
+        if (e2 && s2) minDia += minutosEntre(e2.fecha_hora, s2.fecha_hora);
+        minTrabEmp += minDia;
+
+        // Puntualidad
+        if (e1 && entRef) {
+          const diff = Math.round((new Date(e1.fecha_hora) - new Date(fecha + 'T' + entRef)) / 60000);
+          if (diff > TOLERANCIA_MINUTOS) {
+            totalTardanzas++;
+            sumaDiffTardes += diff;
+            detalleTardanzas.push({ nombre: nombreDisplay, detalle: `${fmtFecha(fecha + 'T12:00')} · +${diff}m tarde`, diff });
+          } else {
+            totalPuntuales++;
+            // solo contar, no listar cada instancia individual
+          }
+        }
+
+        if (!detallePresentes.find(d => d.id === pe.id)) {
+          detallePresentes.push({ nombre: nombreDisplay, detalle: '', id: pe.id, count: 0, minDia: 0 });
+        }
+        const dp = detallePresentes.find(d => d.id === pe.id);
+        if (dp) { dp.count++; dp.minDia += minDia; dp.detalle = `${dp.count} día(s) · ${horasStr(dp.minDia)}`; }
+      }
+    });
+
+    minTrabajadosTotal += minTrabEmp;
+    minProgramadosTotal += minProgEmp;
+
+    if (minTrabEmp > 0 || minProgEmp > 0) {
+      const balance = minTrabEmp - minProgEmp;
+      detalleHoras.push({
+        nombre: nombreDisplay,
+        detalle: `${horasStr(minTrabEmp)} trabajadas · ${horasStr(minProgEmp)} prog · ${balance >= 0 ? '+' : ''}${horasStr(Math.abs(balance))} balance`,
+        balance
+      });
+    }
+  });
+
+  // Puntuales: agrupar por empleado
+  const puntPorEmp = {};
+  vinculados.forEach(pe => {
+    const horEmp = horariosSemana[pe.id] || {};
+    const nombreDisplay = `${pe.apellido || ''} ${pe.nombre || ''}`.trim()
+      || `${(pe.emp_apellido || '')} ${(pe.emp_nombre || '')}`.trim();
+    const fechasHorario = Object.keys(horEmp).filter(f => {
+      const d = new Date(f + 'T12:00');
+      return d >= inicio && d <= hoy;
+    });
+    let cnt = 0;
+    fechasHorario.forEach(fecha => {
+      const h = horEmp[fecha];
+      if (!h || h.estado === 'franco' || h.estado === 'nt') return;
+      const ficDia = (fichajesPorEmp[pe.empleado_id] || {})[fecha] || {};
+      const e1 = ficDia['entrada'];
+      const entRef = h.entrada1 || h.entrada;
+      if (e1 && entRef) {
+        const diff = Math.round((new Date(e1.fecha_hora) - new Date(fecha + 'T' + entRef)) / 60000);
+        if (diff <= TOLERANCIA_MINUTOS) cnt++;
+      }
+    });
+    if (cnt > 0) detallePuntuales.push({ nombre: nombreDisplay, detalle: `${cnt} llegada(s) puntual(es)` });
+  });
+
+  // Ordenar tardanzas de mayor a menor
+  detalleTardanzas.sort((a, b) => b.diff - a.diff);
+  detalleHoras.sort((a, b) => a.balance - b.balance);
+
+  // Guardar para popup
+  _nominaData = { detallePresentes, detalleAusentes, detalleTardanzas, detallePuntuales, detalleHoras };
+
+  // Actualizar label de período
+  const periodoLabel = { hoy: 'hoy', semana: 'últimos 7 días', mes: 'este mes', todo: 'historial' }[periodo] || '';
+  const labelEl = document.getElementById('nomina-kpis-wrap')?.querySelector('.nomina-kpi-title');
+  if (labelEl) labelEl.textContent = `📊 Toda la nómina — ${periodoLabel}`;
+
+  // Tasa de presencia
+  const pct = totalProgramados > 0 ? Math.round((totalPresencias / totalProgramados) * 100) : 0;
+  const colorPres = pct >= 90 ? '#4CAF50' : pct >= 70 ? '#FF9800' : '#E53935';
+  const presEl = document.getElementById('nkpi-presencia');
+  if (presEl) { presEl.textContent = pct + '%'; presEl.style.color = colorPres; }
+  const presSubEl = document.getElementById('nkpi-presencia-sub');
+  if (presSubEl) presSubEl.textContent = `${totalPresencias} presencias / ${totalProgramados} esperadas`;
+
+  // Ausentes
+  const ausEl = document.getElementById('nkpi-ausentes');
+  if (ausEl) ausEl.textContent = detalleAusentes.length;
+  const ausSubEl = document.getElementById('nkpi-ausentes-sub');
+  if (ausSubEl) ausSubEl.textContent = `${totalAusentes} inasistencia(s) total`;
+
+  // Tardanzas
+  const tard = detalleTardanzas.length;
+  const promTarde = tard > 0 ? Math.round(sumaDiffTardes / tard) : 0;
+  const tardEl = document.getElementById('nkpi-tardanzas');
+  if (tardEl) tardEl.textContent = tard;
+  const tardSubEl = document.getElementById('nkpi-tardanzas-sub');
+  if (tardSubEl) tardSubEl.textContent = promTarde > 0 ? `promedio ${promTarde} min tarde` : 'sin tardanzas registradas';
+
+  // Puntuales
+  const puntEl = document.getElementById('nkpi-puntuales');
+  if (puntEl) { puntEl.textContent = totalPuntuales; }
+  const puntSubEl = document.getElementById('nkpi-puntuales-sub');
+  const pctPunt = totalProgramados > 0 ? Math.round((totalPuntuales / totalProgramados) * 100) : 0;
+  if (puntSubEl) puntSubEl.textContent = `${pctPunt}% del total esperado`;
+
+  // Horas
+  const balance = minTrabajadosTotal - minProgramadosTotal;
+  const horasEl = document.getElementById('nkpi-horas');
+  if (horasEl) horasEl.textContent = horasStr(minTrabajadosTotal);
+  const horasSubEl = document.getElementById('nkpi-horas-sub');
+  if (horasSubEl) horasSubEl.textContent = `${balance >= 0 ? '+' : ''}${horasStr(Math.abs(balance))} vs ${horasStr(minProgramadosTotal)} prog`;
+}
+
+function abrirPopupNomina(tipo) {
+  const titulos = {
+    presentes:  '✅ Empleados presentes',
+    ausentes:   '⛔ Ausentes en el período',
+    tardanzas:  '⏰ Tardanzas',
+    puntuales:  '✅ Puntuales',
+    horas:      '⏱️ Horas por empleado',
+  };
+  document.getElementById('popup-alerta-title').textContent = titulos[tipo] || tipo;
+
+  const mapaData = {
+    presentes: _nominaData.detallePresentes || [],
+    ausentes:  _nominaData.detalleAusentes  || [],
+    tardanzas: _nominaData.detalleTardanzas || [],
+    puntuales: _nominaData.detallePuntuales || [],
+    horas:     _nominaData.detalleHoras     || [],
+  };
+
+  const datos = mapaData[tipo] || [];
+  const body = document.getElementById('popup-alerta-body');
+
+  if (!datos.length) {
+    body.innerHTML = '<div class="popup-alerta-empty">Sin registros para mostrar en este período</div>';
+  } else {
+    const badgeColor = {
+      presentes: 'rgba(76,175,80,0.15);color:var(--success)',
+      ausentes:  'rgba(229,57,53,0.15);color:var(--danger)',
+      tardanzas: 'rgba(255,152,0,0.15);color:var(--warning)',
+      puntuales: 'rgba(76,175,80,0.15);color:var(--success)',
+      horas:     'rgba(255,255,255,0.1);color:var(--text)',
+    }[tipo] || 'rgba(255,255,255,0.08);color:var(--text2)';
+
+    body.innerHTML = datos.map(d => {
+      let badge = '';
+      if (tipo === 'tardanzas') {
+        badge = `<span class="popup-alerta-badge" style="background:rgba(255,152,0,0.15);color:var(--warning)">+${d.diff}m</span>`;
+      } else if (tipo === 'ausentes') {
+        badge = `<span class="popup-alerta-badge" style="background:rgba(229,57,53,0.15);color:var(--danger)">${d.count || '–'} día(s)</span>`;
+      } else if (tipo === 'horas') {
+        const bc = d.balance >= 0 ? 'rgba(76,175,80,0.15);color:#4CAF50' : 'rgba(229,57,53,0.15);color:#EF5350';
+        badge = `<span class="popup-alerta-badge" style="background:${bc}">${d.balance >= 0 ? '+' : ''}${horasStr(Math.abs(d.balance))}</span>`;
+      }
+      return `<div class="popup-alerta-row">
+        <div>
+          <div class="popup-alerta-nombre">${d.nombre}</div>
+          ${d.detalle ? `<div class="popup-alerta-detalle">${d.detalle}</div>` : ''}
+        </div>
+        ${badge}
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('popup-alerta').classList.add('show');
 }
 
 // ══════════════════════════════════
