@@ -1003,10 +1003,70 @@ canvas { max-height: 240px; }
               <option value="">Seleccioná un empleado</option>
             </select>
             <select id="analisis-periodo" onchange="cargarAnalisis()">
+              <option value="hoy">Hoy</option>
               <option value="semana">Esta semana</option>
-              <option value="mes">Este mes</option>
+              <option value="mes" selected>Este mes</option>
               <option value="todo">Todo</option>
             </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPIs macro del período seleccionado -->
+      <div id="analisis-kpis" style="display:none;margin-bottom:20px">
+        <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
+          <div class="kpi-card" style="border-color:rgba(76,175,80,0.4)">
+            <div class="kpi-label">Tasa de presencia</div>
+            <div class="kpi-value" id="an-presencia" style="color:#4CAF50">—%</div>
+            <div class="kpi-sub" id="an-presencia-sub">del total esperado</div>
+          </div>
+          <div class="kpi-card" style="border-color:rgba(229,57,53,0.4)">
+            <div class="kpi-label">Ausencias</div>
+            <div class="kpi-value" id="an-ausencias" style="color:#E53935">—</div>
+            <div class="kpi-sub" id="an-ausencias-sub">días sin asistir</div>
+          </div>
+          <div class="kpi-card" style="border-color:rgba(255,152,0,0.4)">
+            <div class="kpi-label">Tardanzas</div>
+            <div class="kpi-value" id="an-tardanzas" style="color:#FF9800">—</div>
+            <div class="kpi-sub" id="an-tardanzas-sub">promedio — min</div>
+          </div>
+          <div class="kpi-card" style="border-color:rgba(201,168,76,0.4)">
+            <div class="kpi-label">Horas trabajadas</div>
+            <div class="kpi-value" id="an-horas" style="color:var(--gold)">—</div>
+            <div class="kpi-sub" id="an-horas-sub">vs programadas</div>
+          </div>
+          <div class="kpi-card" style="border-color:rgba(66,165,245,0.4)">
+            <div class="kpi-label">Puntualidad</div>
+            <div class="kpi-value" id="an-puntualidad" style="color:#42A5F5">—%</div>
+            <div class="kpi-sub">días con horario cumplido</div>
+          </div>
+        </div>
+
+        <!-- Gráfico de asistencia por día -->
+        <div class="panel" style="margin-top:16px;padding:20px">
+          <div class="panel-title" style="margin-bottom:16px">Asistencia por día</div>
+          <div id="an-grafico-wrap" style="overflow-x:auto">
+            <canvas id="an-grafico" height="120"></canvas>
+          </div>
+        </div>
+
+        <!-- Tabla de alertas semáforo -->
+        <div class="panel" style="margin-top:16px;padding:0">
+          <div class="panel-header" style="padding:14px 20px">
+            <div class="panel-title">Detalle por día</div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="tabla-fichajes">
+              <thead><tr>
+                <th>Fecha</th>
+                <th>Entrada</th>
+                <th>Salida</th>
+                <th>Horas</th>
+                <th>Estado</th>
+                <th>Diferencia</th>
+              </tr></thead>
+              <tbody id="an-tabla-body"></tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -1749,23 +1809,33 @@ function renderEmpleados() {
 function cargarAnalisis() {
   const empId = document.getElementById('analisis-empleado').value;
   const periodo = document.getElementById('analisis-periodo').value;
-  const content = document.getElementById('analisis-content');
+  const contentEl = document.getElementById('analisis-content');
   const empty = document.getElementById('analisis-empty');
+  const kpisEl = document.getElementById('analisis-kpis');
 
   if (!empId) {
-    content.style.display = 'none';
+    contentEl.style.display = 'none';
+    kpisEl.style.display = 'none';
     empty.style.display = 'block';
     return;
   }
 
-  content.style.display = 'block';
+  contentEl.style.display = 'block';
+  kpisEl.style.display = 'block';
   empty.style.display = 'none';
 
-  const hoy = new Date(); hoy.setHours(23,59,59,0);
+  const hoyFecha = fechaHoy();
+  const hoy = new Date(); hoy.setHours(23,59,59,999);
   let inicio = new Date();
-  if (periodo === 'semana') { inicio.setDate(inicio.getDate() - 7); }
-  else if (periodo === 'mes') { inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1); }
-  else { inicio = new Date('2020-01-01'); }
+  if (periodo === 'hoy') {
+    inicio = new Date(); inicio.setHours(0,0,0,0);
+  } else if (periodo === 'semana') {
+    inicio.setDate(inicio.getDate() - 7);
+  } else if (periodo === 'mes') {
+    inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  } else {
+    inicio = new Date('2020-01-01');
+  }
 
   const f = todosLosFichajes.filter(x =>
     String(x.empleado_id) === String(empId) &&
@@ -1906,6 +1976,110 @@ function cargarAnalisis() {
       }
     }
   });
+
+  // ── Calcular y mostrar KPIs macro ──
+  const pe = planillaEmpleados.find(p => String(p.empleado_id) === String(empId));
+  const peId = pe ? pe.id : null;
+
+  // Días programados en el período
+  let diasProgramados = 0, diasTrabajados = 0, diasAusente = 0;
+  let totalTardes = 0, sumaDiffTardes = 0, diasPuntuales = 0;
+  let minTrabajados = 0, minProgramados = 0;
+
+  const tablaRows = [];
+
+  if (peId) {
+    const horEmp = horariosSemana[peId] || {};
+    Object.keys(horEmp).forEach(fecha => {
+      const fechaDate = new Date(fecha + 'T12:00');
+      if (fechaDate < inicio || fechaDate > hoy) return;
+      const h = horEmp[fecha];
+      if (!h || h.estado === 'franco' || h.estado === 'nt') return;
+
+      diasProgramados++;
+      const e1 = (byFecha[fecha] || {})['entrada'];
+      const s1 = (byFecha[fecha] || {})['salida'];
+      const e2 = (byFecha[fecha] || {})['entrada2'];
+      const s2 = (byFecha[fecha] || {})['salida2'];
+
+      // Horas trabajadas ese día
+      let minDia = 0;
+      if (e1 && s1) minDia += minutosEntre(e1.fecha_hora, s1.fecha_hora);
+      if (e2 && s2) minDia += minutosEntre(e2.fecha_hora, s2.fecha_hora);
+      minTrabajados += minDia;
+
+      // Horas programadas
+      const entRef = h.entrada1 || h.entrada;
+      const salRef = h.salida1 || h.salida;
+      if (entRef && salRef) {
+        const p = new Date(fecha + 'T' + salRef) - new Date(fecha + 'T' + entRef);
+        minProgramados += Math.abs(p / 60000);
+      }
+
+      if (!e1 && !e2) {
+        diasAusente++;
+        tablaRows.push({ fecha, e1: null, s1: null, minDia: 0, estado: 'ausente', diff: null });
+      } else {
+        diasTrabajados++;
+        let diff = null, estado = 'sin-horario';
+        if (e1 && entRef) {
+          const prog = new Date(fecha + 'T' + entRef);
+          const real = new Date(e1.fecha_hora);
+          diff = Math.round((real - prog) / 60000);
+          if (diff > TOLERANCIA_MINUTOS) {
+            totalTardes++; sumaDiffTardes += diff; estado = 'tarde';
+          } else {
+            diasPuntuales++; estado = 'puntual';
+          }
+        }
+        tablaRows.push({ fecha, e1, s1, e2, s2, minDia, estado, diff });
+      }
+    });
+  }
+
+  const pct = diasProgramados > 0 ? Math.round((diasTrabajados / diasProgramados) * 100) : 0;
+  const pctPunt = diasTrabajados > 0 ? Math.round((diasPuntuales / diasTrabajados) * 100) : 0;
+  const promTarde = totalTardes > 0 ? Math.round(sumaDiffTardes / totalTardes) : 0;
+  const balance = minTrabajados - minProgramados;
+
+  // Color semáforo presencia
+  const colorPres = pct >= 90 ? '#4CAF50' : pct >= 70 ? '#FF9800' : '#E53935';
+  document.getElementById('an-presencia').textContent = pct + '%';
+  document.getElementById('an-presencia').style.color = colorPres;
+  document.getElementById('an-presencia-sub').textContent = `${diasTrabajados} de ${diasProgramados} días`;
+  document.getElementById('an-ausencias').textContent = diasAusente;
+  document.getElementById('an-ausencias-sub').textContent = diasAusente === 1 ? 'día sin asistir' : 'días sin asistir';
+  document.getElementById('an-tardanzas').textContent = totalTardes;
+  document.getElementById('an-tardanzas-sub').textContent = promTarde > 0 ? `promedio ${promTarde} min tarde` : 'sin tardanzas';
+  document.getElementById('an-horas').textContent = horasStr(minTrabajados);
+  document.getElementById('an-horas-sub').textContent = `${balance >= 0 ? '+' : ''}${horasStr(Math.abs(balance))} vs programadas`;
+  document.getElementById('an-puntualidad').textContent = pctPunt + '%';
+
+  // Color semáforo puntualidad
+  const colorPunt = pctPunt >= 90 ? '#4CAF50' : pctPunt >= 70 ? '#FF9800' : '#E53935';
+  document.getElementById('an-puntualidad').style.color = colorPunt;
+
+  // Tabla de detalle por día
+  const tablaBody = document.getElementById('an-tabla-body');
+  if (tablaBody) {
+    tablaBody.innerHTML = tablaRows.sort((a,b) => b.fecha.localeCompare(a.fecha)).map(r => {
+      const semaforo = r.estado === 'puntual' ? '🟢' : r.estado === 'tarde' ? '🟡' : r.estado === 'ausente' ? '🔴' : '⚪';
+      const badge = r.estado === 'puntual' ? '<span class="badge badge-puntual">Puntual</span>'
+        : r.estado === 'tarde' ? '<span class="badge badge-tarde">Tarde</span>'
+        : r.estado === 'ausente' ? '<span class="badge badge-ausente">Ausente</span>'
+        : '—';
+      const diffStr = r.diff !== null ? (r.diff > 0 ? `+${r.diff}m` : `${r.diff}m`) : '—';
+      const diffColor = r.diff > TOLERANCIA_MINUTOS ? 'color:#FF9800' : r.diff < 0 ? 'color:#4CAF50' : '';
+      return `<tr>
+        <td>${semaforo} ${fmtFecha(r.fecha + 'T12:00')}</td>
+        <td>${r.e1 ? fmt(r.e1.fecha_hora) : '—'}</td>
+        <td>${r.s1 ? fmt(r.s1.fecha_hora) : '—'}</td>
+        <td>${r.minDia > 0 ? horasStr(r.minDia) : '—'}</td>
+        <td>${badge}</td>
+        <td style="${diffColor}">${diffStr}</td>
+      </tr>`;
+    }).join('');
+  }
 }
 
 // ══════════════════════════════════
