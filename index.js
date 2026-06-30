@@ -252,6 +252,28 @@ app.post("/api/fichajes", async (c) => {
   if (dup.length > 0)
     return c.json({ error: `Ya existe un fichaje de tipo '${tipo}' en el turno activo`, existing: dup[0] }, 409);
 
+  // Validar secuencia lógica: el tipo debe ser el correcto según los fichajes del turno activo
+  const fichajesActivos = await sql`
+    SELECT tipo FROM fichajes
+    WHERE empleado_id = ${empleado_id} AND fecha_hora::date = ${fechaLaboral}::date
+    ORDER BY fecha_hora ASC`;
+
+  const tipos = fichajesActivos.map(f => f.tipo);
+  const tieneEntrada  = tipos.includes('entrada');
+  const tieneSalida   = tipos.includes('salida');
+  const tieneEntrada2 = tipos.includes('entrada2');
+  const tieneSalida2  = tipos.includes('salida2');
+
+  // Reglas de secuencia
+  if (tipo === 'salida' && !tieneEntrada)
+    return c.json({ error: 'No podés registrar salida sin haber fichado entrada', secuencia: true }, 422);
+  if (tipo === 'entrada2' && !tieneSalida)
+    return c.json({ error: 'No podés registrar segunda entrada sin haber fichado la salida del primer turno', secuencia: true }, 422);
+  if (tipo === 'salida2' && !tieneEntrada2)
+    return c.json({ error: 'No podés registrar segunda salida sin haber fichado la segunda entrada', secuencia: true }, 422);
+  if (tipo === 'entrada' && tieneEntrada && !tieneSalida)
+    return c.json({ error: 'Ya tenés una entrada registrada sin salida. Primero fichá la salida', secuencia: true }, 422);
+
   const [fichaje] = await sql`
     INSERT INTO fichajes (empleado_id, tipo, lat, lng, fecha_hora)
     VALUES (${empleado_id}, ${tipo}, ${lat}, ${lng}, NOW())

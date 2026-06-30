@@ -652,8 +652,10 @@ async function fichar() {
       _esSospechoso = true;
       ring.classList.remove('active');
       btn.disabled = false;
+      const seg = Math.round(minDesdeUltimo * 60);
       const min = Math.round(minDesdeUltimo);
-      document.getElementById('sospechoso-msg').textContent = `Pasaron solo ${min} minuto${min !== 1 ? 's' : ''} desde tu último fichaje. ¿Estás seguro?`;
+      const tiempoStr = minDesdeUltimo < 1 ? `${seg} segundo${seg !== 1 ? 's' : ''}` : `${min} minuto${min !== 1 ? 's' : ''}`;
+      document.getElementById('sospechoso-msg').textContent = `Pasaron solo ${tiempoStr} desde tu último fichaje. ¿Estás seguro?`;
       document.getElementById('overlay-sospechoso').classList.add('show');
       return;
     }
@@ -727,7 +729,17 @@ async function registrarFichaje(pos) {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ empleado_id: empleado.id, tipo: proximoTipo, lat: pos.coords.latitude, lng: pos.coords.longitude })
     });
-    if (!r.ok) throw new Error();
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      ring.classList.remove('active');
+      if (err.secuencia) {
+        toast(err.error || 'Error de secuencia de fichaje');
+      } else {
+        toast('Error al registrar. Verificá tu conexión.');
+      }
+      await cargarHistorial();
+      return;
+    }
     const f = await r.json();
     ring.classList.remove('active');
     mostrarExito(f); await cargarHistorial();

@@ -984,6 +984,11 @@ canvas { max-height: 240px; }
           <div class="alert-value" id="alert-turno-largo">—</div>
           <div class="alert-sub" id="alert-turno-largo-nombres">Sin datos</div>
         </div>
+        <div class="alert-card warning" style="cursor:pointer;border-color:rgba(255,152,0,0.6);background:rgba(255,152,0,0.07)" onclick="abrirPopupAlerta('dudosos')">
+          <div class="alert-title" style="color:var(--warning)">🔍 Fichajes dudosos</div>
+          <div class="alert-value" id="alert-dudosos">—</div>
+          <div class="alert-sub" id="alert-dudosos-nombres">Menos de 60 min entre fichajes</div>
+        </div>
       </div>
 
       <div class="section-title">Actividad reciente</div>
@@ -1803,6 +1808,51 @@ function calcularAlertasHoy(fichajesHoy) {
   if (tlSubEl) tlSubEl.textContent = turnosLargos.length
     ? turnosLargos.slice(0,3).join(', ') + (turnosLargos.length > 3 ? '…' : '')
     : 'Todo en orden';
+
+  // ── FICHAJES DUDOSOS: menos de 3 minutos entre fichajes consecutivos ──
+  _alertaData['dudosos'] = [];
+  const dudososNombres = [];
+
+  // Agrupar todos los fichajes por empleado
+  const fichajesPorEmpDud = {};
+  todosLosFichajes.forEach(f => {
+    if (!fichajesPorEmpDud[f.empleado_id])
+      fichajesPorEmpDud[f.empleado_id] = { nombre: f.nombre + ' ' + f.apellido, empId: f.empleado_id, fichajes: [] };
+    fichajesPorEmpDud[f.empleado_id].fichajes.push(f);
+  });
+
+  Object.values(fichajesPorEmpDud).forEach(emp => {
+    // Ordenar por fecha
+    const sorted = [...emp.fichajes].sort((a, b) => new Date(a.fecha_hora) - new Date(b.fecha_hora));
+    for (let i = 1; i < sorted.length; i++) {
+      const prev = sorted[i-1];
+      const curr = sorted[i];
+      const minDiff = (new Date(curr.fecha_hora) - new Date(prev.fecha_hora)) / 60000;
+      if (minDiff < 60) {
+        const segDiff = Math.round(minDiff * 60);
+        const tiempoStr = minDiff < 1 ? `${segDiff}s` : `${Math.round(minDiff)}m`;
+        if (!dudososNombres.includes(emp.nombre)) dudososNombres.push(emp.nombre);
+        _alertaData['dudosos'].push({
+          nombre: emp.nombre,
+          empId: emp.empId,
+          detalle: `${({ entrada:'E1', salida:'S1', entrada2:'E2', salida2:'S2' }[prev.tipo]||prev.tipo)} → ${({ entrada:'E1', salida:'S1', entrada2:'E2', salida2:'S2' }[curr.tipo]||curr.tipo)} · ${tiempoStr} · ${fmtFecha(curr.fecha_hora)} ${fmt(curr.fecha_hora)}`,
+          fichajePrev: prev,
+          fichajeActual: curr,
+          minDiff
+        });
+      }
+    }
+  });
+
+  // Ordenar de menor a mayor tiempo (los más sospechosos primero)
+  _alertaData['dudosos'].sort((a, b) => a.minDiff - b.minDiff);
+
+  const dudEl = document.getElementById('alert-dudosos');
+  const dudSubEl = document.getElementById('alert-dudosos-nombres');
+  if (dudEl) dudEl.textContent = _alertaData['dudosos'].length;
+  if (dudSubEl) dudSubEl.textContent = dudososNombres.length
+    ? dudososNombres.slice(0,3).join(', ') + (dudososNombres.length > 3 ? '…' : '')
+    : 'Sin fichajes dudosos';
 }
 
 // ══════════════════════════════════
@@ -3868,6 +3918,7 @@ function abrirPopupAlerta(tipo) {
     puntuales:      '✅ Puntuales',
     incompletos:    '⚠️ Fichajes incompletos',
     'turno-largo':  '🔔 Turnos con +10h sin salida',
+    'dudosos':      '🔍 Fichajes dudosos (menos de 60 min)',
   };
   document.getElementById('popup-alerta-title').textContent = titulos[tipo] || tipo;
 
@@ -3890,7 +3941,21 @@ function abrirPopupAlerta(tipo) {
       badge = `<span class="popup-alerta-badge" style="background:rgba(229,57,53,0.15);color:var(--danger)">Ausente</span>`;
     } else if (tipo === 'puntuales') {
       badge = `<span class="popup-alerta-badge" style="background:rgba(72,199,116,0.15);color:var(--success)">Puntual</span>`;
-    } else if (tipo === 'turno-largo') {
+    } else if (tipo === 'dudosos') {
+    const prev = d.fichajePrev;
+    const curr = d.fichajeActual;
+    const tiposLabel = { entrada:'Entrada 1', salida:'Salida 1', entrada2:'Entrada 2', salida2:'Salida 2' };
+    const seg = Math.round(d.minDiff * 60);
+    const tiempoStr = d.minDiff < 1 ? `${seg} segundos` : `${Math.round(d.minDiff)} minutos`;
+    html = `<div class="popup-exp-grid">
+      <div class="popup-exp-item"><div class="popup-exp-label">Fichaje anterior</div><div class="popup-exp-val">${tiposLabel[prev.tipo]||prev.tipo} · ${fmt(prev.fecha_hora)}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Fichaje dudoso</div><div class="popup-exp-val" style="color:var(--warning)">${tiposLabel[curr.tipo]||curr.tipo} · ${fmt(curr.fecha_hora)}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Diferencia</div><div class="popup-exp-val" style="color:var(--warning)">${tiempoStr}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Fecha</div><div class="popup-exp-val">${fmtFecha(curr.fecha_hora)}</div></div>
+    </div>
+    ${d.empId ? `<button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>` : ''}`;
+
+  } else if (tipo === 'turno-largo') {
     const e1 = d.entrada;
     const hsTotal = d.hs;
     const pe = planillaEmpleados.find(p => p.empleado_id === d.empId);
@@ -3910,6 +3975,10 @@ function abrirPopupAlerta(tipo) {
       badge = `<span class="popup-alerta-badge" style="background:rgba(255,152,0,0.15);color:var(--warning)">${d.desde}</span>`;
       } else if (tipo === 'turno-largo') {
         badge = `<span class="popup-alerta-badge" style="background:rgba(156,39,176,0.15);color:#CE93D8">${d.hs}h dentro</span>`;
+      } else if (tipo === 'dudosos') {
+        const seg = Math.round(d.minDiff * 60);
+        const tiempoStr = d.minDiff < 1 ? `${seg}s` : `${Math.round(d.minDiff)}m`;
+        badge = `<span class="popup-alerta-badge" style="background:rgba(255,152,0,0.15);color:var(--warning)">${tiempoStr}</span>`;
       }
 
     return `<div class="popup-alerta-row popup-alerta-row-clickable" data-idx="${i}" data-tipo="${tipo}" ${clickAttr}>
