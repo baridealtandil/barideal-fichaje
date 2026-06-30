@@ -1598,7 +1598,13 @@ function filtrarFichajes() {
     grupos[key].items[fi.tipo] = fi;
   });
 
-  fichajesFiltrados = Object.values(grupos).sort((a, b) => b.fecha.localeCompare(a.fecha));
+  fichajesFiltrados = Object.values(grupos).sort((a, b) => {
+    // Ordenar por apellido, luego nombre, ambos alfabético
+    const apA = (a.apellido || '').toLowerCase();
+    const apB = (b.apellido || '').toLowerCase();
+    if (apA !== apB) return apA.localeCompare(apB, 'es');
+    return (a.nombre || '').toLowerCase().localeCompare((b.nombre || '').toLowerCase(), 'es');
+  });
   paginaActual = 1;
   renderTablaFichajes();
 }
