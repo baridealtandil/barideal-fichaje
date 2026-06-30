@@ -1373,6 +1373,11 @@ function minutosEntre(dt1, dt2) {
   return Math.round((new Date(dt2) - new Date(dt1)) / 60000);
 }
 function fechaHoy() {
+  // Usar la fecha del fichaje más reciente para no depender del reloj del navegador
+  if (todosLosFichajes && todosLosFichajes.length > 0) {
+    const ultimo = todosLosFichajes.reduce((a, b) => a.fecha_hora > b.fecha_hora ? a : b);
+    return ultimo.fecha_hora.split('T')[0];
+  }
   return new Date().toISOString().split('T')[0];
 }
 function avatarLetras(nombre, apellido) {
