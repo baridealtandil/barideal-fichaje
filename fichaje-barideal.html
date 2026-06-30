@@ -797,8 +797,20 @@ async function iniciarPushNotifications(empId) {
   try {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
 
-    // Registrar service worker
+    // Registrar service worker y forzar activación inmediata si hay update
     const reg = await navigator.serviceWorker.register('/sw.js');
+    // Si hay un SW nuevo esperando, activarlo ya
+    if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+    reg.addEventListener('updatefound', () => {
+      const nuevo = reg.installing;
+      if (nuevo) {
+        nuevo.addEventListener('statechange', () => {
+          if (nuevo.state === 'installed' && navigator.serviceWorker.controller) {
+            nuevo.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      }
+    });
     await navigator.serviceWorker.ready;
 
     // Pedir permiso (solo si no está dado o denegado)
