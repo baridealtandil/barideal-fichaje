@@ -488,14 +488,65 @@ function onGeoError() {
   document.getElementById('geo-text').textContent = 'Error al obtener ubicación'; geoOk = false;
 }
 
-async function cargarTurno() {
-  const hoy = new Date().toISOString().split('T')[0];
+// ── DÍA LABORAL ACTIVO ──
+// Un turno pertenece al día en que empezó, aunque la salida sea al día siguiente.
+// Devuelve la fecha YYYY-MM-DD del turno activo (el de la última entrada sin salida),
+// o la fecha local de hoy si no hay turno abierto.
+let _fechaLaboralActiva = null;
+
+function fechaLocal() {
+  const d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+
+async function resolverFechaLaboral() {
+  // Traer fichajes de hoy y ayer para detectar turno abierto
+  const hoy  = fechaLocal();
+  const ayer = (() => { const d = new Date(); d.setDate(d.getDate()-1);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
+
   try {
-    const r = await fetch(`${API}/api/horarios?empleado_id=${empleado.id}&fecha=${hoy}`);
+    const [rH, rA] = await Promise.all([
+      fetch(`${API}/api/fichajes?empleado_id=${empleado.id}&fecha=${hoy}`),
+      fetch(`${API}/api/fichajes?empleado_id=${empleado.id}&fecha=${ayer}`)
+    ]);
+    const fHoy  = rH.ok  ? await rH.json()  : [];
+    const fAyer = rA.ok  ? await rA.json()  : [];
+
+    // Verificar si hay turno abierto de ayer (entrada sin salida)
+    const entradaAyer  = fAyer.find(f => f.tipo === 'entrada');
+    const salidaAyer   = fAyer.find(f => f.tipo === 'salida');
+    const entrada2Ayer = fAyer.find(f => f.tipo === 'entrada2');
+    const salida2Ayer  = fAyer.find(f => f.tipo === 'salida2');
+
+    const turnoAbiertoDeAyer =
+      (entradaAyer  && !salidaAyer)  ||
+      (entrada2Ayer && !salida2Ayer);
+
+    if (turnoAbiertoDeAyer) {
+      _fechaLaboralActiva = ayer;
+      return { fecha: ayer, fichajesActivos: fAyer };
+    }
+
+    _fechaLaboralActiva = hoy;
+    return { fecha: hoy, fichajesActivos: fHoy };
+  } catch {
+    _fechaLaboralActiva = hoy;
+    return { fecha: hoy, fichajesActivos: [] };
+  }
+}
+
+async function cargarTurno() {
+  const { fecha } = await resolverFechaLaboral();
+  try {
+    const r = await fetch(`${API}/api/horarios?empleado_id=${empleado.id}&fecha=${fecha}`);
     const data = r.ok ? await r.json() : null;
     const th = document.getElementById('turno-hora'), ts = document.getElementById('turno-sub');
-    if (data && data.entrada) {
-      const e1 = data.entrada.substring(0,5), s1 = (data.salida||'?').substring(0,5);
+    if (data && (data.entrada1 || data.entrada)) {
+      const e1 = (data.entrada1||data.entrada).substring(0,5);
+      const s1 = (data.salida1||data.salida||'?').substring(0,5);
       let txt = `${e1} — ${s1}`, sub = 'Turno simple';
       if (data.entrada2) {
         txt += ` / ${data.entrada2.substring(0,5)} — ${(data.salida2||'?').substring(0,5)}`;
@@ -507,41 +558,23 @@ async function cargarTurno() {
 }
 
 async function cargarHistorial() {
-  const hoy = new Date().toISOString().split('T')[0];
-  try {
-    const r = await fetch(`${API}/api/fichajes?empleado_id=${empleado.id}&fecha=${hoy}`);
-    fichajesHoy = r.ok ? await r.json() : [];
-  } catch { fichajesHoy = []; }
+  const { fecha, fichajesActivos } = await resolverFechaLaboral();
+  fichajesHoy = fichajesActivos;
   renderHistorial(); actualizarBoton();
-  await verificarFichajeIncompleto();
+  verificarFichajeIncompletoOverlay();
 }
 
-async function verificarFichajeIncompleto() {
+function verificarFichajeIncompletoOverlay() {
+  // Mostrar overlay solo si hay entrada sin salida de hace más de 10 horas
+  // (turno abierto anormalmente largo — el encargado revisará)
   try {
-    // Traer fichajes de los últimos 2 días para detectar entradas sin salida > 12hs
-    const ayer = new Date();
-    ayer.setDate(ayer.getDate() - 1);
-    const fechaAyer = ayer.toISOString().split('T')[0];
-    const r = await fetch(`${API}/api/fichajes?empleado_id=${empleado.id}&fecha=${fechaAyer}`);
-    const fichajesAyer = r.ok ? await r.json() : [];
-
-    // Combinar ayer + hoy para buscar entradas huérfanas
-    const todos = [...fichajesAyer, ...fichajesHoy];
-    const ahora = Date.now();
-
-    // Buscar entrada sin salida correspondiente con más de 12 horas
     const tieneEntradaSinSalida = (tipo_entrada, tipo_salida) => {
-      const entrada = todos.find(f => f.tipo === tipo_entrada);
-      const salida  = todos.find(f => f.tipo === tipo_salida);
+      const entrada = fichajesHoy.find(f => f.tipo === tipo_entrada);
+      const salida  = fichajesHoy.find(f => f.tipo === tipo_salida);
       if (!entrada || salida) return false;
-      const hs = (ahora - new Date(entrada.fecha_hora).getTime()) / 3600000;
-      return hs > 12;
+      return (Date.now() - new Date(entrada.fecha_hora).getTime()) / 3600000 > 10;
     };
-
-    const incompleto = tieneEntradaSinSalida('entrada', 'salida') ||
-                       tieneEntradaSinSalida('entrada2', 'salida2');
-
-    if (incompleto) {
+    if (tieneEntradaSinSalida('entrada', 'salida') || tieneEntradaSinSalida('entrada2', 'salida2')) {
       document.getElementById('overlay-incompleto').classList.add('show');
     }
   } catch { /* silencioso */ }

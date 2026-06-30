@@ -222,13 +222,35 @@ app.post("/api/fichajes", async (c) => {
   const [emp] = await sql`SELECT id FROM empleados WHERE id = ${empleado_id}`;
   if (!emp) return c.json({ error: "Empleado no encontrado" }, 404);
 
-  const hoy = new Date().toISOString().split("T")[0];
+  // Determinar el día laboral activo: si hay una entrada abierta de ayer, ese es el día activo
+  const ahoraAR = new Date(Date.now() - 3 * 60 * 60 * 1000); // UTC-3
+  const hoy = ahoraAR.toISOString().split("T")[0];
+  const ayerD = new Date(ahoraAR); ayerD.setDate(ayerD.getDate() - 1);
+  const ayer = ayerD.toISOString().split("T")[0];
+
+  // Ver si hay turno abierto de ayer
+  const turnoAbiertoAyer = await sql`
+    SELECT id FROM fichajes
+    WHERE empleado_id = ${empleado_id}
+      AND fecha_hora::date = ${ayer}::date
+      AND tipo IN ('entrada','entrada2')
+      AND NOT EXISTS (
+        SELECT 1 FROM fichajes f2
+        WHERE f2.empleado_id = ${empleado_id}
+          AND f2.fecha_hora::date = ${ayer}::date
+          AND f2.tipo = CASE tipo WHEN 'entrada' THEN 'salida' ELSE 'salida2' END
+      )
+    LIMIT 1`;
+
+  const fechaLaboral = turnoAbiertoAyer.length > 0 ? ayer : hoy;
+
+  // Chequear duplicado dentro del día laboral activo
   const dup = await sql`
     SELECT id FROM fichajes
-    WHERE empleado_id = ${empleado_id} AND tipo = ${tipo} AND fecha_hora::date = ${hoy}::date
+    WHERE empleado_id = ${empleado_id} AND tipo = ${tipo} AND fecha_hora::date = ${fechaLaboral}::date
     LIMIT 1`;
   if (dup.length > 0)
-    return c.json({ error: `Ya existe un fichaje de tipo '${tipo}' hoy`, existing: dup[0] }, 409);
+    return c.json({ error: `Ya existe un fichaje de tipo '${tipo}' en el turno activo`, existing: dup[0] }, 409);
 
   const [fichaje] = await sql`
     INSERT INTO fichajes (empleado_id, tipo, lat, lng, fecha_hora)
@@ -406,7 +428,8 @@ app.post("/api/horarios/batch", async (c) => {
 //  MÉTRICAS
 // ══════════════════════════════════════════════════
 app.get("/api/metricas/hoy", async (c) => {
-  const hoy = new Date().toISOString().split("T")[0];
+  const ahoraAR2 = new Date(Date.now() - 3 * 60 * 60 * 1000);
+  const hoy = ahoraAR2.toISOString().split("T")[0];
   const [totales] = await sql`
     SELECT
       COUNT(*) FILTER (WHERE tipo = 'entrada') AS entradas,

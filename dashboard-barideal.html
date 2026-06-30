@@ -979,6 +979,11 @@ canvas { max-height: 240px; }
           <div class="alert-value" id="alert-incompletos">—</div>
           <div class="alert-sub" id="alert-incompletos-nombres">Sin datos</div>
         </div>
+        <div class="alert-card danger" style="cursor:pointer;border-color:rgba(156,39,176,0.6);background:rgba(156,39,176,0.07)" onclick="abrirPopupAlerta('turno-largo')">
+          <div class="alert-title" style="color:#CE93D8">🔔 Turnos +10h sin salida</div>
+          <div class="alert-value" id="alert-turno-largo">—</div>
+          <div class="alert-sub" id="alert-turno-largo-nombres">Sin datos</div>
+        </div>
       </div>
 
       <div class="section-title">Actividad reciente</div>
@@ -1750,11 +1755,54 @@ function calcularAlertasHoy(fichajesHoy) {
     const salida  = emp ? emp.fichajes.find(f => f.tipo === 'salida') : null;
     const salida2 = emp ? emp.fichajes.find(f => f.tipo === 'salida2') : null;
     const hs = entrada ? Math.floor((Date.now() - new Date(entrada.fecha_hora).getTime()) / 3600000) : null;
-    // get empId from fichajes
     const empFichaje = emp ? emp.fichajes[0] : null;
     const empIdInc = empFichaje ? empFichaje.empleado_id : null;
     return { nombre, desde: hs ? hs + 'h sin salida' : 'Sin salida', empId: empIdInc, entrada, entrada2, salida, salida2 };
   });
+
+  // ── TURNOS LARGOS: entrada sin salida con más de 10 horas ──
+  // Busca en TODOS los fichajes (no solo hoy) para capturar turnos nocturnos
+  const turnoLargoGrupos = {};
+  todosLosFichajes.forEach(f => {
+    if (!turnoLargoGrupos[f.empleado_id])
+      turnoLargoGrupos[f.empleado_id] = { nombre: f.nombre + ' ' + f.apellido, empId: f.empleado_id, fichajes: [] };
+    turnoLargoGrupos[f.empleado_id].fichajes.push(f);
+  });
+
+  const turnosLargos = [];
+  _alertaData['turno-largo'] = [];
+
+  Object.values(turnoLargoGrupos).forEach(emp => {
+    const chequear = (tipoEntrada, tipoSalida) => {
+      const entrada = emp.fichajes.find(f => f.tipo === tipoEntrada);
+      const salida  = emp.fichajes.find(f => f.tipo === tipoSalida && f.fecha_hora > (entrada?.fecha_hora || ''));
+      if (!entrada || salida) return;
+      const hs = (ahora - new Date(entrada.fecha_hora).getTime()) / 3600000;
+      if (hs > 10) {
+        const hsRedondeado = Math.floor(hs);
+        turnosLargos.push(emp.nombre);
+        _alertaData['turno-largo'].push({
+          nombre: emp.nombre,
+          empId: emp.empId,
+          entrada,
+          detalle: `Lleva ${hsRedondeado}h dentro — entró ${fmt(entrada.fecha_hora)}`,
+          hs: hsRedondeado
+        });
+      }
+    };
+    chequear('entrada', 'salida');
+    chequear('entrada2', 'salida2');
+  });
+
+  // Ordenar de mayor a menor tiempo
+  _alertaData['turno-largo'].sort((a, b) => b.hs - a.hs);
+
+  const tlEl = document.getElementById('alert-turno-largo');
+  const tlSubEl = document.getElementById('alert-turno-largo-nombres');
+  if (tlEl) tlEl.textContent = turnosLargos.length;
+  if (tlSubEl) tlSubEl.textContent = turnosLargos.length
+    ? turnosLargos.slice(0,3).join(', ') + (turnosLargos.length > 3 ? '…' : '')
+    : 'Todo en orden';
 }
 
 // ══════════════════════════════════
@@ -3815,10 +3863,11 @@ let _alertaData = { ausentes: [], tardes: [], puntuales: [], incompletos: [] };
 
 function abrirPopupAlerta(tipo) {
   const titulos = {
-    ausentes:    '⛔ Ausentes hoy',
-    tardes:      '⏰ Llegadas tarde hoy',
-    puntuales:   '✅ Puntuales',
-    incompletos: '⚠️ Fichajes incompletos',
+    ausentes:       '⛔ Ausentes hoy',
+    tardes:         '⏰ Llegadas tarde hoy',
+    puntuales:      '✅ Puntuales',
+    incompletos:    '⚠️ Fichajes incompletos',
+    'turno-largo':  '🔔 Turnos con +10h sin salida',
   };
   document.getElementById('popup-alerta-title').textContent = titulos[tipo] || tipo;
 
@@ -3841,9 +3890,27 @@ function abrirPopupAlerta(tipo) {
       badge = `<span class="popup-alerta-badge" style="background:rgba(229,57,53,0.15);color:var(--danger)">Ausente</span>`;
     } else if (tipo === 'puntuales') {
       badge = `<span class="popup-alerta-badge" style="background:rgba(72,199,116,0.15);color:var(--success)">Puntual</span>`;
-    } else if (tipo === 'incompletos') {
+    } else if (tipo === 'turno-largo') {
+    const e1 = d.entrada;
+    const hsTotal = d.hs;
+    const pe = planillaEmpleados.find(p => p.empleado_id === d.empId);
+    const hoy = fechaHoy();
+    const fechaEntrada = e1 ? e1.fecha_hora.split('T')[0] : hoy;
+    const horario = pe ? (horariosSemana[pe.id] || {})[fechaEntrada] : null;
+    const salRef = horario ? (horario.salida1 || horario.salida) : null;
+    html = `<div class="popup-exp-grid">
+      <div class="popup-exp-item"><div class="popup-exp-label">Entró a las</div><div class="popup-exp-val">${e1 ? fmt(e1.fecha_hora) : '—'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Fecha de entrada</div><div class="popup-exp-val">${e1 ? fmtFecha(e1.fecha_hora) : '—'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Tiempo dentro</div><div class="popup-exp-val" style="color:#CE93D8">${hsTotal}h</div></div>
+      ${salRef ? `<div class="popup-exp-item"><div class="popup-exp-label">Salida asignada</div><div class="popup-exp-val">${salRef.substring(0,5)}</div></div>` : ''}
+    </div>
+    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>`;
+
+  } else if (tipo === 'incompletos') {
       badge = `<span class="popup-alerta-badge" style="background:rgba(255,152,0,0.15);color:var(--warning)">${d.desde}</span>`;
-    }
+      } else if (tipo === 'turno-largo') {
+        badge = `<span class="popup-alerta-badge" style="background:rgba(156,39,176,0.15);color:#CE93D8">${d.hs}h dentro</span>`;
+      }
 
     return `<div class="popup-alerta-row popup-alerta-row-clickable" data-idx="${i}" data-tipo="${tipo}" ${clickAttr}>
       <div style="flex:1">
