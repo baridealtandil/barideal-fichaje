@@ -1660,7 +1660,7 @@ function renderTablaFichajes() {
     const diffMin = (entradaRef && e1) ? Math.round((new Date(e1.fecha_hora) - new Date(`${g.fecha}T${entradaRef}`)) / 60000) : null;
     return `
       <tr style="cursor:pointer" onclick="abrirPopupPunt('${g.nombre} ${g.apellido}', '${g.fecha}', '${horarioAsig || ''}', '${e1 ? fmt(e1.fecha_hora) : ''}', ${diffMin})">
-        <td class="td-nombre">${g.nombre} ${g.apellido}</td>
+        <td class="td-nombre">${g.apellido} ${g.nombre}</td>
         <td>${fmtFecha(g.fecha + 'T12:00')}</td>
         <td>${fmt(e1?.fecha_hora)}</td>
         <td>${fmt(s1?.fecha_hora)}</td>
