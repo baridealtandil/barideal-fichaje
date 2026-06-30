@@ -1986,7 +1986,7 @@ function cargarAnalisis() {
   let totalTardes = 0, sumaDiffTardes = 0, diasPuntuales = 0;
   let minTrabajados = 0, minProgramados = 0;
 
-  const tablaRows = [];
+  const tablaRowsKpi = [];
 
   if (peId) {
     const horEmp = horariosSemana[peId] || {};
@@ -2018,7 +2018,7 @@ function cargarAnalisis() {
 
       if (!e1 && !e2) {
         diasAusente++;
-        tablaRows.push({ fecha, e1: null, s1: null, minDia: 0, estado: 'ausente', diff: null });
+        tablaRowsKpi.push({ fecha, e1: null, s1: null, minDia: 0, estado: 'ausente', diff: null });
       } else {
         diasTrabajados++;
         let diff = null, estado = 'sin-horario';
@@ -2032,7 +2032,7 @@ function cargarAnalisis() {
             diasPuntuales++; estado = 'puntual';
           }
         }
-        tablaRows.push({ fecha, e1, s1, e2, s2, minDia, estado, diff });
+        tablaRowsKpi.push({ fecha, e1, s1, e2, s2, minDia, estado, diff });
       }
     });
   }
@@ -2062,7 +2062,7 @@ function cargarAnalisis() {
   // Tabla de detalle por día
   const tablaBody = document.getElementById('an-tabla-body');
   if (tablaBody) {
-    tablaBody.innerHTML = tablaRows.sort((a,b) => b.fecha.localeCompare(a.fecha)).map(r => {
+    tablaBody.innerHTML = tablaRowsKpi.sort((a,b) => b.fecha.localeCompare(a.fecha)).map(r => {
       const semaforo = r.estado === 'puntual' ? '🟢' : r.estado === 'tarde' ? '🟡' : r.estado === 'ausente' ? '🔴' : '⚪';
       const badge = r.estado === 'puntual' ? '<span class="badge badge-puntual">Puntual</span>'
         : r.estado === 'tarde' ? '<span class="badge badge-tarde">Tarde</span>'
