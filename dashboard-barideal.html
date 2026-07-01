@@ -3875,9 +3875,9 @@ function cerrarPopupPunt() {
   document.getElementById('popup-puntualidad').classList.remove('show');
 }
 
-// â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
+// ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ 
 //  GRILLA WHATSAPP
-// â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
+// ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ 
 function toggleMenuWsp(e) {
   e.stopPropagation();
   const m = document.getElementById('menu-wsp');
@@ -3931,7 +3931,7 @@ function generarGrillaWsp() {
 
   const html = `
     <div style="font-family:Arial,sans-serif;background:#fff;padding:16px;border-radius:8px;color:#111">
-      <div style="font-size:15px;font-weight:800;margin-bottom:12px;text-align:center">ðŸ º BAR IDEAL — ${semLabel} · ${rolLabel}</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:12px;text-align:center">🍺 BAR IDEAL — ${semLabel} · ${rolLabel}</div>
       <table style="width:100%;border-collapse:collapse;font-size:12px;border:1px solid #ccc">
         <thead>
           <tr style="background:#1A1A2E;color:#fff">
@@ -3965,19 +3965,19 @@ function generarGrillaWsp() {
 }
 
 
-// â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
+// ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ 
 //  POPUP ALERTAS
-// â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
+// ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ 
 let _alertaData = { ausentes: [], tardes: [], puntuales: [], incompletos: [], 'turno-largo': [], 'dudosos': [] };
 
 function abrirPopupAlerta(tipo) {
   const titulos = {
     ausentes:       '⛔ Ausentes hoy',
-    tardes:         'â ° Llegadas tarde hoy',
+    tardes:         '⏰ Llegadas tarde hoy',
     puntuales:      '✅ Puntuales',
-    incompletos:    'âš ï¸  Fichajes incompletos',
+    incompletos:    '⚠️ Fichajes incompletos',
     'turno-largo':  '🔔 Turnos con +10h sin salida',
-    'dudosos':      'ðŸ”  Fichajes dudosos (menos de 60 min)',
+    'dudosos':      '🔍 Fichajes dudosos (menos de 60 min)',
   };
   document.getElementById('popup-alerta-title').textContent = titulos[tipo] || tipo;
 
