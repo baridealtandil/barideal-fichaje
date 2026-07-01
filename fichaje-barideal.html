@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="ideal"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ideal ÃÂ· Fichaje</title>
+<title>ideal ÃÂÃÂ· Fichaje</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -299,7 +299,7 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 </head>
 <body>
 
-<!-- Ã¢ÂÂÃ¢ÂÂ ONBOARDING Ã¢ÂÂÃ¢ÂÂ -->
+<!-- ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ ONBOARDING ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ -->
 <div id="screen-onboarding" class="screen active">
   <div class="brand">
     <div class="brand-wordmark">
@@ -308,14 +308,14 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
   </div>
   <div class="onboarding-card">
     <h2>Bienvenido/a</h2>
-    <p>RegistrÃÂ¡ tus datos una sola vez para empezar a fichar.</p>
+    <p>RegistrÃÂÃÂ¡ tus datos una sola vez para empezar a fichar.</p>
     <div class="form-group">
       <label>Nombre</label>
-      <input type="text" id="input-nombre" placeholder="Ej: MarÃÂ­a" autocomplete="given-name">
+      <input type="text" id="input-nombre" placeholder="Ej: MarÃÂÃÂ­a" autocomplete="given-name">
     </div>
     <div class="form-group">
       <label>Apellido</label>
-      <input type="text" id="input-apellido" placeholder="Ej: GonzÃÂ¡lez" autocomplete="family-name">
+      <input type="text" id="input-apellido" placeholder="Ej: GonzÃÂÃÂ¡lez" autocomplete="family-name">
     </div>
     <div class="form-group">
       <label>Celular</label>
@@ -326,7 +326,7 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
   </div>
 </div>
 
-<!-- Ã¢ÂÂÃ¢ÂÂ MATCHING Ã¢ÂÂÃ¢ÂÂ -->
+<!-- ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ MATCHING ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ -->
 <div id="screen-matching" class="screen">
   <div class="brand">
     <div class="brand-wordmark">
@@ -334,30 +334,30 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
     </div>
   </div>
   <div class="onboarding-card">
-    <h2>ÃÂ¿Sos vos?</h2>
-    <p>Encontramos tu nombre en la planilla. ConfirmÃÂ¡ para vincular tu cuenta.</p>
+    <h2>ÃÂÃÂ¿Sos vos?</h2>
+    <p>Encontramos tu nombre en la planilla. ConfirmÃÂÃÂ¡ para vincular tu cuenta.</p>
     <div id="matching-opciones" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px"></div>
     <button class="btn-primary" onclick="matchNoSoyYo()" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:var(--off);margin-top:4px">No soy ninguno de estos</button>
   </div>
 </div>
 
-<!-- Ã¢ÂÂÃ¢ÂÂ APP Ã¢ÂÂÃ¢ÂÂ -->
+<!-- ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ APP ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ -->
 <div id="screen-app" class="screen">
   <div class="app-header">
     <div class="header-user">
-      <div class="nombre" id="header-nombre">Ã¢ÂÂ</div>
-      <div class="id-tag" id="header-id">ID Ã¢ÂÂ</div>
+      <div class="nombre" id="header-nombre">ÃÂ¢ÃÂÃÂ</div>
+      <div class="id-tag" id="header-id">ID ÃÂ¢ÃÂÃÂ</div>
     </div>
   </div>
   <div class="app-body">
     <div class="clock-display">
       <div class="time" id="clock">--:--</div>
-      <div class="date" id="clock-date">Ã¢ÂÂ</div>
+      <div class="date" id="clock-date">ÃÂ¢ÃÂÃÂ</div>
     </div>
 
     <div class="turno-info" id="turno-info">
       <div class="turno-label">Turno programado</div>
-      <div class="turno-hora" id="turno-hora">CargandoÃ¢ÂÂ¦</div>
+      <div class="turno-hora" id="turno-hora">CargandoÃÂ¢ÃÂÃÂ¦</div>
       <div class="turno-sub" id="turno-sub">Verificando planilla</div>
     </div>
 
@@ -376,34 +376,34 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 
     <div class="geo-status">
       <div class="geo-dot" id="geo-dot"></div>
-      <span id="geo-text">Obteniendo ubicaciÃÂ³nÃ¢ÂÂ¦</span>
+      <span id="geo-text">Obteniendo ubicaciÃÂÃÂ³nÃÂ¢ÃÂÃÂ¦</span>
     </div>
 
     <div class="historial">
       <div class="historial-title">Fichajes de hoy</div>
       <div class="historial-list" id="historial-list">
-        <div style="font-size:12px;color:var(--dim);text-align:center;padding:14px">CargandoÃ¢ÂÂ¦</div>
+        <div style="font-size:12px;color:var(--dim);text-align:center;padding:14px">CargandoÃÂ¢ÃÂÃÂ¦</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Ã¢ÂÂÃ¢ÂÂ OVERLAY ÃÂXITO Ã¢ÂÂÃ¢ÂÂ -->
+<!-- ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ OVERLAY ÃÂÃÂXITO ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ -->
 <div id="overlay-success">
   <div class="success-logo">
     <img src="/logo-ideal.png" alt="ideal" style="width:180px;height:auto;filter:invert(1)"/>
   </div>
-  <div class="success-ring" id="success-ring">Ã¢ÂÂ</div>
+  <div class="success-ring" id="success-ring">ÃÂ¢ÃÂÃÂ</div>
   <div class="success-tipo" id="success-tipo">Entrada</div>
   <div class="success-hora" id="success-hora">--:--</div>
   <div class="success-msg" id="success-msg">Fichaje registrado</div>
-  <div class="success-id" id="success-id">ID #Ã¢ÂÂ</div>
+  <div class="success-id" id="success-id">ID #ÃÂ¢ÃÂÃÂ</div>
 </div>
 
 <div id="overlay-sospechoso">
-  <div class="sospechoso-icon">Ã¢ÂÂ Ã¯Â¸Â</div>
+  <div class="sospechoso-icon">ÃÂ¢ÃÂÃÂ ÃÂ¯ÃÂ¸ÃÂ</div>
   <div class="sospechoso-title">Fichaje sospechoso</div>
-  <div class="sospechoso-sub" id="sospechoso-msg">PasÃÂ³ menos de 1 hora desde tu ÃÂºltimo fichaje.</div>
+  <div class="sospechoso-sub" id="sospechoso-msg">PasÃÂÃÂ³ menos de 1 hora desde tu ÃÂÃÂºltimo fichaje.</div>
   <div class="sospechoso-btns">
     <button class="sospechoso-btn-cancel" onclick="cancelarSospechoso()">Cancelar</button>
     <button class="sospechoso-btn-ok" onclick="confirmarSospechoso()">Confirmar de todas formas</button>
@@ -411,8 +411,8 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 </div>
 
 <div id="overlay-confirm">
-  <div class="confirm-icon">Ã¢ÂÂ Ã¯Â¸Â</div>
-  <div class="confirm-title">ÃÂ¿EstÃÂ¡s seguro?</div>
+  <div class="confirm-icon">ÃÂ¢ÃÂÃÂ ÃÂ¯ÃÂ¸ÃÂ</div>
+  <div class="confirm-title">ÃÂÃÂ¿EstÃÂÃÂ¡s seguro?</div>
   <div class="confirm-btns">
     <button class="confirm-btn-cancel" onclick="cancelarSalida()">Cancelar mi salida</button>
     <button class="confirm-btn-ok" onclick="confirmarSalida()">Confirmar mi salida</button>
@@ -420,11 +420,11 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 </div>
 
 <div id="overlay-incompleto">
-  <div class="incompleto-icon">Ã¢ÂÂ Ã¯Â¸Â</div>
+  <div class="incompleto-icon">ÃÂ¢ÃÂÃÂ ÃÂ¯ÃÂ¸ÃÂ</div>
   <div class="incompleto-title">Turno sin cerrar</div>
-  <div class="incompleto-sub" id="incompleto-msg">TenÃÂ©s una entrada sin salida registrada.</div>
+  <div class="incompleto-sub" id="incompleto-msg">TenÃÂÃÂ©s una entrada sin salida registrada.</div>
   <div id="incompleto-form" style="width:100%;max-width:300px;margin-top:8px">
-    <div style="font-size:12px;color:var(--warning);margin-bottom:8px;text-align:center">IngresÃÂ¡ la hora real en que saliste</div>
+    <div style="font-size:12px;color:var(--warning);margin-bottom:8px;text-align:center">IngresÃÂÃÂ¡ la hora real en que saliste</div>
     <input type="time" id="incompleto-hora" style="width:100%;padding:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;font-size:18px;text-align:center;outline:none;margin-bottom:10px">
     <button class="incompleto-btn" onclick="informarSalidaManual()" style="background:var(--warning);color:#000">Confirmar salida</button>
     <button class="incompleto-btn" onclick="cerrarIncompleto()" style="background:rgba(255,255,255,0.15);margin-top:12px;font-size:14px;border:1px solid rgba(255,255,255,0.3)">El encargado lo resuelve</button>
@@ -558,7 +558,8 @@ async function resolverFechaLaboral() {
 // Cargar turno programado (planilla)
 async function cargarTurno() {
   try {
-    const r = await fetch(API+'/api/horarios?fecha='+fechaLocal());
+    if (!empleado) return;
+    const r = await fetch(API+'/api/horarios?empleado_id='+empleado.id+'&fecha='+fechaLocal());
     if (!r.ok) return;
     const data = await r.json();
     const e1 = data && (data.entrada1 || data.entrada);
@@ -571,7 +572,8 @@ async function cargarTurno() {
       elH.textContent = txt;
       if (elS) elS.textContent = '';
     } else {
-      if (elS) elS.textContent = 'Sin turno programado';
+      if (elH) elH.textContent = data && data.estado === 'franco' ? 'Franco' : data && data.estado === 'ausente' ? 'Ausente' : '';
+      if (elS) elS.textContent = '';
     }
   } catch(e) {
     const elS = document.getElementById('turno-sub');
