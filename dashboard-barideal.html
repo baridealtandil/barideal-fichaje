@@ -1937,10 +1937,12 @@ function renderTablaFichajes() {
     if (e2 && s2) totalMin += minutosEntre(e2.fecha_hora, s2.fecha_hora);
 
     const hoy2 = fechaHoy();
-    const horario = (horariosSemana[g.items['entrada']?.empleado_id] || {})[g.fecha];
+    const pe_match = planillaEmpleados ? planillaEmpleados.find(p => String(p.empleado_id) === String(g.items['entrada']?.empleado_id)) : null;
+    const horario = pe_match ? (horariosSemana[pe_match.id] || {})[g.fecha] : null;
     let estado = '';
-    if (horario && e1) {
-      const prog = new Date(`${g.fecha}T${horario.entrada}`);
+    const entRef = horario ? (horario.entrada1 || horario.entrada) : null;
+    if (entRef && e1) {
+      const prog = new Date(`${g.fecha}T${entRef}`);
       const real = new Date(e1.fecha_hora);
       const diff = Math.round((real - prog) / 60000);
       if (diff > TOLERANCIA_MINUTOS) estado = `<span class="badge badge-tarde">Tarde ${diff}m</span>`;
@@ -1962,7 +1964,6 @@ function renderTablaFichajes() {
     }
 
     // Buscar horario via planilla_emp_id (horariosSemana usa planilla_emp_id como clave)
-    const pe_match = planillaEmpleados ? planillaEmpleados.find(p => p.empleado_id === (g.items['entrada']?.empleado_id)) : null;
     const horarioReal = pe_match ? (horariosSemana[pe_match.id] || {})[g.fecha] : horario;
     const entradaRef = horarioReal ? (horarioReal.entrada1 || horarioReal.entrada || null) : null;
     const horarioAsig = entradaRef || null;
@@ -2110,10 +2111,12 @@ function cargarAnalisis() {
     if (e2 && s2) minDia += minutosEntre(e2.fecha_hora, s2.fecha_hora);
     totalMin += minDia;
 
-    const horario = (horariosSemana[empId] || {})[fecha];
+    const pe_match = planillaEmpleados ? planillaEmpleados.find(p => String(p.empleado_id) === String(empId)) : null;
+    const horario = pe_match ? (horariosSemana[pe_match.id] || {})[fecha] : null;
     let estadoBadge = '', diffStr = '';
-    if (horario && e1) {
-      const prog = new Date(`${fecha}T${horario.entrada}`);
+    const entRef = horario ? (horario.entrada1 || horario.entrada) : null;
+    if (entRef && e1) {
+      const prog = new Date(`${fecha}T${entRef}`);
       const real = new Date(e1.fecha_hora);
       const diff = Math.round((real - prog) / 60000);
       if (diff > TOLERANCIA_MINUTOS) {
@@ -2128,8 +2131,10 @@ function cargarAnalisis() {
     // Bolsa
     let horasProg = 0;
     if (horario) {
-      if (horario.entrada && horario.salida) {
-        const p1 = new Date(`${fecha}T${horario.salida}`) - new Date(`${fecha}T${horario.entrada}`);
+      const e1_ref = horario.entrada1 || horario.entrada;
+      const s1_ref = horario.salida1 || horario.salida;
+      if (e1_ref && s1_ref) {
+        const p1 = new Date(`${fecha}T${s1_ref}`) - new Date(`${fecha}T${e1_ref}`);
         horasProg += p1 / 60000;
       }
       if (horario.entrada2 && horario.salida2) {
@@ -2144,13 +2149,15 @@ function cargarAnalisis() {
 
   // Calcular ausencias y bolsa total
   let diasProg = 0, minProg = 0;
-  if (Object.keys(horariosSemana).length) {
-    const horEmp = horariosSemana[empId] || {};
+  if (Object.keys(horariosSemana).length && pe_match) {
+    const horEmp = horariosSemana[pe_match.id] || {};
     const fechasRango = Object.keys(horEmp).filter(f => new Date(f) >= inicio && new Date(f) <= hoy);
     diasProg = fechasRango.length;
     fechasRango.forEach(f => {
       const h = horEmp[f];
-      if (h.entrada && h.salida) minProg += minutosEntre(`${f}T${h.entrada}`, `${f}T${h.salida}`);
+      const e1_ref = h.entrada1 || h.entrada;
+      const s1_ref = h.salida1 || h.salida;
+      if (e1_ref && s1_ref) minProg += minutosEntre(`${f}T${e1_ref}`, `${f}T${s1_ref}`);
       if (h.entrada2 && h.salida2) minProg += minutosEntre(`${f}T${h.entrada2}`, `${f}T${h.salida2}`);
     });
   }
@@ -3868,9 +3875,9 @@ function cerrarPopupPunt() {
   document.getElementById('popup-puntualidad').classList.remove('show');
 }
 
-// ââââââââââââââââââââââââââââââââââ
+// â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
 //  GRILLA WHATSAPP
-// ââââââââââââââââââââââââââââââââââ
+// â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
 function toggleMenuWsp(e) {
   e.stopPropagation();
   const m = document.getElementById('menu-wsp');
@@ -3907,7 +3914,7 @@ function generarGrillaWsp() {
     semanaActual.forEach(fecha => {
       const h = (horariosSemana[pe.id] || {})[fecha];
       const tdStyle = 'padding:5px 4px;border-right:1px solid #ccc;border-bottom:1px solid #ccc;text-align:center';
-      if (!h) { celdas += `<td style="${tdStyle};color:#aaa">â</td>`; return; }
+      if (!h) { celdas += `<td style="${tdStyle};color:#aaa">â€”</td>`; return; }
       if (h.estado === 'franco') { celdas += `<td style="${tdStyle};color:#4472C4;font-weight:700">FRANCO</td>`; return; }
       if (h.estado === 'ausente') { celdas += `<td style="${tdStyle};color:#E53935;font-weight:700">AUSENTE</td>`; return; }
       if (h.estado === 'nt') { celdas += `<td style="${tdStyle};color:#888;font-weight:700">NT</td>`; return; }
@@ -3915,8 +3922,8 @@ function generarGrillaWsp() {
       const s = (h.salida1 || h.salida || '').substring(0,5);
       const e2 = h.entrada2 ? h.entrada2.substring(0,5) : '';
       const s2 = h.salida2 ? h.salida2.substring(0,5) : '';
-      const t1 = `${e}${s ? 'â'+s : ''}`;
-      const t2 = e2 ? `${e2}${s2 ? 'â'+s2 : ''}` : '';
+      const t1 = `${e}${s ? 'â€“'+s : ''}`;
+      const t2 = e2 ? `${e2}${s2 ? 'â€“'+s2 : ''}` : '';
       celdas += `<td style="${tdStyle}">${t1}${t2 ? '<br>'+t2 : ''}</td>`;
     });
     filas += `<tr><td style="text-align:left;font-weight:600;padding:5px 8px;border-right:1px solid #ccc;border-bottom:1px solid #ccc">${pe.apellido} ${pe.nombre}</td><td style="color:#888;padding:5px 8px;border-right:1px solid #ccc;border-bottom:1px solid #ccc">${pe.rol||''}</td>${celdas}</tr>`;
@@ -3924,7 +3931,7 @@ function generarGrillaWsp() {
 
   const html = `
     <div style="font-family:Arial,sans-serif;background:#fff;padding:16px;border-radius:8px;color:#111">
-      <div style="font-size:15px;font-weight:800;margin-bottom:12px;text-align:center">ðº BAR IDEAL â ${semLabel} Â· ${rolLabel}</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:12px;text-align:center">ðŸ º BAR IDEAL â€” ${semLabel} Â· ${rolLabel}</div>
       <table style="width:100%;border-collapse:collapse;font-size:12px;border:1px solid #ccc">
         <thead>
           <tr style="background:#1A1A2E;color:#fff">
@@ -3949,7 +3956,7 @@ function generarGrillaWsp() {
   preview.style.display = 'block';
   preview.innerHTML = html + `
     <div style="padding:12px 16px;display:flex;gap:10px;align-items:center">
-      <span style="font-size:12px;color:var(--text3)">CopiÃ¡ esta imagen con â+Shift+4 (Mac) o la herramienta de captura</span>
+      <span style="font-size:12px;color:var(--text3)">CopiÃ¡ esta imagen con âŒ˜+Shift+4 (Mac) o la herramienta de captura</span>
       <button onclick="document.getElementById('preview-grilla-wsp').style.display='none'"
         style="padding:6px 12px;background:transparent;border:1px solid var(--border);color:var(--text3);border-radius:6px;cursor:pointer;font-size:12px">Cerrar</button>
     </div>`;
@@ -3958,19 +3965,19 @@ function generarGrillaWsp() {
 }
 
 
-// ââââââââââââââââââââââââââââââââââ
+// â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
 //  POPUP ALERTAS
-// ââââââââââââââââââââââââââââââââââ
-let _alertaData = { ausentes: [], tardes: [], puntuales: [], incompletos: [] };
+// â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
+let _alertaData = { ausentes: [], tardes: [], puntuales: [], incompletos: [], 'turno-largo': [], 'dudosos': [] };
 
 function abrirPopupAlerta(tipo) {
   const titulos = {
-    ausentes:       'â Ausentes hoy',
-    tardes:         'â° Llegadas tarde hoy',
-    puntuales:      'â Puntuales',
-    incompletos:    'â ï¸ Fichajes incompletos',
-    'turno-largo':  'ð Turnos con +10h sin salida',
-    'dudosos':      'ð Fichajes dudosos (menos de 60 min)',
+    ausentes:       'â›” Ausentes hoy',
+    tardes:         'â ° Llegadas tarde hoy',
+    puntuales:      'âœ… Puntuales',
+    incompletos:    'âš ï¸  Fichajes incompletos',
+    'turno-largo':  'ðŸ”” Turnos con +10h sin salida',
+    'dudosos':      'ðŸ”  Fichajes dudosos (menos de 60 min)',
   };
   document.getElementById('popup-alerta-title').textContent = titulos[tipo] || tipo;
 
@@ -3993,45 +4000,15 @@ function abrirPopupAlerta(tipo) {
       badge = `<span class="popup-alerta-badge" style="background:rgba(229,57,53,0.15);color:var(--danger)">Ausente</span>`;
     } else if (tipo === 'puntuales') {
       badge = `<span class="popup-alerta-badge" style="background:rgba(72,199,116,0.15);color:var(--success)">Puntual</span>`;
-    } else if (tipo === 'dudosos') {
-    const prev = d.fichajePrev;
-    const curr = d.fichajeActual;
-    const tiposLabel = { entrada:'Entrada 1', salida:'Salida 1', entrada2:'Entrada 2', salida2:'Salida 2' };
-    const seg = Math.round(d.minDiff * 60);
-    const tiempoStr = d.minDiff < 1 ? `${seg} segundos` : `${Math.round(d.minDiff)} minutos`;
-    html = `<div class="popup-exp-grid">
-      <div class="popup-exp-item"><div class="popup-exp-label">Fichaje anterior</div><div class="popup-exp-val">${tiposLabel[prev.tipo]||prev.tipo} Â· ${fmt(prev.fecha_hora)}</div></div>
-      <div class="popup-exp-item"><div class="popup-exp-label">Fichaje dudoso</div><div class="popup-exp-val" style="color:var(--warning)">${tiposLabel[curr.tipo]||curr.tipo} Â· ${fmt(curr.fecha_hora)}</div></div>
-      <div class="popup-exp-item"><div class="popup-exp-label">Diferencia</div><div class="popup-exp-val" style="color:var(--warning)">${tiempoStr}</div></div>
-      <div class="popup-exp-item"><div class="popup-exp-label">Fecha</div><div class="popup-exp-val">${fmtFecha(curr.fecha_hora)}</div></div>
-    </div>
-    ${d.empId ? `<button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa â</button>` : ''}`;
-
-  } else if (tipo === 'turno-largo') {
-    const e1 = d.entrada;
-    const hsTotal = d.hs;
-    const pe = planillaEmpleados.find(p => p.empleado_id === d.empId);
-    const hoy = fechaHoy();
-    const fechaEntrada = e1 ? e1.fecha_hora.split('T')[0] : hoy;
-    const horario = pe ? (horariosSemana[pe.id] || {})[fechaEntrada] : null;
-    const salRef = horario ? (horario.salida1 || horario.salida) : null;
-    html = `<div class="popup-exp-grid">
-      <div class="popup-exp-item"><div class="popup-exp-label">EntrÃ³ a las</div><div class="popup-exp-val">${e1 ? fmt(e1.fecha_hora) : 'â'}</div></div>
-      <div class="popup-exp-item"><div class="popup-exp-label">Fecha de entrada</div><div class="popup-exp-val">${e1 ? fmtFecha(e1.fecha_hora) : 'â'}</div></div>
-      <div class="popup-exp-item"><div class="popup-exp-label">Tiempo dentro</div><div class="popup-exp-val" style="color:#CE93D8">${hsTotal}h</div></div>
-      ${salRef ? `<div class="popup-exp-item"><div class="popup-exp-label">Salida asignada</div><div class="popup-exp-val">${salRef.substring(0,5)}</div></div>` : ''}
-    </div>
-    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa â</button>`;
-
-  } else if (tipo === 'incompletos') {
+    } else if (tipo === 'incompletos') {
       badge = `<span class="popup-alerta-badge" style="background:rgba(255,152,0,0.15);color:var(--warning)">${d.desde}</span>`;
-      } else if (tipo === 'turno-largo') {
-        badge = `<span class="popup-alerta-badge" style="background:rgba(156,39,176,0.15);color:#CE93D8">${d.hs}h dentro</span>`;
-      } else if (tipo === 'dudosos') {
-        const seg = Math.round(d.minDiff * 60);
-        const tiempoStr = d.minDiff < 1 ? `${seg}s` : `${Math.round(d.minDiff)}m`;
-        badge = `<span class="popup-alerta-badge" style="background:rgba(255,152,0,0.15);color:var(--warning)">${tiempoStr}</span>`;
-      }
+    } else if (tipo === 'turno-largo') {
+      badge = `<span class="popup-alerta-badge" style="background:rgba(156,39,176,0.15);color:#CE93D8">${d.hs}h dentro</span>`;
+    } else if (tipo === 'dudosos') {
+      const seg = Math.round(d.minDiff * 60);
+      const tiempoStr = d.minDiff < 1 ? `${seg}s` : `${Math.round(d.minDiff)}m`;
+      badge = `<span class="popup-alerta-badge" style="background:rgba(255,152,0,0.15);color:var(--warning)">${tiempoStr}</span>`;
+    }
 
     return `<div class="popup-alerta-row popup-alerta-row-clickable" data-idx="${i}" data-tipo="${tipo}" ${clickAttr}>
       <div style="flex:1">
@@ -4040,7 +4017,7 @@ function abrirPopupAlerta(tipo) {
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         ${badge}
-        ${d.empId ? '<span class="popup-expand-icon">âº</span>' : ''}
+        ${d.empId ? '<span class="popup-expand-icon">â€º</span>' : ''}
       </div>
     </div>
     <div class="popup-alerta-detalle-expand" id="expand-${tipo}-${i}" style="display:none"></div>`;
@@ -4058,7 +4035,7 @@ function expandirFilaAlerta(el, tipo, idx) {
 
   // Cerrar todos los otros
   document.querySelectorAll('.popup-alerta-detalle-expand').forEach(e => { e.style.display = 'none'; });
-  document.querySelectorAll('.popup-expand-icon').forEach(e => { e.textContent = 'âº'; e.style.transform = ''; });
+  document.querySelectorAll('.popup-expand-icon').forEach(e => { e.textContent = 'â€º'; e.style.transform = ''; });
 
   if (isOpen) return; // toggle off
 
@@ -4066,7 +4043,7 @@ function expandirFilaAlerta(el, tipo, idx) {
   if (!d) return;
 
   const icon = el.querySelector('.popup-expand-icon');
-  if (icon) { icon.textContent = 'âº'; icon.style.transform = 'rotate(90deg)'; }
+  if (icon) { icon.textContent = 'â€º'; icon.style.transform = 'rotate(90deg)'; }
 
   let html = '';
   const hoy = fechaHoy();
@@ -4074,8 +4051,8 @@ function expandirFilaAlerta(el, tipo, idx) {
   if (tipo === 'ausentes') {
     const pe = planillaEmpleados.find(p => p.empleado_id === d.empId);
     const h = d.horario || {};
-    const entRef = h.entrada1 || h.entrada || 'â';
-    const salRef = h.salida1  || h.salida  || 'â';
+    const entRef = h.entrada1 || h.entrada || 'â€”';
+    const salRef = h.salida1  || h.salida  || 'â€”';
     // Historial de ausencias del mes
     const inicioMes = new Date(); inicioMes.setDate(1); inicioMes.setHours(0,0,0,0);
     const fichajesMes = todosLosFichajes.filter(f => f.empleado_id === d.empId && new Date(f.fecha_hora) >= inicioMes);
@@ -4215,7 +4192,6 @@ function abrirPopupKpi(tipo) {
         fichajes: fichajes
       };
     });
-  }
   } else if (tipo === 'empleados') {
     datos = todosLosEmpleados.map(e => ({
       empId: e.id,
@@ -4239,7 +4215,6 @@ function abrirPopupKpi(tipo) {
         sorted.forEach(function(f,i){ if(i<4) fichajes[posNames[i]] = f; });
         return { empId: e.empId, nombre: e.nombre, fichajes: fichajes };
       });
-  }
   } else if (tipo === 'total') {
     const porDia = {};
     todosLosFichajes.forEach(f => {

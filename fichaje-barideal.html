@@ -510,7 +510,7 @@ function onGeoOk(pos) {
   const dot = document.getElementById('geo-dot');
   const txt = document.getElementById('geo-text');
   if (dot) {
-    dot.className = 'geo-dot ' + (geoOk ? 'ok' : 'bad');
+    dot.className = 'geo-dot ' + (geoOk ? 'ok' : 'error');
   }
   if (txt) {
     txt.textContent = geoOk ? 'Dentro del local ('+Math.round(dist)+'m)' : 'Fuera del local ('+Math.round(dist)+'m)';
@@ -522,7 +522,7 @@ function onGeoError() {
   geoOk = false;
   const dot = document.getElementById('geo-dot');
   const txt = document.getElementById('geo-text');
-  if (dot) dot.className = 'geo-dot bad';
+  if (dot) dot.className = 'geo-dot error';
   if (txt) txt.textContent = 'Sin ubicacion';
   actualizarBoton();
 }
@@ -582,13 +582,7 @@ async function cargarTurno() {
   }
 }
 
-async function cargarHistorial() {
-  const res = await resolverFechaLaboral();
-  fichajesHoy = res.fichajesActivos;
-  renderHistorial();
-  actualizarBoton();
-  verificarFichajeIncompletoOverlay();
-}
+
 async function cargarHistorial() {
   const res = await resolverFechaLaboral();
   fichajesHoy = res.fichajesActivos;
