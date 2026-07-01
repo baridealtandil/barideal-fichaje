@@ -378,7 +378,7 @@ app.post("/api/fichajes/forzar-cierre", async (c) => {
 });
 
 app.get("/api/fichajes", async (c) => {
-  const emp_id = c.req.query("empleado_id");
+  const emp_id = c.req.query("empleado_id") || c.req.query("emp_id");
   const fecha  = c.req.query("fecha");
 
   if (emp_id && fecha) {
