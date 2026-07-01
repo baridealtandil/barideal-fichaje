@@ -421,9 +421,14 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 
 <div id="overlay-incompleto">
   <div class="incompleto-icon">⚠️</div>
-  <div class="incompleto-title">Fichaje incompleto</div>
-  <div class="incompleto-sub" id="incompleto-msg">Tenés una entrada sin salida registrada. Reportate con el encargado.</div>
-  <button class="incompleto-btn" onclick="cerrarIncompleto()">Entendido</button>
+  <div class="incompleto-title">Turno sin cerrar</div>
+  <div class="incompleto-sub" id="incompleto-msg">Tenés una entrada sin salida registrada.</div>
+  <div id="incompleto-form" style="width:100%;max-width:300px;margin-top:8px">
+    <div style="font-size:12px;color:var(--warning);margin-bottom:8px;text-align:center">Ingresá la hora real en que saliste</div>
+    <input type="time" id="incompleto-hora" style="width:100%;padding:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;font-size:18px;text-align:center;outline:none;margin-bottom:10px">
+    <button class="incompleto-btn" onclick="informarSalidaManual()" style="background:var(--warning);color:#000">Confirmar salida</button>
+    <button class="incompleto-btn" onclick="cerrarIncompleto()" style="background:rgba(255,255,255,0.08);margin-top:8px;font-size:13px">El encargado lo resuelve</button>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -565,23 +570,95 @@ async function cargarHistorial() {
 }
 
 function verificarFichajeIncompletoOverlay() {
-  // Mostrar overlay solo si hay entrada sin salida de hace más de 10 horas
-  // (turno abierto anormalmente largo — el encargado revisará)
   try {
-    const tieneEntradaSinSalida = (tipo_entrada, tipo_salida) => {
-      const entrada = fichajesHoy.find(f => f.tipo === tipo_entrada);
-      const salida  = fichajesHoy.find(f => f.tipo === tipo_salida);
-      if (!entrada || salida) return false;
-      return (Date.now() - new Date(entrada.fecha_hora).getTime()) / 3600000 > 10;
+    const detectar = (tipoEntrada, tipoSalida) => {
+      const entrada = fichajesHoy.find(f => f.tipo === tipoEntrada);
+      const salida  = fichajesHoy.find(f => f.tipo === tipoSalida);
+      if (!entrada || salida) return null;
+      return entrada;
     };
-    if (tieneEntradaSinSalida('entrada', 'salida') || tieneEntradaSinSalida('entrada2', 'salida2')) {
-      document.getElementById('overlay-incompleto').classList.add('show');
-    }
-  } catch { /* silencioso */ }
+
+    const entradaAbierta = detectar('entrada', 'salida') || detectar('entrada2', 'salida2');
+    if (!entradaAbierta) return;
+
+    const hs = Math.floor((Date.now() - new Date(entradaAbierta.fecha_hora).getTime()) / 3600000);
+    const fechaEntrada = new Date(entradaAbierta.fecha_hora).toLocaleDateString('es-AR', {
+      weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Argentina/Buenos_Aires'
+    });
+    const horaEntrada = fmt(entradaAbierta.fecha_hora);
+
+    document.getElementById('incompleto-msg').textContent =
+      `Entraste el ${fechaEntrada} a las ${horaEntrada} y no hay salida registrada (hace ${hs}h).`;
+
+    // Pre-completar con hora actual como sugerencia
+    const ahora = new Date();
+    const hh = String(ahora.getHours()).padStart(2,'0');
+    const mm = String(ahora.getMinutes()).padStart(2,'0');
+    const input = document.getElementById('incompleto-hora');
+    if (input) input.value = `${hh}:${mm}`;
+
+    // Guardar referencia al fichaje abierto para el envío
+    window._entradaAbiertaParaCierre = entradaAbierta;
+
+    document.getElementById('overlay-incompleto').classList.add('show');
+  } catch(e) { console.warn('verificarFichajeIncompletoOverlay:', e); }
 }
 
 function cerrarIncompleto() {
   document.getElementById('overlay-incompleto').classList.remove('show');
+}
+
+async function informarSalidaManual() {
+  const horaInput = document.getElementById('incompleto-hora').value;
+  if (!horaInput) { toast('Ingresá la hora de salida'); return; }
+
+  const entrada = window._entradaAbiertaParaCierre;
+  if (!entrada) { toast('Error: no se encontró la entrada abierta'); return; }
+
+  // Construir fecha/hora de salida: misma fecha que la entrada, hora ingresada
+  // Si la hora de salida es menor a la de entrada, es del día siguiente
+  const fechaEntrada = new Date(entrada.fecha_hora);
+  const [hh, mm] = horaInput.split(':').map(Number);
+
+  // Fecha base: día de la entrada en hora local AR
+  const salidaDate = new Date(fechaEntrada);
+  salidaDate.setHours(hh + 3, mm, 0, 0); // sumar UTC offset para guardar en UTC
+
+  // Si la salida quedó antes de la entrada, sumar un día
+  if (salidaDate <= fechaEntrada) salidaDate.setDate(salidaDate.getDate() + 1);
+
+  const tipoSalida = entrada.tipo === 'entrada' ? 'salida' : 'salida2';
+
+  const btn = document.querySelector('#overlay-incompleto .incompleto-btn');
+  if (btn) btn.disabled = true;
+
+  try {
+    const r = await fetch(`${API}/api/fichajes/cierre-manual`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        empleado_id: empleado.id,
+        tipo: tipoSalida,
+        lat: geoLat || 0,
+        lng: geoLng || 0,
+        fecha_hora: salidaDate.toISOString(),
+        manual: true
+      })
+    });
+
+    if (r.ok) {
+      cerrarIncompleto();
+      toast('Salida registrada correctamente');
+      await cargarHistorial();
+    } else {
+      const err = await r.json().catch(() => ({}));
+      toast(err.error || 'Error al registrar la salida');
+    }
+  } catch {
+    toast('Error de conexión');
+  }
+
+  if (btn) btn.disabled = false;
 }
 
 function renderHistorial() {

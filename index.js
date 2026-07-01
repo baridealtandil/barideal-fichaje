@@ -76,6 +76,9 @@ async function migrate() {
     await sql`ALTER TABLE horarios DROP COLUMN IF EXISTS empleado_id`;
   } catch(e) {}
 
+  // Agregar columna manual a fichajes si no existe
+  await sql`ALTER TABLE fichajes ADD COLUMN IF NOT EXISTS manual BOOLEAN DEFAULT FALSE`;
+
   // Tabla push tokens para notificaciones
   await sql`
     CREATE TABLE IF NOT EXISTS push_tokens (
@@ -278,6 +281,50 @@ app.post("/api/fichajes", async (c) => {
     VALUES (${empleado_id}, ${tipo}, ${lat}, ${lng}, NOW())
     RETURNING *`;
   return c.json(fichaje, 201);
+});
+
+// Cierre manual por el empleado con hora real informada
+app.post("/api/fichajes/cierre-manual", async (c) => {
+  try {
+    const { empleado_id, tipo, lat, lng, fecha_hora, manual } = await c.req.json();
+    if (!empleado_id || !tipo || !fecha_hora)
+      return c.json({ error: "Faltan datos" }, 400);
+
+    const tiposValidos = ["salida", "salida2"];
+    if (!tiposValidos.includes(tipo))
+      return c.json({ error: "tipo inválido para cierre manual" }, 400);
+
+    // Verificar que existe la entrada correspondiente
+    const tipoEntrada = tipo === 'salida' ? 'entrada' : 'entrada2';
+    const entrada = await sql`
+      SELECT id, fecha_hora FROM fichajes
+      WHERE empleado_id = ${empleado_id} AND tipo = ${tipoEntrada}
+      ORDER BY fecha_hora DESC LIMIT 1`;
+
+    if (!entrada.length)
+      return c.json({ error: "No se encontró la entrada correspondiente" }, 404);
+
+    // Verificar que no haya ya una salida
+    const yaExiste = await sql`
+      SELECT id FROM fichajes
+      WHERE empleado_id = ${empleado_id} AND tipo = ${tipo}
+        AND fecha_hora > ${entrada[0].fecha_hora}
+      LIMIT 1`;
+
+    if (yaExiste.length)
+      return c.json({ error: "Ya existe una salida para este turno" }, 409);
+
+    const [fichaje] = await sql`
+      INSERT INTO fichajes (empleado_id, tipo, lat, lng, fecha_hora, manual)
+      VALUES (${empleado_id}, ${tipo}, ${lat || 0}, ${lng || 0}, ${fecha_hora}, TRUE)
+      RETURNING *`;
+
+    console.log(\`✏️ Cierre manual: empleado \${empleado_id} — \${tipo} — \${fecha_hora}\`);
+    return c.json(fichaje, 201);
+  } catch(e) {
+    console.error("Error cierre-manual:", e.message);
+    return c.json({ error: e.message }, 500);
+  }
 });
 
 // Forzar cierre de turno abierto (desde dashboard del encargado)

@@ -1955,6 +1955,11 @@ function renderTablaFichajes() {
     if (esIncompletoE1 || esIncompletoE2) {
       estado += ` <span class="badge-incompleto">⚠️ Incompleto</span>`;
     }
+    // Badge cierre manual por empleado
+    const tieneManual = [e1, s1, e2, s2].some(f => f && f.manual);
+    if (tieneManual) {
+      estado += ` <span class="badge-incompleto" style="background:rgba(255,152,0,0.2);color:var(--warning)">✏️ Manual</span>`;
+    }
 
     // Buscar horario via planilla_emp_id (horariosSemana usa planilla_emp_id como clave)
     const pe_match = planillaEmpleados ? planillaEmpleados.find(p => p.empleado_id === (g.items['entrada']?.empleado_id)) : null;
