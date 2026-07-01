@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ideal Â· Dashboard</title>
+<title>ideal · Dashboard</title>
   <link rel="apple-touch-icon" href="/logo-ideal.png"/>
   <link rel="icon" type="image/png" href="/logo-ideal.png"/>
   <meta name="theme-color" content="#0A0A0A"/>
@@ -41,7 +41,7 @@ body {
   min-height: 100vh;
 }
 
-/* ââ SIDEBAR ââ */
+/* ── SIDEBAR ── */
 .sidebar {
   position: fixed; top: 0; left: 0; bottom: 0;
   width: 220px;
@@ -74,7 +74,7 @@ body {
   font-size: 11px; color: var(--text3);
 }
 
-/* ââ MAIN ââ */
+/* ── MAIN ── */
 .main { margin-left: 220px; min-height: 100vh; }
 
 .topbar {
@@ -105,11 +105,11 @@ body {
 
 .content { padding: 28px; }
 
-/* ââ SECTIONS ââ */
+/* ── SECTIONS ── */
 .section { display: none; }
 .section.active { display: block; }
 
-/* ââ KPI GRID ââ */
+/* ── KPI GRID ── */
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -128,7 +128,7 @@ body {
 .kpi-sub { font-size: 11px; color: var(--text2); margin-top: 6px; }
 .kpi-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
 
-/* ââ ALERT CARDS ââ */
+/* ── ALERT CARDS ── */
 .alert-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -151,7 +151,7 @@ body {
 .alert-card .alert-value { font-size: 22px; font-weight: 700; color: var(--text); }
 .alert-card .alert-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
 
-/* ââ PANEL / TABLE ââ */
+/* ── PANEL / TABLE ── */
 .panel {
   background: var(--card);
   border: 1px solid var(--border);
@@ -200,7 +200,7 @@ tr:hover td { background: rgba(200,146,42,0.03); }
 .badge-fuera    { background: rgba(239,83,80,0.12);  color: #EF9A9A; }
 .badge-turno    { background: var(--border2); color: var(--text2); }
 
-/* ââ FILTERS ââ */
+/* ── FILTERS ── */
 .filters {
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
 }
@@ -213,7 +213,7 @@ select, input[type=date], input[type=text] {
 select:focus, input:focus { border-color: var(--gold-dim); }
 select option { background: var(--bg2); }
 
-/* ââ PAGINATION ââ */
+/* ── PAGINATION ── */
 .pagination {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   padding: 16px;
@@ -228,11 +228,11 @@ select option { background: var(--bg2); }
 .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 .page-info { font-size: 12px; color: var(--text3); }
 
-/* ââ CHART ââ */
+/* ── CHART ── */
 .chart-wrap { padding: 20px; position: relative; }
 canvas { max-height: 240px; }
 
-/* ââ EMPLEADOS CARDS ââ */
+/* ── EMPLEADOS CARDS ── */
 .emp-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -259,7 +259,7 @@ canvas { max-height: 240px; }
 }
 .emp-stat-val { font-weight: 600; color: var(--text); }
 
-/* ââ RESUMEN EMPLEADO ââ */
+/* ── RESUMEN EMPLEADO ── */
 .resumen-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -296,7 +296,7 @@ canvas { max-height: 240px; }
   display: flex; flex-direction: column; gap: 4px; }
 .bolsa-breakdown span { color: var(--text); font-weight: 600; }
 
-/* ââ EDIT / DELETE BUTTONS ââ */
+/* ── EDIT / DELETE BUTTONS ── */
 .emp-actions {
   display: flex; gap: 4px; flex-shrink: 0;
 }
@@ -348,7 +348,7 @@ canvas { max-height: 240px; }
   border: 1px solid var(--border); border-radius: 8px; font-size: 13px; cursor: pointer;
 }
 
-/* ââ BUSCADOR DE EMPLEADOS ââ */
+/* ── BUSCADOR DE EMPLEADOS ── */
 .emp-search-wrap {
   position: relative; margin-bottom: 0;
 }
@@ -436,7 +436,7 @@ canvas { max-height: 240px; }
   cursor: pointer;
 }
 
-/* ââ HORARIOS ââ */
+/* ── HORARIOS ── */
 .horarios-table { border-collapse: collapse; width: 100%; min-width: 700px; }
 .horarios-table th {
   padding: 8px 6px; font-size: 10px; font-weight: 700; text-transform: uppercase;
@@ -580,7 +580,7 @@ canvas { max-height: 240px; }
 }
 .btn-add-turno:hover { color: #FFF; }
 
-/* ââ MODAL ââ */
+/* ── MODAL ── */
 .modal-bg {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.7);
@@ -612,7 +612,7 @@ canvas { max-height: 240px; }
 .btn-danger { background: rgba(239,83,80,0.15); color: var(--danger); border: 1px solid rgba(239,83,80,0.3); }
 .btn-danger:hover { background: rgba(239,83,80,0.25); }
 
-/* ââ RESPONSIVE ââ */
+/* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .sidebar { display: none; }
   .main { margin-left: 0; }
@@ -651,7 +651,7 @@ canvas { max-height: 240px; }
 .live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%;
   background: #4CAF50; margin-right: 6px; animation: pulse 2s infinite; }
 
-/* ââ Drawer ficha empleado ââ */
+/* ── Drawer ficha empleado ── */
 #drawer-emp {
   position: fixed; top: 0; right: -480px; width: 460px; height: 100vh;
   background: var(--bg2); border-left: 1px solid var(--border);
@@ -708,7 +708,7 @@ canvas { max-height: 240px; }
 .emp-card { cursor: pointer; transition: border-color 0.15s; }
 .emp-card:hover { border-color: var(--gold); }
 
-/* ââ Popup puntualidad ââ */
+/* ── Popup puntualidad ── */
 #popup-puntualidad {
   position: fixed; inset: 0; background: rgba(0,0,0,0.7);
   display: none; align-items: center; justify-content: center; z-index: 600;
@@ -736,7 +736,7 @@ canvas { max-height: 240px; }
 .popup-punt-val.rojo { color: var(--danger); }
 .popup-punt-val.amarillo { color: var(--warning); }
 
-/* ââ BotÃ³n grilla WhatsApp ââ */
+/* ── Botón grilla WhatsApp ── */
 .btn-wsp {
   display: flex; align-items: center; gap: 6px;
   padding: 8px 14px; background: #25D366; color: #fff;
@@ -764,7 +764,7 @@ canvas { max-height: 240px; }
 .wsp-check-label:hover { background: rgba(255,255,255,0.06); }
 .wsp-check-label input[type="checkbox"] { accent-color: #25D366; width: 15px; height: 15px; cursor: pointer; }
 
-/* ââ Popup alertas ââ */
+/* ── Popup alertas ── */
 #popup-alerta {
   position: fixed; inset: 0; background: rgba(0,0,0,0.75);
   display: none; align-items: center; justify-content: center; z-index: 600;
@@ -793,7 +793,7 @@ canvas { max-height: 240px; }
 .popup-alerta-badge { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
 .popup-alerta-empty { padding: 24px 20px; text-align: center; color: var(--text3); font-size: 13px; }
 
-/* ââ Filas clickeables en popup ââ */
+/* ── Filas clickeables en popup ── */
 .popup-alerta-row-clickable { transition: background 0.1s; }
 .popup-alerta-row-clickable:hover { background: rgba(255,255,255,0.04); }
 .popup-expand-icon {
@@ -817,7 +817,7 @@ canvas { max-height: 240px; }
 }
 .popup-exp-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
 
-/* ââ Filas clickeables en popup ââ */
+/* ── Filas clickeables en popup ── */
 .popup-alerta-row-clickable { transition: background 0.1s; border-radius: 0; }
 .popup-alerta-row-clickable:hover { background: rgba(255,255,255,0.04); }
 .popup-expand-icon {
@@ -852,7 +852,7 @@ canvas { max-height: 240px; }
 }
 .popup-exp-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
 
-/* ââ KPIs NÃMINA GENERAL ââ */
+/* ── KPIs NÓMINA GENERAL ── */
 .nomina-kpi-header {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 14px;
@@ -890,7 +890,7 @@ canvas { max-height: 240px; }
 </head>
 <body>
 
-<!-- ââ SIDEBAR ââ -->
+<!-- ── SIDEBAR ── -->
 <aside class="sidebar">
   <div class="sidebar-brand">
     <div style="margin-bottom:6px">
@@ -900,93 +900,93 @@ canvas { max-height: 240px; }
   </div>
   <nav class="sidebar-nav">
     <button class="nav-item active" onclick="showSection('principal')">
-      <span class="nav-icon">ð</span> Principal
+      <span class="nav-icon">📊</span> Principal
     </button>
     <button class="nav-item" onclick="showSection('fichajes')">
-      <span class="nav-icon">ð</span> Fichajes
+      <span class="nav-icon">🕐</span> Fichajes
     </button>
     <button class="nav-item" onclick="showSection('empleados')">
-      <span class="nav-icon">ð¥</span> Empleados
+      <span class="nav-icon">👥</span> Empleados
     </button>
     <button class="nav-item" onclick="showSection('analisis')">
-      <span class="nav-icon">ð</span> AnÃ¡lisis
+      <span class="nav-icon">📈</span> Análisis
     </button>
     <button class="nav-item" onclick="showSection('horarios')">
-      <span class="nav-icon">ð</span> Horarios
+      <span class="nav-icon">📅</span> Horarios
     </button>
   </nav>
   <div class="sidebar-footer">
-    <span class="live-dot"></span>En vivo Â· cada 30s
+    <span class="live-dot"></span>En vivo · cada 30s
   </div>
 </aside>
 
-<!-- ââ MAIN ââ -->
+<!-- ── MAIN ── -->
 <main class="main">
   <div class="topbar">
     <h2 id="topbar-title" style="font-size:15px;font-weight:600;color:var(--text)">Resumen general</h2>
     <div class="topbar-actions">
-      <button class="btn btn-outline" onclick="actualizarTodo()">â» Actualizar</button>
-      <button class="btn btn-gold" onclick="exportarExcel()">â¬ Exportar Excel</button>
+      <button class="btn btn-outline" onclick="actualizarTodo()">↻ Actualizar</button>
+      <button class="btn btn-gold" onclick="exportarExcel()">⬇ Exportar Excel</button>
     </div>
   </div>
 
   <div class="content">
 
-    <!-- ââ PRINCIPAL ââ -->
+    <!-- ── PRINCIPAL ── -->
     <section class="section active" id="s-principal">
       <div class="kpi-grid">
         <div class="kpi-card" onclick="abrirPopupKpi('fichajes-hoy')">
           <div class="kpi-label">Fichajes hoy</div>
-          <div class="kpi-value" id="kpi-hoy">â</div>
+          <div class="kpi-value" id="kpi-hoy">—</div>
           <div class="kpi-sub" id="kpi-hoy-sub">registros de hoy</div>
         </div>
         <div class="kpi-card" onclick="abrirPopupKpi('empleados')">
           <div class="kpi-label">Empleados</div>
-          <div class="kpi-value" id="kpi-empleados">â</div>
+          <div class="kpi-value" id="kpi-empleados">—</div>
           <div class="kpi-sub">registrados</div>
         </div>
         <div class="kpi-card" onclick="abrirPopupKpi('dentro')">
           <div class="kpi-label">Dentro ahora</div>
-          <div class="kpi-value" id="kpi-dentro">â</div>
+          <div class="kpi-value" id="kpi-dentro">—</div>
           <div class="kpi-sub" id="kpi-dentro-sub">con entrada activa</div>
         </div>
         <div class="kpi-card" onclick="abrirPopupKpi('total')">
           <div class="kpi-label">Total fichajes</div>
-          <div class="kpi-value" id="kpi-total">â</div>
-          <div class="kpi-sub">histÃ³rico</div>
+          <div class="kpi-value" id="kpi-total">—</div>
+          <div class="kpi-sub">histórico</div>
         </div>
       </div>
 
-      <div class="section-title">Alertas del dÃ­a</div>
+      <div class="section-title">Alertas del día</div>
       <div class="alert-grid">
         <div class="alert-card danger" style="cursor:pointer" onclick="abrirPopupAlerta('ausentes')">
-          <div class="alert-title">â Ausentes hoy</div>
-          <div class="alert-value" id="alert-ausentes">â</div>
+          <div class="alert-title">⛔ Ausentes hoy</div>
+          <div class="alert-value" id="alert-ausentes">—</div>
           <div class="alert-sub" id="alert-ausentes-nombres">Sin datos</div>
         </div>
         <div class="alert-card warning" style="cursor:pointer" onclick="abrirPopupAlerta('tardes')">
-          <div class="alert-title">â° Llegadas tarde hoy</div>
-          <div class="alert-value" id="alert-tardes">â</div>
+          <div class="alert-title">⏰ Llegadas tarde hoy</div>
+          <div class="alert-value" id="alert-tardes">—</div>
           <div class="alert-sub" id="alert-tardes-nombres">Sin datos</div>
         </div>
         <div class="alert-card success" style="cursor:pointer" onclick="abrirPopupAlerta('puntuales')">
-          <div class="alert-title">â Puntuales</div>
-          <div class="alert-value" id="alert-puntuales">â</div>
+          <div class="alert-title">✅ Puntuales</div>
+          <div class="alert-value" id="alert-puntuales">—</div>
           <div class="alert-sub">entraron a tiempo</div>
         </div>
         <div class="alert-card incompleto" style="cursor:pointer" onclick="abrirPopupAlerta('incompletos')">
-          <div class="alert-title">â ï¸ Fichajes incompletos</div>
-          <div class="alert-value" id="alert-incompletos">â</div>
+          <div class="alert-title">⚠️ Fichajes incompletos</div>
+          <div class="alert-value" id="alert-incompletos">—</div>
           <div class="alert-sub" id="alert-incompletos-nombres">Sin datos</div>
         </div>
         <div class="alert-card danger" style="cursor:pointer;border-color:rgba(156,39,176,0.6);background:rgba(156,39,176,0.07)" onclick="abrirPopupAlerta('turno-largo')">
-          <div class="alert-title" style="color:#CE93D8">ð Turnos +10h sin salida</div>
-          <div class="alert-value" id="alert-turno-largo">â</div>
+          <div class="alert-title" style="color:#CE93D8">🔔 Turnos +10h sin salida</div>
+          <div class="alert-value" id="alert-turno-largo">—</div>
           <div class="alert-sub" id="alert-turno-largo-nombres">Sin datos</div>
         </div>
         <div class="alert-card warning" style="cursor:pointer;border-color:rgba(255,152,0,0.6);background:rgba(255,152,0,0.07)" onclick="abrirPopupAlerta('dudosos')">
-          <div class="alert-title" style="color:var(--warning)">ð Fichajes dudosos</div>
-          <div class="alert-value" id="alert-dudosos">â</div>
+          <div class="alert-title" style="color:var(--warning)">🔍 Fichajes dudosos</div>
+          <div class="alert-value" id="alert-dudosos">—</div>
           <div class="alert-sub" id="alert-dudosos-nombres">Menos de 60 min entre fichajes</div>
         </div>
       </div>
@@ -994,7 +994,7 @@ canvas { max-height: 240px; }
       <div class="section-title">Actividad reciente</div>
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title">Ãltimos fichajes</div>
+          <div class="panel-title">Últimos fichajes</div>
         </div>
         <div class="panel-body">
           <table>
@@ -1002,14 +1002,14 @@ canvas { max-height: 240px; }
               <th>Empleado</th><th>Tipo</th><th>Fecha</th><th>Hora</th>
             </tr></thead>
             <tbody id="tabla-reciente">
-              <tr><td colspan="4" class="empty-state">Cargandoâ¦</td></tr>
+              <tr><td colspan="4" class="empty-state">Cargando…</td></tr>
             </tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- ââ FICHAJES ââ -->
+    <!-- ── FICHAJES ── -->
     <section class="section" id="s-fichajes">
       <div class="panel">
         <div class="panel-header">
@@ -1035,33 +1035,33 @@ canvas { max-height: 240px; }
               <th>Horas</th><th>Estado</th>
             </tr></thead>
             <tbody id="tabla-fichajes">
-              <tr><td colspan="8" class="empty-state">Cargandoâ¦</td></tr>
+              <tr><td colspan="8" class="empty-state">Cargando…</td></tr>
             </tbody>
           </table>
         </div>
         <div class="pagination">
-          <button class="page-btn" id="btn-prev" onclick="cambiarPagina(-1)">â Anterior</button>
+          <button class="page-btn" id="btn-prev" onclick="cambiarPagina(-1)">← Anterior</button>
           <span class="page-info" id="page-info">1 / 1</span>
-          <button class="page-btn" id="btn-next" onclick="cambiarPagina(1)">Siguiente â</button>
+          <button class="page-btn" id="btn-next" onclick="cambiarPagina(1)">Siguiente →</button>
         </div>
       </div>
     </section>
 
-    <!-- ââ EMPLEADOS ââ -->
+    <!-- ── EMPLEADOS ── -->
     <section class="section" id="s-empleados">
       <!-- Buscador global -->
       <div class="panel" style="margin-bottom:20px;overflow:visible">
         <div class="panel-header">
-          <div class="panel-title">ð Buscar empleado</div>
+          <div class="panel-title">🔍 Buscar empleado</div>
           <span style="font-size:12px;color:var(--text3)" id="emp-total-count"></span>
         </div>
         <div class="panel-body" style="overflow:visible">
           <div class="emp-search-wrap" id="emp-search-wrap">
             <input class="emp-search-input" id="emp-search-input" type="text"
-              placeholder="EscribÃ­ nombre o apellidoâ¦"
+              placeholder="Escribí nombre o apellido…"
               oninput="buscarEmpleado(this.value)"
               autocomplete="off"/>
-            <span class="emp-search-icon">ð</span>
+            <span class="emp-search-icon">🔍</span>
             <div class="emp-search-results" id="emp-search-results"></div>
           </div>
         </div>
@@ -1069,15 +1069,15 @@ canvas { max-height: 240px; }
 
       <div class="section-title">Estado actual</div>
       <div class="emp-grid" id="emp-grid">
-        <div class="empty-state">Cargando empleadosâ¦</div>
+        <div class="empty-state">Cargando empleados…</div>
       </div>
 
-      <!-- VinculaciÃ³n planilla -->
+      <!-- Vinculación planilla -->
       <div class="panel" style="margin-top:20px">
         <div class="panel-header">
-          <div class="panel-title">ð¥ Empleados de la planilla</div>
+          <div class="panel-title">👥 Empleados de la planilla</div>
           <div class="filters">
-            <span style="font-size:12px;color:var(--text3)" id="planilla-status">Cargandoâ¦</span>
+            <span style="font-size:12px;color:var(--text3)" id="planilla-status">Cargando…</span>
           </div>
         </div>
         <div class="panel-body">
@@ -1088,7 +1088,7 @@ canvas { max-height: 240px; }
                 <th>Rol</th>
                 <th>Vinculado con</th>
                 <th>Estado</th>
-                <th>AcciÃ³n</th>
+                <th>Acción</th>
               </tr>
             </thead>
             <tbody id="tabla-planilla"></tbody>
@@ -1097,13 +1097,13 @@ canvas { max-height: 240px; }
       </div>
     </section>
 
-    <!-- ââ ANÃLISIS ââ -->
+    <!-- ── ANÁLISIS ── -->
     <section class="section" id="s-analisis">
 
-      <!-- ââ KPIs NÃMINA â siempre visibles ââ -->
+      <!-- ── KPIs NÓMINA — siempre visibles ── -->
       <div id="nomina-kpis-wrap" style="margin-bottom:20px">
         <div class="nomina-kpi-header">
-          <div class="nomina-kpi-title">ð Toda la nÃ³mina â hoy</div>
+          <div class="nomina-kpi-title">📊 Toda la nómina — hoy</div>
           <select id="nomina-periodo" onchange="calcularKpisNomina()" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;outline:none">
             <option value="hoy">Hoy</option>
             <option value="semana">Esta semana</option>
@@ -1114,27 +1114,27 @@ canvas { max-height: 240px; }
         <div class="nomina-kpi-grid">
           <div class="nomina-kpi-card" style="--nomina-accent:#4CAF50" onclick="abrirPopupNomina('presentes')">
             <div class="nomina-kpi-label">Tasa de presencia</div>
-            <div class="nomina-kpi-value" id="nkpi-presencia">â%</div>
+            <div class="nomina-kpi-value" id="nkpi-presencia">—%</div>
             <div class="nomina-kpi-sub" id="nkpi-presencia-sub">empleados vs esperados</div>
           </div>
           <div class="nomina-kpi-card" style="--nomina-accent:#E53935" onclick="abrirPopupNomina('ausentes')">
             <div class="nomina-kpi-label">Ausentes</div>
-            <div class="nomina-kpi-value" id="nkpi-ausentes" style="color:#E53935">â</div>
-            <div class="nomina-kpi-sub" id="nkpi-ausentes-sub">en el perÃ­odo</div>
+            <div class="nomina-kpi-value" id="nkpi-ausentes" style="color:#E53935">—</div>
+            <div class="nomina-kpi-sub" id="nkpi-ausentes-sub">en el período</div>
           </div>
           <div class="nomina-kpi-card" style="--nomina-accent:#FF9800" onclick="abrirPopupNomina('tardanzas')">
             <div class="nomina-kpi-label">Tardanzas</div>
-            <div class="nomina-kpi-value" id="nkpi-tardanzas" style="color:#FF9800">â</div>
-            <div class="nomina-kpi-sub" id="nkpi-tardanzas-sub">promedio â min</div>
+            <div class="nomina-kpi-value" id="nkpi-tardanzas" style="color:#FF9800">—</div>
+            <div class="nomina-kpi-sub" id="nkpi-tardanzas-sub">promedio — min</div>
           </div>
           <div class="nomina-kpi-card" style="--nomina-accent:#4CAF50" onclick="abrirPopupNomina('puntuales')">
             <div class="nomina-kpi-label">Puntuales</div>
-            <div class="nomina-kpi-value" id="nkpi-puntuales" style="color:#4CAF50">â</div>
+            <div class="nomina-kpi-value" id="nkpi-puntuales" style="color:#4CAF50">—</div>
             <div class="nomina-kpi-sub" id="nkpi-puntuales-sub">% del total esperado</div>
           </div>
           <div class="nomina-kpi-card" style="--nomina-accent:#FFFFFF" onclick="abrirPopupNomina('horas')">
             <div class="nomina-kpi-label">Horas trabajadas</div>
-            <div class="nomina-kpi-value" id="nkpi-horas">â</div>
+            <div class="nomina-kpi-value" id="nkpi-horas">—</div>
             <div class="nomina-kpi-sub" id="nkpi-horas-sub">vs programadas</div>
           </div>
         </div>
@@ -1145,7 +1145,7 @@ canvas { max-height: 240px; }
           <div class="panel-title">Filtrar por empleado</div>
           <div class="filters">
             <select id="analisis-empleado" onchange="cargarAnalisis()">
-              <option value="">SeleccionÃ¡ un empleado</option>
+              <option value="">Seleccioná un empleado</option>
             </select>
             <select id="analisis-periodo" onchange="cargarAnalisis()">
               <option value="hoy">Hoy</option>
@@ -1157,48 +1157,48 @@ canvas { max-height: 240px; }
         </div>
       </div>
 
-      <!-- KPIs macro del perÃ­odo seleccionado -->
+      <!-- KPIs macro del período seleccionado -->
       <div id="analisis-kpis" style="display:none;margin-bottom:20px">
         <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
           <div class="kpi-card" style="border-color:rgba(76,175,80,0.4)">
             <div class="kpi-label">Tasa de presencia</div>
-            <div class="kpi-value" id="an-presencia" style="color:#4CAF50">â%</div>
+            <div class="kpi-value" id="an-presencia" style="color:#4CAF50">—%</div>
             <div class="kpi-sub" id="an-presencia-sub">del total esperado</div>
           </div>
           <div class="kpi-card" style="border-color:rgba(229,57,53,0.4)">
             <div class="kpi-label">Ausencias</div>
-            <div class="kpi-value" id="an-ausencias" style="color:#E53935">â</div>
-            <div class="kpi-sub" id="an-ausencias-sub">dÃ­as sin asistir</div>
+            <div class="kpi-value" id="an-ausencias" style="color:#E53935">—</div>
+            <div class="kpi-sub" id="an-ausencias-sub">días sin asistir</div>
           </div>
           <div class="kpi-card" style="border-color:rgba(255,152,0,0.4)">
             <div class="kpi-label">Tardanzas</div>
-            <div class="kpi-value" id="an-tardanzas" style="color:#FF9800">â</div>
-            <div class="kpi-sub" id="an-tardanzas-sub">promedio â min</div>
+            <div class="kpi-value" id="an-tardanzas" style="color:#FF9800">—</div>
+            <div class="kpi-sub" id="an-tardanzas-sub">promedio — min</div>
           </div>
           <div class="kpi-card" style="border-color:rgba(201,168,76,0.4)">
             <div class="kpi-label">Horas trabajadas</div>
-            <div class="kpi-value" id="an-horas" style="color:var(--gold)">â</div>
+            <div class="kpi-value" id="an-horas" style="color:var(--gold)">—</div>
             <div class="kpi-sub" id="an-horas-sub">vs programadas</div>
           </div>
           <div class="kpi-card" style="border-color:rgba(66,165,245,0.4)">
             <div class="kpi-label">Puntualidad</div>
-            <div class="kpi-value" id="an-puntualidad" style="color:#42A5F5">â%</div>
-            <div class="kpi-sub">dÃ­as con horario cumplido</div>
+            <div class="kpi-value" id="an-puntualidad" style="color:#42A5F5">—%</div>
+            <div class="kpi-sub">días con horario cumplido</div>
           </div>
         </div>
 
-        <!-- GrÃ¡fico de asistencia por dÃ­a -->
+        <!-- Gráfico de asistencia por día -->
         <div class="panel" style="margin-top:16px;padding:20px">
-          <div class="panel-title" style="margin-bottom:16px">Asistencia por dÃ­a</div>
+          <div class="panel-title" style="margin-bottom:16px">Asistencia por día</div>
           <div id="an-grafico-wrap" style="overflow-x:auto">
             <canvas id="an-grafico" height="120"></canvas>
           </div>
         </div>
 
-        <!-- Tabla de alertas semÃ¡foro -->
+        <!-- Tabla de alertas semáforo -->
         <div class="panel" style="margin-top:16px;padding:0">
           <div class="panel-header" style="padding:14px 20px">
-            <div class="panel-title">Detalle por dÃ­a</div>
+            <div class="panel-title">Detalle por día</div>
           </div>
           <div style="overflow-x:auto">
             <table class="tabla-fichajes">
@@ -1233,34 +1233,34 @@ canvas { max-height: 240px; }
         <div class="resumen-grid">
           <div class="resumen-card">
             <div class="resumen-label">Horas trabajadas</div>
-            <div class="resumen-value gold" id="res-horas">â</div>
-            <div class="resumen-sub">en el perÃ­odo</div>
+            <div class="resumen-value gold" id="res-horas">—</div>
+            <div class="resumen-sub">en el período</div>
           </div>
           <div class="resumen-card">
-            <div class="resumen-label">DÃ­as trabajados</div>
-            <div class="resumen-value" id="res-dias">â</div>
+            <div class="resumen-label">Días trabajados</div>
+            <div class="resumen-value" id="res-dias">—</div>
             <div class="resumen-sub">con al menos 1 fichaje</div>
           </div>
           <div class="resumen-card">
             <div class="resumen-label">Promedio diario</div>
-            <div class="resumen-value" id="res-prom">â</div>
-            <div class="resumen-sub">horas por dÃ­a</div>
+            <div class="resumen-value" id="res-prom">—</div>
+            <div class="resumen-sub">horas por día</div>
           </div>
           <div class="resumen-card">
             <div class="resumen-label">Llegadas tarde</div>
-            <div class="resumen-value warning" id="res-tardes">â</div>
-            <div class="resumen-sub">veces en el perÃ­odo</div>
+            <div class="resumen-value warning" id="res-tardes">—</div>
+            <div class="resumen-sub">veces en el período</div>
           </div>
           <div class="resumen-card">
             <div class="resumen-label">Ausencias</div>
-            <div class="resumen-value danger" id="res-ausencias">â</div>
-            <div class="resumen-sub">dÃ­as sin fichar</div>
+            <div class="resumen-value danger" id="res-ausencias">—</div>
+            <div class="resumen-sub">días sin fichar</div>
           </div>
         </div>
 
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">Horas trabajadas por dÃ­a</div>
+            <div class="panel-title">Horas trabajadas por día</div>
           </div>
           <div class="chart-wrap">
             <canvas id="chart-horas"></canvas>
@@ -1287,49 +1287,49 @@ canvas { max-height: 240px; }
 
       </div>
       <div id="analisis-empty" style="padding:40px;text-align:center;color:var(--text3);font-size:13px">
-        SeleccionÃ¡ un empleado para ver su anÃ¡lisis
+        Seleccioná un empleado para ver su análisis
       </div>
     </section>
 
-    <!-- ââ HORARIOS ââ -->
+    <!-- ── HORARIOS ── -->
     <section class="section" id="s-horarios">
       <div class="panel" style="margin-bottom:20px">
         <div class="panel-header">
           <div class="panel-title">Planilla semanal de turnos</div>
           <div class="filters" style="gap:8px">
-            <!-- NavegaciÃ³n semana -->
+            <!-- Navegación semana -->
             <div class="semana-nav">
-              <button class="semana-nav-btn" onclick="navegarSemana(-1)">â</button>
-              <span class="semana-label" id="semana-label">â</span>
-              <button class="semana-nav-btn" onclick="navegarSemana(1)">â¶</button>
+              <button class="semana-nav-btn" onclick="navegarSemana(-1)">◀</button>
+              <span class="semana-label" id="semana-label">—</span>
+              <button class="semana-nav-btn" onclick="navegarSemana(1)">▶</button>
             </div>
             <input type="date" id="semana-inicio" onchange="cargarHorarios()" style="display:none">
             <button class="btn btn-outline" onclick="irAHoy()" style="font-size:12px">Hoy</button>
             <div style="position:relative;display:inline-block">
-              <button class="btn-wsp" onclick="toggleMenuWsp(event)" title="Generar imagen para WhatsApp">ð² WhatsApp â¾</button>
+              <button class="btn-wsp" onclick="toggleMenuWsp(event)" title="Generar imagen para WhatsApp">📲 WhatsApp ▾</button>
               <div id="menu-wsp" style="display:none;position:absolute;top:38px;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;z-index:200;min-width:200px;box-shadow:0 8px 24px rgba(0,0,0,0.5)">
-                <div style="font-size:10px;color:var(--text3);padding:0 0 8px;text-transform:uppercase;letter-spacing:0.5px">SeleccionÃ¡ los roles</div>
-                <label class="wsp-check-label"><input type="checkbox" value="SalÃ³n" class="wsp-rol-check" checked> ð½ï¸ SalÃ³n</label>
-                <label class="wsp-check-label"><input type="checkbox" value="Cocina" class="wsp-rol-check" checked> ð¨âð³ Cocina</label>
-                <label class="wsp-check-label"><input type="checkbox" value="Encargado" class="wsp-rol-check"> ð Encargado</label>
-                <label class="wsp-check-label"><input type="checkbox" value="Limpieza" class="wsp-rol-check"> ð§¹ Limpieza</label>
-                <label class="wsp-check-label"><input type="checkbox" value="AdministraciÃ³n" class="wsp-rol-check"> ð AdministraciÃ³n</label>
-                <button onclick="generarGrillaWsp()" class="menu-wsp-btn" style="margin-top:8px;background:#25D366;color:#fff;font-weight:700;width:100%;border-radius:6px">ð² Generar grilla</button>
+                <div style="font-size:10px;color:var(--text3);padding:0 0 8px;text-transform:uppercase;letter-spacing:0.5px">Seleccioná los roles</div>
+                <label class="wsp-check-label"><input type="checkbox" value="Salón" class="wsp-rol-check" checked> 🍽️ Salón</label>
+                <label class="wsp-check-label"><input type="checkbox" value="Cocina" class="wsp-rol-check" checked> 👨‍🍳 Cocina</label>
+                <label class="wsp-check-label"><input type="checkbox" value="Encargado" class="wsp-rol-check"> 👔 Encargado</label>
+                <label class="wsp-check-label"><input type="checkbox" value="Limpieza" class="wsp-rol-check"> 🧹 Limpieza</label>
+                <label class="wsp-check-label"><input type="checkbox" value="Administración" class="wsp-rol-check"> 📊 Administración</label>
+                <button onclick="generarGrillaWsp()" class="menu-wsp-btn" style="margin-top:8px;background:#25D366;color:#fff;font-weight:700;width:100%;border-radius:6px">📲 Generar grilla</button>
               </div>
             </div>
             <button class="btn btn-outline" onclick="document.getElementById('file-horarios').click()" style="font-size:12px">
-              ð Importar Excel
+              📁 Importar Excel
             </button>
             <input type="file" id="file-horarios" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarHorarios(event)">
           </div>
         </div>
 
-        <!-- Leyenda rÃ¡pida -->
+        <!-- Leyenda rápida -->
         <div style="display:flex;gap:16px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text3)">
-          <span>ð¡ Clic en celda para editar turno</span>
-          <span style="color:#64B4FF">â  Franco</span>
-          <span style="color:#FF5050">â  Ausente</span>
-          <span style="color:#DDD">â  Turno asignado</span>
+          <span>💡 Clic en celda para editar turno</span>
+          <span style="color:#64B4FF">■ Franco</span>
+          <span style="color:#FF5050">■ Ausente</span>
+          <span style="color:#DDD">■ Turno asignado</span>
         </div>
 
         <div style="overflow-x:auto">
@@ -1340,21 +1340,21 @@ canvas { max-height: 240px; }
                 <th class="th-rol">Rol</th>
                 <th id="th-lun">Lun</th>
                 <th id="th-mar">Mar</th>
-                <th id="th-mie">MiÃ©</th>
+                <th id="th-mie">Mié</th>
                 <th id="th-jue">Jue</th>
                 <th id="th-vie">Vie</th>
-                <th id="th-sab">SÃ¡b</th>
+                <th id="th-sab">Sáb</th>
                 <th id="th-dom">Dom</th>
               </tr>
             </thead>
             <tbody id="tabla-horarios">
-              <tr><td colspan="9" class="empty-state">Cargandoâ¦</td></tr>
+              <tr><td colspan="9" class="empty-state">Cargando…</td></tr>
             </tbody>
           </table>
         </div>
 
         <div id="sin-vincular-alert" style="display:none;margin:12px 16px;padding:10px 14px;background:rgba(255,180,0,0.1);border:1px solid rgba(255,180,0,0.3);border-radius:8px;font-size:12px;color:#FFB400">
-          â ï¸ <strong id="sin-vincular-count">0</strong> empleado(s) de la planilla aÃºn no vinculados con la app.
+          ⚠️ <strong id="sin-vincular-count">0</strong> empleado(s) de la planilla aún no vinculados con la app.
           <button onclick="showSection('empleados')" style="margin-left:8px;background:none;border:none;color:#FFB400;text-decoration:underline;cursor:pointer;font-size:12px">Ver empleados</button>
         </div>
       </div>
@@ -1363,12 +1363,12 @@ canvas { max-height: 240px; }
   </div><!-- /content -->
 </main>
 
-<!-- ââ MODAL EDITAR EMPLEADO ââ -->
+<!-- ── MODAL EDITAR EMPLEADO ── -->
 <div class="modal-bg" id="modal-edit-emp">
   <div class="modal-edit-emp">
     <div class="modal-edit-header">
       <div class="modal-edit-title">Editar empleado</div>
-      <button class="modal-close-btn" onclick="cerrarEditarEmp()">Ã</button>
+      <button class="modal-close-btn" onclick="cerrarEditarEmp()">×</button>
     </div>
     <div class="modal-edit-body">
       <input type="hidden" id="edit-emp-id"/>
@@ -1391,19 +1391,19 @@ canvas { max-height: 240px; }
       </div>
     </div>
     <div class="modal-edit-footer">
-      <button class="modal-edit-danger" id="edit-delete-btn" onclick="confirmarEliminar()">ð Eliminar</button>
+      <button class="modal-edit-danger" id="edit-delete-btn" onclick="confirmarEliminar()">🗑 Eliminar</button>
       <button class="modal-edit-cancel" onclick="cerrarEditarEmp()">Cancelar</button>
       <button class="modal-edit-save" onclick="guardarEdicion()">Guardar</button>
     </div>
   </div>
 </div>
 
-<!-- ââ MODAL NUEVO EMPLEADO ââ -->
+<!-- ── MODAL NUEVO EMPLEADO ── -->
 <div class="modal-bg" id="modal-emp-nuevo">
   <div class="modal-emp-new">
     <div class="modal-emp-header">
       <div class="modal-emp-title" id="modal-emp-title">Agregar empleado</div>
-      <button class="modal-close-btn" onclick="cerrarModalEmp()">Ã</button>
+      <button class="modal-close-btn" onclick="cerrarModalEmp()">×</button>
     </div>
     <div class="modal-emp-body">
       <div class="modal-emp-field">
@@ -1412,11 +1412,11 @@ canvas { max-height: 240px; }
       </div>
       <div class="modal-emp-field">
         <label>Apellido</label>
-        <input class="modal-emp-input" id="new-emp-apellido" type="text" placeholder="Ej: GonzÃ¡lez"/>
+        <input class="modal-emp-input" id="new-emp-apellido" type="text" placeholder="Ej: González"/>
       </div>
       <div class="modal-emp-field">
         <label>Rol / Sector</label>
-        <input class="modal-emp-input" id="new-emp-rol" type="text" placeholder="Ej: Cocina, SalÃ³nâ¦"/>
+        <input class="modal-emp-input" id="new-emp-rol" type="text" placeholder="Ej: Cocina, Salón…"/>
         <div class="rol-suggestions" id="rol-suggestions"></div>
       </div>
       <div class="modal-emp-field" id="vincular-field" style="display:none">
@@ -1433,7 +1433,7 @@ canvas { max-height: 240px; }
   </div>
 </div>
 
-<!-- ââ MODAL TURNO NUEVO ââ -->
+<!-- ── MODAL TURNO NUEVO ── -->
 <div id="modal-turno" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto">
   <div style="background:#181818;border:1px solid rgba(255,255,255,0.12);border-radius:14px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6);margin:auto">
 
@@ -1443,12 +1443,12 @@ canvas { max-height: 240px; }
         <div id="modal-title" style="font-size:15px;font-weight:600;color:#F0F0F0"></div>
         <div id="modal-info" style="font-size:12px;color:#555;margin-top:3px"></div>
       </div>
-      <button onclick="cerrarModal()" style="background:none;border:none;color:#555;font-size:24px;cursor:pointer;line-height:1;padding:0;margin-left:12px">Ã</button>
+      <button onclick="cerrarModal()" style="background:none;border:none;color:#555;font-size:24px;cursor:pointer;line-height:1;padding:0;margin-left:12px">×</button>
     </div>
 
-    <!-- DÃ­as de la semana -->
+    <!-- Días de la semana -->
     <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06)">
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:10px">Aplicar a los dÃ­as</div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:10px">Aplicar a los días</div>
       <div style="display:flex;gap:6px;justify-content:space-between" id="dias-checks">
         <!-- se llena con JS -->
       </div>
@@ -1478,7 +1478,7 @@ canvas { max-height: 240px; }
       </button>
       <button onclick="borrarTurno()"
         style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#777;font-size:12px;cursor:pointer">
-        â Borrar
+        ✕ Borrar
       </button>
     </div>
 
@@ -1489,18 +1489,18 @@ canvas { max-height: 240px; }
         <div style="display:flex;align-items:center;gap:8px">
           <input type="text" id="m-entrada" placeholder="08:00" maxlength="5" pattern="[0-9]{2}:[0-9]{2}"
             style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:16px;text-align:center;outline:none">
-          <span style="color:#555">â</span>
+          <span style="color:#555">→</span>
           <input type="text" id="m-salida" placeholder="17:00" maxlength="5" pattern="[0-9]{2}:[0-9]{2}"
             style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:16px;text-align:center;outline:none">
         </div>
       </div>
       <div>
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:6px">2Âº turno <span style="font-weight:400;text-transform:none">(opcional)</span></div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:6px">2º turno <span style="font-weight:400;text-transform:none">(opcional)</span></div>
         <div style="display:flex;align-items:center;gap:8px">
-          <input type="text" id="m-entrada2" placeholder="â" maxlength="5" pattern="[0-9]{2}:[0-9]{2}"
+          <input type="text" id="m-entrada2" placeholder="—" maxlength="5" pattern="[0-9]{2}:[0-9]{2}"
             style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:16px;text-align:center;outline:none">
-          <span style="color:#555">â</span>
-          <input type="text" id="m-salida2" placeholder="â" maxlength="5" pattern="[0-9]{2}:[0-9]{2}"
+          <span style="color:#555">→</span>
+          <input type="text" id="m-salida2" placeholder="—" maxlength="5" pattern="[0-9]{2}:[0-9]{2}"
             style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:16px;text-align:center;outline:none">
         </div>
       </div>
@@ -1516,17 +1516,17 @@ canvas { max-height: 240px; }
 </div>
 
 <script>
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  CONFIG
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 const API = 'https://magnificent-determination-production-1d42.up.railway.app';
 const BAR_LAT = -37.327585; // Coordenadas Bar ideal
 const BAR_LNG = -59.1383669;
 const TOLERANCIA_MINUTOS = 10; // minutos de gracia para llegada tarde
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  ESTADO GLOBAL
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 let todosLosFichajes = [];
 let todosLosEmpleados = [];
 let fichajesFiltrados = [];
@@ -1538,9 +1538,9 @@ let horariosSemana = {};
 let planillaEmpleados = []; // empleados de la planilla
 let semanaActual = [];
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  NAV
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 function showSection(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -1548,7 +1548,7 @@ function showSection(id) {
   event.currentTarget.classList.add('active');
   const titles = {
     principal: 'Resumen general', fichajes: 'Registro de fichajes',
-    empleados: 'Estado de empleados', analisis: 'AnÃ¡lisis por empleado',
+    empleados: 'Estado de empleados', analisis: 'Análisis por empleado',
     horarios: 'Planilla de horarios'
   };
   document.getElementById('topbar-title').textContent = titles[id] || '';
@@ -1556,19 +1556,19 @@ function showSection(id) {
   if (id === 'analisis') calcularKpisNomina();
 }
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  UTILS
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 function fmt(dt) {
-  if (!dt) return 'â';
+  if (!dt) return '—';
   return new Date(dt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Argentina/Buenos_Aires' });
 }
 function fmtFecha(dt) {
-  if (!dt) return 'â';
+  if (!dt) return '—';
   return new Date(dt).toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', month: 'short' });
 }
 function horasStr(min) {
-  if (!min && min !== 0) return 'â';
+  if (!min && min !== 0) return '—';
   const h = Math.floor(Math.abs(min) / 60);
   const m = Math.abs(min) % 60;
   const sign = min < 0 ? '-' : '';
@@ -1590,9 +1590,9 @@ function avatarLetras(nombre, apellido) {
   return (nombre?.[0] || '') + (apellido?.[0] || '');
 }
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  CARGA DE DATOS
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 async function cargarEmpleados() {
   const r = await fetch(`${API}/api/empleados/list`);
   todosLosEmpleados = await r.json();
@@ -1612,20 +1612,20 @@ async function cargarFichajes() {
 
 async function actualizarTodo() {
   await Promise.all([cargarEmpleados(), cargarFichajes()]);
-  // Recalcular KPIs de nÃ³mina si la secciÃ³n estÃ¡ activa o para mantener datos frescos
+  // Recalcular KPIs de nómina si la sección está activa o para mantener datos frescos
   if (document.getElementById('s-analisis')?.classList.contains('active')) {
     calcularKpisNomina();
   }
 }
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  SELECT EMPLEADOS
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 function poblarSelectEmpleados() {
   ['filt-empleado', 'analisis-empleado'].forEach(id => {
     const sel = document.getElementById(id);
     const val = sel.value;
-    sel.innerHTML = `<option value="">${id === 'filt-empleado' ? 'Todos los empleados' : 'SeleccionÃ¡ un empleado'}</option>`;
+    sel.innerHTML = `<option value="">${id === 'filt-empleado' ? 'Todos los empleados' : 'Seleccioná un empleado'}</option>`;
     todosLosEmpleados.forEach(e => {
       const opt = document.createElement('option');
       opt.value = e.id;
@@ -1636,9 +1636,9 @@ function poblarSelectEmpleados() {
   });
 }
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  KPIs
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 function calcularKPIs() {
   const hoy = fechaHoy();
   const fichajesHoy = todosLosFichajes.filter(f =>
@@ -1677,15 +1677,15 @@ function calcularAlertasHoy(fichajesHoy) {
   _alertaData.ausentes = [];
   _alertaData.puntuales = [];
 
-  // Iterar PLANILLA (lo que estÃ¡ en la grilla) en lugar de todosLosEmpleados
+  // Iterar PLANILLA (lo que está en la grilla) en lugar de todosLosEmpleados
   planillaEmpleados.forEach(pe => {
     // Solo empleados vinculados a la app
     if (!pe.empleado_id) return;
 
     const horario = (horariosSemana[pe.id] || {})[hoy];
-    // Sin horario asignado hoy â ignorar
+    // Sin horario asignado hoy → ignorar
     if (!horario) return;
-    // Franco o NT â ignorar
+    // Franco o NT → ignorar
     if (horario.estado === 'franco' || horario.estado === 'nt') return;
 
     const nombreCompleto = pe.apellido + ' ' + pe.nombre;
@@ -1694,9 +1694,9 @@ function calcularAlertasHoy(fichajesHoy) {
     const fichajesEmp = fichajesHoy.filter(f => f.empleado_id === pe.empleado_id);
 
     if (!fichajesEmp.length) {
-      // No fichÃ³ â ausente
+      // No fichó — ausente
       ausentes.push(nombreCompleto);
-      _alertaData.ausentes.push({ nombre: nombreCompleto, detalle: 'No fichÃ³ hoy', empId: pe.empleado_id, peId: pe.id, horario });
+      _alertaData.ausentes.push({ nombre: nombreCompleto, detalle: 'No fichó hoy', empId: pe.empleado_id, peId: pe.id, horario });
     } else {
       // Verificar puntualidad
       const entrada = fichajesEmp.find(f => f.tipo === 'entrada');
@@ -1709,7 +1709,7 @@ function calcularAlertasHoy(fichajesHoy) {
           tardes.push(nombreCompleto);
           _alertaData.tardes.push({
             nombre: nombreCompleto,
-            detalle: `Asignado: ${entradaRef.substring(0,5)} Â· EntrÃ³: ${fmt(entrada.fecha_hora)}`,
+            detalle: `Asignado: ${entradaRef.substring(0,5)} · Entró: ${fmt(entrada.fecha_hora)}`,
             diff, empId: pe.empleado_id, entrada
           });
         } else {
@@ -1725,12 +1725,12 @@ function calcularAlertasHoy(fichajesHoy) {
   });
 
   document.getElementById('alert-ausentes').textContent = ausentes.length;
-  document.getElementById('alert-ausentes-nombres').textContent = ausentes.length ? ausentes.slice(0,3).join(', ') + (ausentes.length > 3 ? 'â¦' : '') : 'Nadie ausente';
+  document.getElementById('alert-ausentes-nombres').textContent = ausentes.length ? ausentes.slice(0,3).join(', ') + (ausentes.length > 3 ? '…' : '') : 'Nadie ausente';
   document.getElementById('alert-tardes').textContent = tardes.length;
-  document.getElementById('alert-tardes-nombres').textContent = tardes.length ? tardes.slice(0,3).join(', ') + (tardes.length > 3 ? 'â¦' : '') : 'Sin tardanzas';
+  document.getElementById('alert-tardes-nombres').textContent = tardes.length ? tardes.slice(0,3).join(', ') + (tardes.length > 3 ? '…' : '') : 'Sin tardanzas';
   document.getElementById('alert-puntuales').textContent = puntuales.length;
 
-  // Fichajes incompletos: entrada sin salida con mÃ¡s de 12 horas
+  // Fichajes incompletos: entrada sin salida con más de 12 horas
   const ahora = Date.now();
   const incompletos = [];
   const gruposPorEmp = {};
@@ -1751,7 +1751,7 @@ function calcularAlertasHoy(fichajesHoy) {
   });
   document.getElementById('alert-incompletos').textContent = incompletos.length;
   document.getElementById('alert-incompletos-nombres').textContent = incompletos.length
-    ? incompletos.slice(0,3).join(', ') + (incompletos.length > 3 ? 'â¦' : '')
+    ? incompletos.slice(0,3).join(', ') + (incompletos.length > 3 ? '…' : '')
     : 'Sin fichajes incompletos';
   _alertaData.incompletos = incompletos.map(nombre => {
     const emp = Object.values(gruposPorEmp).find(g => g.nombre === nombre);
@@ -1765,7 +1765,7 @@ function calcularAlertasHoy(fichajesHoy) {
     return { nombre, desde: hs ? hs + 'h sin salida' : 'Sin salida', empId: empIdInc, entrada, entrada2, salida, salida2 };
   });
 
-  // ââ TURNOS LARGOS: entrada sin salida con mÃ¡s de 10 horas ââ
+  // ── TURNOS LARGOS: entrada sin salida con más de 10 horas ──
   // Busca en TODOS los fichajes (no solo hoy) para capturar turnos nocturnos
   const turnoLargoGrupos = {};
   todosLosFichajes.forEach(f => {
@@ -1790,7 +1790,7 @@ function calcularAlertasHoy(fichajesHoy) {
           nombre: emp.nombre,
           empId: emp.empId,
           entrada,
-          detalle: `Lleva ${hsRedondeado}h dentro â entrÃ³ ${fmt(entrada.fecha_hora)}`,
+          detalle: `Lleva ${hsRedondeado}h dentro — entró ${fmt(entrada.fecha_hora)}`,
           hs: hsRedondeado
         });
       }
@@ -1806,10 +1806,10 @@ function calcularAlertasHoy(fichajesHoy) {
   const tlSubEl = document.getElementById('alert-turno-largo-nombres');
   if (tlEl) tlEl.textContent = turnosLargos.length;
   if (tlSubEl) tlSubEl.textContent = turnosLargos.length
-    ? turnosLargos.slice(0,3).join(', ') + (turnosLargos.length > 3 ? 'â¦' : '')
+    ? turnosLargos.slice(0,3).join(', ') + (turnosLargos.length > 3 ? '…' : '')
     : 'Todo en orden';
 
-  // ââ FICHAJES DUDOSOS: menos de 3 minutos entre fichajes consecutivos ââ
+  // ── FICHAJES DUDOSOS: menos de 3 minutos entre fichajes consecutivos ──
   _alertaData['dudosos'] = [];
   const dudososNombres = [];
 
@@ -1835,7 +1835,7 @@ function calcularAlertasHoy(fichajesHoy) {
         _alertaData['dudosos'].push({
           nombre: emp.nombre,
           empId: emp.empId,
-          detalle: `${({ entrada:'E1', salida:'S1', entrada2:'E2', salida2:'S2' }[prev.tipo]||prev.tipo)} â ${({ entrada:'E1', salida:'S1', entrada2:'E2', salida2:'S2' }[curr.tipo]||curr.tipo)} Â· ${tiempoStr} Â· ${fmtFecha(curr.fecha_hora)} ${fmt(curr.fecha_hora)}`,
+          detalle: `${({ entrada:'E1', salida:'S1', entrada2:'E2', salida2:'S2' }[prev.tipo]||prev.tipo)} → ${({ entrada:'E1', salida:'S1', entrada2:'E2', salida2:'S2' }[curr.tipo]||curr.tipo)} · ${tiempoStr} · ${fmtFecha(curr.fecha_hora)} ${fmt(curr.fecha_hora)}`,
           fichajePrev: prev,
           fichajeActual: curr,
           minDiff
@@ -1844,20 +1844,20 @@ function calcularAlertasHoy(fichajesHoy) {
     }
   });
 
-  // Ordenar de menor a mayor tiempo (los mÃ¡s sospechosos primero)
+  // Ordenar de menor a mayor tiempo (los más sospechosos primero)
   _alertaData['dudosos'].sort((a, b) => a.minDiff - b.minDiff);
 
   const dudEl = document.getElementById('alert-dudosos');
   const dudSubEl = document.getElementById('alert-dudosos-nombres');
   if (dudEl) dudEl.textContent = _alertaData['dudosos'].length;
   if (dudSubEl) dudSubEl.textContent = dudososNombres.length
-    ? dudososNombres.slice(0,3).join(', ') + (dudososNombres.length > 3 ? 'â¦' : '')
+    ? dudososNombres.slice(0,3).join(', ') + (dudososNombres.length > 3 ? '…' : '')
     : 'Sin fichajes dudosos';
 }
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  TABLA RECIENTE
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 function renderRecientes() {
   const tbody = document.getElementById('tabla-reciente');
   const recientes = todosLosFichajes.slice(0, 15);
@@ -1876,9 +1876,9 @@ function renderRecientes() {
   `).join('');
 }
 
-// ââââââââââââââââââââââââââââââââââ
-//  TABLA FICHAJES (paginada y por dÃ­a)
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
+//  TABLA FICHAJES (paginada y por día)
+// ══════════════════════════════════
 function filtrarFichajes() {
   const empId = document.getElementById('filt-empleado').value;
   const periodo = document.getElementById('filt-periodo').value;
@@ -1903,7 +1903,7 @@ function filtrarFichajes() {
   });
 
   fichajesFiltrados = Object.values(grupos).sort((a, b) => {
-    // Ordenar por apellido, luego nombre, ambos alfabÃ©tico
+    // Ordenar por apellido, luego nombre, ambos alfabético
     const apA = (a.apellido || '').toLowerCase();
     const apB = (b.apellido || '').toLowerCase();
     if (apA !== apB) return apA.localeCompare(apB, 'es');
@@ -1955,12 +1955,12 @@ function renderTablaFichajes() {
     const esIncompletoE1 = e1 && !s1 && (ahoraDash - new Date(e1.fecha_hora).getTime()) / 3600000 > 12;
     const esIncompletoE2 = e2 && !s2 && (ahoraDash - new Date(e2.fecha_hora).getTime()) / 3600000 > 12;
     if (esIncompletoE1 || esIncompletoE2) {
-      estado += ` <span class="badge-incompleto">â ï¸ Incompleto</span>`;
+      estado += ` <span class="badge-incompleto">⚠️ Incompleto</span>`;
     }
     // Badge cierre manual por empleado
     const tieneManual = [e1, s1, e2, s2].some(f => f && f.manual);
     if (tieneManual) {
-      estado += ` <span class="badge-incompleto" style="background:rgba(255,152,0,0.2);color:var(--warning)">âï¸ Manual</span>`;
+      estado += ` <span class="badge-incompleto" style="background:rgba(255,152,0,0.2);color:var(--warning)">✏️ Manual</span>`;
     }
 
     // Buscar horario via planilla_emp_id (horariosSemana usa planilla_emp_id como clave)
@@ -1976,7 +1976,7 @@ function renderTablaFichajes() {
         <td>${fmt(s1?.fecha_hora)}</td>
         <td>${fmt(e2?.fecha_hora)}</td>
         <td>${fmt(s2?.fecha_hora)}</td>
-        <td>${totalMin > 0 ? horasStr(totalMin) : 'â'}</td>
+        <td>${totalMin > 0 ? horasStr(totalMin) : '—'}</td>
         <td>${estado}</td>
       </tr>
     `;
@@ -1988,9 +1988,9 @@ function cambiarPagina(delta) {
   renderTablaFichajes();
 }
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  EMPLEADOS CARDS
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 function renderEmpleados() {
   const grid = document.getElementById('emp-grid');
   const hoy = fechaHoy();
@@ -2021,7 +2021,7 @@ function renderEmpleados() {
     if (hoyEmp['entrada2'] && hoyEmp['salida2']) minHoy += minutosEntre(hoyEmp['entrada2'].fecha_hora, hoyEmp['salida2'].fecha_hora);
     if (dentro && hayEntrada) minHoy += minutosEntre(hayEntrada.fecha_hora, new Date().toISOString());
 
-    // Verificar si estÃ¡ en planilla
+    // Verificar si está en planilla
     const enPlanilla = planillaEmpleados.some(pe => pe.empleado_id === e.id);
 
     return `
@@ -2035,8 +2035,8 @@ function renderEmpleados() {
           <div class="emp-actions">
             ${!enPlanilla ? `<button onclick="agregarAPlanilla(${e.id}, '${e.nombre}', '${e.apellido}')"
               title="Agregar a la planilla" class="emp-action-btn" style="background:rgba(255,107,0,0.2);color:#FF9944;font-size:16px">+</button>` : ''}
-            <button class="emp-action-btn btn-edit-emp" onclick="abrirEditarEmp(${e.id}, '${e.nombre}', '${e.apellido}', '${e.celular}')" title="Editar">âï¸</button>
-            <button class="emp-action-btn btn-del-emp" onclick="eliminarEmp(${e.id}, '${e.nombre} ${e.apellido}')" title="Eliminar">ðï¸</button>
+            <button class="emp-action-btn btn-edit-emp" onclick="abrirEditarEmp(${e.id}, '${e.nombre}', '${e.apellido}', '${e.celular}')" title="Editar">✏️</button>
+            <button class="emp-action-btn btn-del-emp" onclick="eliminarEmp(${e.id}, '${e.nombre} ${e.apellido}')" title="Eliminar">🗑️</button>
           </div>
         </div>
         <div class="emp-stats">
@@ -2044,18 +2044,18 @@ function renderEmpleados() {
             Estado<span class="badge ${dentro ? 'badge-dentro' : 'badge-fuera'}">${dentro ? 'Dentro' : 'Fuera'}</span>
           </div>
           <div class="emp-stat">
-            Hoy <span class="emp-stat-val">${minHoy > 0 ? horasStr(minHoy) : 'â'}</span>
+            Hoy <span class="emp-stat-val">${minHoy > 0 ? horasStr(minHoy) : '—'}</span>
           </div>
-          ${hayEntrada ? `<div class="emp-stat">EntrÃ³ <span class="emp-stat-val">${fmt(hayEntrada.fecha_hora)}</span></div>` : ''}
+          ${hayEntrada ? `<div class="emp-stat">Entró <span class="emp-stat-val">${fmt(hayEntrada.fecha_hora)}</span></div>` : ''}
         </div>
       </div>
     `;
   }).join('');
 }
 
-// ââââââââââââââââââââââââââââââââââ
-//  ANÃLISIS POR EMPLEADO
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
+//  ANÁLISIS POR EMPLEADO
+// ══════════════════════════════════
 function cargarAnalisis() {
   const empId = document.getElementById('analisis-empleado').value;
   const periodo = document.getElementById('analisis-periodo').value;
@@ -2168,7 +2168,7 @@ function cargarAnalisis() {
   // KPIs
   document.getElementById('res-horas').textContent = horasStr(totalMin);
   document.getElementById('res-dias').textContent = diasConFichaje;
-  document.getElementById('res-prom').textContent = diasConFichaje ? horasStr(Math.round(totalMin / diasConFichaje)) : 'â';
+  document.getElementById('res-prom').textContent = diasConFichaje ? horasStr(Math.round(totalMin / diasConFichaje)) : '—';
   document.getElementById('res-tardes').textContent = tardes;
   document.getElementById('res-ausencias').textContent = ausencias;
 
@@ -2183,7 +2183,7 @@ function cargarAnalisis() {
   // Tabla analisis
   const tbody = document.getElementById('tabla-analisis');
   if (!tablaRows.length) {
-    tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Sin datos en el perÃ­odo</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Sin datos en el período</td></tr>`;
   } else {
     tbody.innerHTML = tablaRows.map(r => `
       <tr>
@@ -2199,7 +2199,7 @@ function cargarAnalisis() {
     `).join('');
   }
 
-  // GrÃ¡fico
+  // Gráfico
   const labels = tablaRows.map(r => fmtFecha(r.fecha + 'T12:00'));
   const data = tablaRows.map(r => parseFloat((r.minDia / 60).toFixed(2)));
 
@@ -2233,11 +2233,11 @@ function cargarAnalisis() {
     }
   });
 
-  // ââ Calcular y mostrar KPIs macro ââ
+  // ── Calcular y mostrar KPIs macro ──
   const pe = planillaEmpleados.find(p => String(p.empleado_id) === String(empId));
   const peId = pe ? pe.id : null;
 
-  // DÃ­as programados en el perÃ­odo
+  // Días programados en el período
   let diasProgramados = 0, diasTrabajados = 0, diasAusente = 0;
   let totalTardes = 0, sumaDiffTardes = 0, diasPuntuales = 0;
   let minTrabajados = 0, minProgramados = 0;
@@ -2258,7 +2258,7 @@ function cargarAnalisis() {
       const e2 = (byFecha[fecha] || {})['entrada2'];
       const s2 = (byFecha[fecha] || {})['salida2'];
 
-      // Horas trabajadas ese dÃ­a
+      // Horas trabajadas ese día
       let minDia = 0;
       if (e1 && s1) minDia += minutosEntre(e1.fecha_hora, s1.fecha_hora);
       if (e2 && s2) minDia += minutosEntre(e2.fecha_hora, s2.fecha_hora);
@@ -2298,39 +2298,39 @@ function cargarAnalisis() {
   const promTarde = totalTardes > 0 ? Math.round(sumaDiffTardes / totalTardes) : 0;
   const balance = minTrabajados - minProgramados;
 
-  // Color semÃ¡foro presencia
+  // Color semáforo presencia
   const colorPres = pct >= 90 ? '#4CAF50' : pct >= 70 ? '#FF9800' : '#E53935';
   document.getElementById('an-presencia').textContent = pct + '%';
   document.getElementById('an-presencia').style.color = colorPres;
-  document.getElementById('an-presencia-sub').textContent = `${diasTrabajados} de ${diasProgramados} dÃ­as`;
+  document.getElementById('an-presencia-sub').textContent = `${diasTrabajados} de ${diasProgramados} días`;
   document.getElementById('an-ausencias').textContent = diasAusente;
-  document.getElementById('an-ausencias-sub').textContent = diasAusente === 1 ? 'dÃ­a sin asistir' : 'dÃ­as sin asistir';
+  document.getElementById('an-ausencias-sub').textContent = diasAusente === 1 ? 'día sin asistir' : 'días sin asistir';
   document.getElementById('an-tardanzas').textContent = totalTardes;
   document.getElementById('an-tardanzas-sub').textContent = promTarde > 0 ? `promedio ${promTarde} min tarde` : 'sin tardanzas';
   document.getElementById('an-horas').textContent = horasStr(minTrabajados);
   document.getElementById('an-horas-sub').textContent = `${balance >= 0 ? '+' : ''}${horasStr(Math.abs(balance))} vs programadas`;
   document.getElementById('an-puntualidad').textContent = pctPunt + '%';
 
-  // Color semÃ¡foro puntualidad
+  // Color semáforo puntualidad
   const colorPunt = pctPunt >= 90 ? '#4CAF50' : pctPunt >= 70 ? '#FF9800' : '#E53935';
   document.getElementById('an-puntualidad').style.color = colorPunt;
 
-  // Tabla de detalle por dÃ­a
+  // Tabla de detalle por día
   const tablaBody = document.getElementById('an-tabla-body');
   if (tablaBody) {
     tablaBody.innerHTML = tablaRowsKpi.sort((a,b) => b.fecha.localeCompare(a.fecha)).map(r => {
-      const semaforo = r.estado === 'puntual' ? 'ð¢' : r.estado === 'tarde' ? 'ð¡' : r.estado === 'ausente' ? 'ð´' : 'âª';
+      const semaforo = r.estado === 'puntual' ? '🟢' : r.estado === 'tarde' ? '🟡' : r.estado === 'ausente' ? '🔴' : '⚪';
       const badge = r.estado === 'puntual' ? '<span class="badge badge-puntual">Puntual</span>'
         : r.estado === 'tarde' ? '<span class="badge badge-tarde">Tarde</span>'
         : r.estado === 'ausente' ? '<span class="badge badge-ausente">Ausente</span>'
-        : 'â';
-      const diffStr = r.diff !== null ? (r.diff > 0 ? `+${r.diff}m` : `${r.diff}m`) : 'â';
+        : '—';
+      const diffStr = r.diff !== null ? (r.diff > 0 ? `+${r.diff}m` : `${r.diff}m`) : '—';
       const diffColor = r.diff > TOLERANCIA_MINUTOS ? 'color:#FF9800' : r.diff < 0 ? 'color:#4CAF50' : '';
       return `<tr>
         <td>${semaforo} ${fmtFecha(r.fecha + 'T12:00')}</td>
-        <td>${r.e1 ? fmt(r.e1.fecha_hora) : 'â'}</td>
-        <td>${r.s1 ? fmt(r.s1.fecha_hora) : 'â'}</td>
-        <td>${r.minDia > 0 ? horasStr(r.minDia) : 'â'}</td>
+        <td>${r.e1 ? fmt(r.e1.fecha_hora) : '—'}</td>
+        <td>${r.s1 ? fmt(r.s1.fecha_hora) : '—'}</td>
+        <td>${r.minDia > 0 ? horasStr(r.minDia) : '—'}</td>
         <td>${badge}</td>
         <td style="${diffColor}">${diffStr}</td>
       </tr>`;
@@ -2338,12 +2338,12 @@ function cargarAnalisis() {
   }
 }
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  HORARIOS SEMANAL
-// ââââââââââââââââââââââââââââââââââ
-// ââââââââââââââââââââââââââââââââââ
-//  MÃDULO HORARIOS â v3 LIMPIO
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
+// ══════════════════════════════════
+//  MÓDULO HORARIOS — v3 LIMPIO
+// ══════════════════════════════════
 
 let semanaOffset = 0;
 let modalEmpId = null;
@@ -2371,7 +2371,7 @@ function irAHoy() {
 async function cargarHorarios() {
   if (!planillaEmpleados.length) await cargarPlanillaEmpleados();
 
-  // Calcular semana segÃºn offset
+  // Calcular semana según offset
   const hoy = new Date();
   const diaHoy = hoy.getDay();
   const diffHoy = diaHoy === 0 ? -6 : 1 - diaHoy;
@@ -2390,10 +2390,10 @@ async function cargarHorarios() {
   const ini = new Date(semanaActual[0] + 'T12:00');
   const fin = new Date(semanaActual[6] + 'T12:00');
   const labelEl = document.getElementById('semana-label');
-  if (labelEl) labelEl.textContent = `${ini.getDate()}/${ini.getMonth()+1} â ${fin.getDate()}/${fin.getMonth()+1}/${fin.getFullYear()}`;
+  if (labelEl) labelEl.textContent = `${ini.getDate()}/${ini.getMonth()+1} – ${fin.getDate()}/${fin.getMonth()+1}/${fin.getFullYear()}`;
 
   // Headers
-  const diasNombres = ['Lun','Mar','MiÃ©','Jue','Vie','SÃ¡b','Dom'];
+  const diasNombres = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
   const ids = ['th-lun','th-mar','th-mie','th-jue','th-vie','th-sab','th-dom'];
   const hoyStr = fechaHoy();
   semanaActual.forEach((fecha, i) => {
@@ -2435,7 +2435,7 @@ function renderTablaHorarios() {
   if (!tbody) return;
 
   if (!planillaEmpleados.length) {
-    tbody.innerHTML = `<tr><td colspan="9" class="empty-state">ImportÃ¡ la planilla Excel para ver los empleados</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="empty-state">Importá la planilla Excel para ver los empleados</td></tr>`;
     return;
   }
 
@@ -2469,8 +2469,8 @@ function renderTablaHorarios() {
             contenido = `<span class="turno-badge" style="background:rgba(120,120,120,0.2);color:#888">NT</span>`;
           } else if (h.entrada1) {
             cls += ' has-turno';
-            contenido = `<span class="turno-hora">${h.entrada1.substring(0,5)}â${(h.salida1||'?').substring(0,5)}</span>`;
-            if (h.entrada2) contenido += `<span class="turno-hora2">${h.entrada2.substring(0,5)}â${(h.salida2||'?').substring(0,5)}</span>`;
+            contenido = `<span class="turno-hora">${h.entrada1.substring(0,5)}–${(h.salida1||'?').substring(0,5)}</span>`;
+            if (h.entrada2) contenido += `<span class="turno-hora2">${h.entrada2.substring(0,5)}–${(h.salida2||'?').substring(0,5)}</span>`;
           }
         }
 
@@ -2487,7 +2487,7 @@ function renderTablaHorarios() {
 
       html += `<tr>
         <td class="td-nombre">${pe.apellido} ${pe.nombre}</td>
-        <td class="td-rol">${pe.rol || 'â'}</td>
+        <td class="td-rol">${pe.rol || '—'}</td>
         ${celdas}
       </tr>`;
     });
@@ -2504,14 +2504,14 @@ function abrirModal(empId, fecha, nombre, rol) {
   document.getElementById('modal-title').textContent = nombre;
   const d = new Date(fecha + 'T12:00');
   document.getElementById('modal-info').textContent =
-    d.toLocaleDateString('es-AR', {weekday:'long', day:'numeric', month:'long'}) + (rol ? ` Â· ${rol}` : '');
+    d.toLocaleDateString('es-AR', {weekday:'long', day:'numeric', month:'long'}) + (rol ? ` · ${rol}` : '');
 
   document.getElementById('m-entrada').value  = (h.entrada1||h.entrada)  ? (h.entrada1||h.entrada).substring(0,5)  : '';
   document.getElementById('m-salida').value   = (h.salida1||h.salida)   ? (h.salida1||h.salida).substring(0,5)   : '';
   document.getElementById('m-entrada2').value = h.entrada2 ? h.entrada2.substring(0,5) : '';
   document.getElementById('m-salida2').value  = h.salida2  ? h.salida2.substring(0,5)  : '';
 
-  // Checkboxes de dÃ­as â marcar solo el dÃ­a actual, deshabilitar dÃ­as pasados
+  // Checkboxes de días — marcar solo el día actual, deshabilitar días pasados
   const diasNombres = ['L','M','M','J','V','S','D'];
   const diasContainer = document.getElementById('dias-checks');
   const hoyStr2 = fechaHoy();
@@ -2568,7 +2568,7 @@ function toggleEstadoModal(estado) {
 
 async function guardarTurno() {
   const btn = document.getElementById('btn-guardar-turno');
-  if (btn) { btn.disabled = true; btn.textContent = 'Guardandoâ¦'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
 
   const _e1 = document.getElementById('m-entrada').value;
   const _s1 = document.getElementById('m-salida').value;
@@ -2580,7 +2580,7 @@ async function guardarTurno() {
   const entrada2 = modalEstado === 'normal' ? (_e2 || null) : null;
   const salida2  = modalEstado === 'normal' ? (_s2 || null) : null;
 
-  // DÃ­as seleccionados via checkboxes
+  // Días seleccionados via checkboxes
   const diasSeleccionados = semanaActual.filter((f, i) => {
     const el = document.getElementById('dia-' + i);
     return el ? el.checked : false;
@@ -2611,7 +2611,7 @@ async function guardarTurno() {
     cerrarModal();
     renderTablaHorarios();
   } catch(e) {
-    alert('Error de conexiÃ³n: ' + e.message);
+    alert('Error de conexión: ' + e.message);
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = 'Guardar turno'; }
   }
@@ -2656,14 +2656,14 @@ async function guardarEstadoRapido(planillaEmpId, fecha, estado) {
   } catch(e) { alert('Error: ' + e.message); }
 }
 
-// ââ Importar Excel (planilla oficial) ââ
+// ── Importar Excel (planilla oficial) ──
 async function importarHorarios(event) {
   const file = event.target.files[0];
   if (!file) return;
 
   const semanaInput = document.getElementById('semana-inicio').value;
   if (!semanaInput) {
-    alert('â ï¸ SeleccionÃ¡ primero la semana antes de importar la planilla.');
+    alert('⚠️ Seleccioná primero la semana antes de importar la planilla.');
     event.target.value = '';
     return;
   }
@@ -2689,7 +2689,7 @@ async function importarHorarios(event) {
       headerRow = i; break;
     }
   }
-  if (headerRow === -1) { alert('No se encontrÃ³ la fila de encabezado en el Excel.'); return; }
+  if (headerRow === -1) { alert('No se encontró la fila de encabezado en el Excel.'); return; }
 
   const header = rows[headerRow].map(c => String(c).toLowerCase().trim());
   const colNombre  = header.findIndex(h => h.includes('apellido') || h.includes('nombre'));
@@ -2712,7 +2712,7 @@ async function importarHorarios(event) {
     // Ignorar filas que son instrucciones o encabezados secundarios
     if (nombreCompleto.toUpperCase().startsWith('INSTRUCCIONES') ||
         nombreCompleto.toUpperCase().startsWith('NOTA') ||
-        nombreCompleto.toUpperCase().startsWith('ACLARACIÃN') ||
+        nombreCompleto.toUpperCase().startsWith('ACLARACIÓN') ||
         nombreCompleto.length > 60) continue;
 
     // Separar apellido y nombre (formato "Apellido Nombre" o "Apellido, Nombre")
@@ -2733,7 +2733,7 @@ async function importarHorarios(event) {
 
     empleadosBatch.push({ nombre, apellido, rol });
 
-    // Generar horario para cada dÃ­a de la semana
+    // Generar horario para cada día de la semana
     for (let d = 0; d < 7; d++) {
       const colDia = colLun + d;
       const estadoCelda = colDia >= 0 ? String(row[colDia] || '').trim().toUpperCase() : '';
@@ -2781,7 +2781,7 @@ async function importarHorarios(event) {
     });
     const d2 = await r2.json();
 
-    alert(`â Planilla importada\n${d1.insertados} empleados nuevos en planilla\n${d2.guardados} horarios cargados`);
+    alert(`✅ Planilla importada\n${d1.insertados} empleados nuevos en planilla\n${d2.guardados} horarios cargados`);
     await cargarPlanillaEmpleados();
     cargarHorarios();
   } catch(e) {
@@ -2794,7 +2794,7 @@ function fmtTimeExcel(val) {
   if (!val) return null;
   const s = String(val).trim();
   if (!s) return null;
-  // Si es nÃºmero decimal de Excel (fracciÃ³n de dÃ­a)
+  // Si es número decimal de Excel (fracción de día)
   if (!isNaN(parseFloat(s)) && !s.includes(':')) {
     const totalMin = Math.round(parseFloat(s) * 24 * 60);
     const h = Math.floor(totalMin / 60);
@@ -2814,10 +2814,10 @@ function encontrarEnPlanilla(nombre, apellido) {
   ) || null;
 }
 
-// ââ Cargar planilla de empleados ââ
-// ââââââââââââââââââââââââââââââââââ
+// ── Cargar planilla de empleados ──
+// ══════════════════════════════════
 //  EDITAR / ELIMINAR EMPLEADOS
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 let editContext = {}; // { tipo, id, nombre, apellido, celular, rol }
 
 function abrirEditarEmp(id, nombre, apellido, celular) {
@@ -2881,7 +2881,7 @@ async function confirmarEliminar() {
   const id   = document.getElementById('edit-emp-id').value;
   const nombre = `${document.getElementById('edit-emp-nombre').value} ${document.getElementById('edit-emp-apellido').value}`;
 
-  if (!confirm(`Â¿Seguro que querÃ©s eliminar a ${nombre}? Esta acciÃ³n no se puede deshacer.`)) return;
+  if (!confirm(`¿Seguro que querés eliminar a ${nombre}? Esta acción no se puede deshacer.`)) return;
 
   try {
     if (tipo === 'app') {
@@ -2896,7 +2896,7 @@ async function confirmarEliminar() {
 }
 
 async function eliminarEmp(id, nombre) {
-  if (!confirm(`Â¿Seguro que querÃ©s eliminar a ${nombre}?`)) return;
+  if (!confirm(`¿Seguro que querés eliminar a ${nombre}?`)) return;
   try {
     await fetch(`${API}/api/empleados/${id}`, { method: 'DELETE' });
     await actualizarTodo();
@@ -2904,16 +2904,16 @@ async function eliminarEmp(id, nombre) {
 }
 
 async function eliminarPlanilla(id, nombre) {
-  if (!confirm(`Â¿Seguro que querÃ©s eliminar a ${nombre} de la planilla?`)) return;
+  if (!confirm(`¿Seguro que querés eliminar a ${nombre} de la planilla?`)) return;
   try {
     await fetch(`${API}/api/planilla/empleados/${id}`, { method: 'DELETE' });
     await cargarPlanillaEmpleados();
   } catch(e) { alert('Error: ' + e.message); }
 }
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  BUSCADOR DE EMPLEADOS
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 
 // Roles existentes en la planilla
 function getRolesDisponibles() {
@@ -2924,7 +2924,7 @@ function getRolesDisponibles() {
 }
 
 function normalizar(s) {
-  return (s||'').toLowerCase().normalize('NFD').replace(/[Ì-Í¯]/g,'').trim();
+  return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();
 }
 
 function buscarEmpleado(q) {
@@ -2942,7 +2942,7 @@ function buscarEmpleado(q) {
   // IDs de empleados app ya mostrados via planilla
   const idsEnPlanilla = new Set(matchesPlan.filter(pe => pe.empleado_id).map(pe => pe.empleado_id));
 
-  // Empleados de la app que NO estÃ¡n en planilla y coinciden
+  // Empleados de la app que NO están en planilla y coinciden
   const matchesAppSolo = todosLosEmpleados.filter(e =>
     !idsEnPlanilla.has(e.id) &&
     !planillaEmpleados.some(pe => pe.empleado_id === e.id) &&
@@ -2958,8 +2958,8 @@ function buscarEmpleado(q) {
       : `${pe.apellido} ${pe.nombre}`;
     const initials = `${(pe.nombre||'')[0]||''}${(pe.apellido||'')[0]||''}`;
     const info = pe.empleado_id
-      ? `${pe.rol || 'â'} Â· ${pe.celular || 'Sin celular'}`
-      : `${pe.rol || 'â'} Â· Sin vincular`;
+      ? `${pe.rol || '—'} · ${pe.celular || 'Sin celular'}`
+      : `${pe.rol || '—'} · Sin vincular`;
     html += `<div class="emp-search-item" onclick="seleccionarPlanillaBusqueda(${pe.id}, '${nombre}')">
       <div class="emp-search-item-avatar">${initials}</div>
       <div>
@@ -2975,13 +2975,13 @@ function buscarEmpleado(q) {
       <div class="emp-search-item-avatar" style="background:rgba(255,100,0,0.15);color:#FF9944">${initials}</div>
       <div>
         <div class="emp-search-item-name">${e.nombre} ${e.apellido}</div>
-        <div class="emp-search-item-rol">App Â· Sin planilla</div>
+        <div class="emp-search-item-rol">App · Sin planilla</div>
       </div>
     </div>`;
   });
 
   html += `<div class="emp-search-add" onclick="abrirModalNuevoEmp('${q}')">
-    â Agregar "<strong>${q}</strong>" como nuevo empleado
+    ➕ Agregar "<strong>${q}</strong>" como nuevo empleado
   </div>`;
 
   results.innerHTML = html;
@@ -3025,13 +3025,13 @@ function buscarEnHorarios(q) {
       <div class="emp-search-item-avatar">${initials}</div>
       <div>
         <div class="emp-search-item-name">${pe.apellido} ${pe.nombre}</div>
-        <div class="emp-search-item-rol">${pe.rol || 'â'}</div>
+        <div class="emp-search-item-rol">${pe.rol || '—'}</div>
       </div>
     </div>`;
   }).join('');
 
   html += `<div class="emp-search-add" onclick="abrirModalNuevoEmpPlanilla('${q}')">
-    â Agregar "<strong>${q}</strong>" a la planilla
+    ➕ Agregar "<strong>${q}</strong>" a la planilla
   </div>`;
 
   results.innerHTML = html;
@@ -3054,9 +3054,9 @@ function filtrarTablaHorarios(q) {
   });
 }
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  MODAL NUEVO EMPLEADO
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 let nuevoEmpContext = 'planilla'; // 'planilla' o 'horarios'
 
 function abrirModalNuevoEmp(nombrePrefill) {
@@ -3085,7 +3085,7 @@ function _abrirModalNuevo(nombrePrefill) {
   // Selector de empleados de la app para vincular
   const sel = document.getElementById('new-emp-vincular');
   sel.innerHTML = '<option value="">Sin vincular por ahora</option>' +
-    todosLosEmpleados.map(e => `<option value="${e.id}">${e.nombre} ${e.apellido} Â· ${e.celular}</option>`).join('');
+    todosLosEmpleados.map(e => `<option value="${e.id}">${e.nombre} ${e.apellido} · ${e.celular}</option>`).join('');
   document.getElementById('vincular-field').style.display = todosLosEmpleados.length ? 'block' : 'none';
 
   document.getElementById('emp-search-results').classList.remove('visible');
@@ -3119,7 +3119,7 @@ async function guardarNuevoEmp() {
     });
     const d = await r.json();
 
-    // Si hay vinculaciÃ³n, buscar el ID reciÃ©n creado y vincular
+    // Si hay vinculación, buscar el ID recién creado y vincular
     if (vincularId) {
       await cargarPlanillaEmpleados(); // refresh para obtener IDs
       const pe = planillaEmpleados.find(p =>
@@ -3143,15 +3143,15 @@ async function guardarNuevoEmp() {
     if (document.getElementById('hor-search-input'))
       document.getElementById('hor-search-input').value = '';
 
-    alert(`â ${apellido} ${nombre} agregado correctamente.`);
+    alert(`✅ ${apellido} ${nombre} agregado correctamente.`);
   } catch(e) {
     alert('Error al agregar: ' + e.message);
   }
 }
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  UPDATE emp-grid to add data-emp-id
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 
 async function cargarPlanillaEmpleados() {
   try {
@@ -3179,14 +3179,14 @@ function renderTablaPlanilla() {
   // IDs ya vinculados en la planilla
   const idsVinculados = new Set(planillaEmpleados.filter(pe => pe.empleado_id).map(pe => pe.empleado_id));
 
-  // Empleados de la app que NO estÃ¡n vinculados a ningÃºn registro de planilla
+  // Empleados de la app que NO están vinculados a ningún registro de planilla
   const sinPlanilla = todosLosEmpleados.filter(e => !idsVinculados.has(e.id));
 
-  // Solo mostrar empleados que NO estÃ¡n vinculados a ningÃºn registro de planilla
+  // Solo mostrar empleados que NO están vinculados a ningún registro de planilla
   const idsYaVinculados = new Set(planillaEmpleados.filter(pe => pe.empleado_id).map(pe => pe.empleado_id));
   const opcionesEmpleados = todosLosEmpleados
     .filter(e => !idsYaVinculados.has(e.id))
-    .map(e => `<option value="${e.id}">${e.nombre} ${e.apellido} Â· ${e.celular}</option>`)
+    .map(e => `<option value="${e.id}">${e.nombre} ${e.apellido} · ${e.celular}</option>`)
     .join('');
 
   let rows = '';
@@ -3194,15 +3194,15 @@ function renderTablaPlanilla() {
   // Filas de planilla
   rows += planillaEmpleados.map(pe => {
     const vinculado = pe.empleado_id;
-    const nombre_app = vinculado ? `${pe.emp_nombre || ''} ${pe.emp_apellido || ''}`.trim() : 'â';
+    const nombre_app = vinculado ? `${pe.emp_nombre || ''} ${pe.emp_apellido || ''}`.trim() : '—';
     const estado = vinculado
-      ? '<span style="color:#4CAF50">â Vinculado</span>'
-      : '<span style="color:#FFB400">â  Sin vincular</span>';
+      ? '<span style="color:#4CAF50">✓ Vinculado</span>'
+      : '<span style="color:#FFB400">⚠ Sin vincular</span>';
 
     const accion = vinculado
       ? `<span style="font-size:12px;color:var(--text3)">${nombre_app}</span>`
       : `<select onchange="vincularManual(${pe.id}, this.value)" style="background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px">
-           <option value="">Vincular conâ¦</option>
+           <option value="">Vincular con…</option>
            ${opcionesEmpleados}
          </select>`;
 
@@ -3210,12 +3210,12 @@ function renderTablaPlanilla() {
       <td>${pe.apellido} ${pe.nombre}
         <span style="margin-left:6px">
           <button class="emp-action-btn btn-edit-emp" style="display:inline-flex;width:22px;height:22px;font-size:11px"
-            onclick="abrirEditarPlanilla(${pe.id}, '${pe.nombre}', '${pe.apellido}', '${pe.rol||''}')">âï¸</button>
+            onclick="abrirEditarPlanilla(${pe.id}, '${pe.nombre}', '${pe.apellido}', '${pe.rol||''}')">✏️</button>
           <button class="emp-action-btn btn-del-emp" style="display:inline-flex;width:22px;height:22px;font-size:11px"
-            onclick="eliminarPlanilla(${pe.id}, '${pe.apellido} ${pe.nombre}')">ðï¸</button>
+            onclick="eliminarPlanilla(${pe.id}, '${pe.apellido} ${pe.nombre}')">🗑️</button>
         </span>
       </td>
-      <td><span style="font-size:11px;color:var(--text3)">${pe.rol || 'â'}</span></td>
+      <td><span style="font-size:11px;color:var(--text3)">${pe.rol || '—'}</span></td>
       <td>${nombre_app}</td>
       <td>${estado}</td>
       <td>${accion}</td>
@@ -3225,7 +3225,7 @@ function renderTablaPlanilla() {
   // Filas de empleados de la app sin planilla
   if (sinPlanilla.length) {
     rows += `<tr><td colspan="5" style="padding:8px 16px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);background:rgba(255,100,0,0.05);border-top:1px solid var(--border)">
-      â ï¸ Registrados en la app pero no en la planilla
+      ⚠️ Registrados en la app pero no en la planilla
     </td></tr>`;
     rows += sinPlanilla.map(e => {
       const roles = getRolesDisponibles();
@@ -3235,13 +3235,13 @@ function renderTablaPlanilla() {
         <td>
           <select onchange="agregarAPlanillaConRol(${e.id}, '${e.nombre}', '${e.apellido}', this.value)"
             style="background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px">
-            <option value="">Asignar rolâ¦</option>
+            <option value="">Asignar rol…</option>
             ${opRoles}
             <option value="__nuevo__">+ Nuevo rol</option>
           </select>
         </td>
-        <td>${e.celular || 'â'}</td>
-        <td><span style="color:#FF6B00">â  Sin planilla</span></td>
+        <td>${e.celular || '—'}</td>
+        <td><span style="color:#FF6B00">⚠ Sin planilla</span></td>
         <td><button onclick="agregarAPlanilla(${e.id}, '${e.nombre}', '${e.apellido}')"
           style="background:rgba(255,107,0,0.15);color:#FF9944;border:1px solid rgba(255,107,0,0.3);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer">
           + Agregar a planilla
@@ -3251,7 +3251,7 @@ function renderTablaPlanilla() {
   }
 
   if (!rows) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Sin empleados en planilla. ImportÃ¡ la planilla Excel.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Sin empleados en planilla. Importá la planilla Excel.</td></tr>';
     return;
   }
 
@@ -3261,7 +3261,7 @@ function renderTablaPlanilla() {
 async function agregarAPlanillaConRol(empId, nombre, apellido, rol) {
   if (!rol) return;
   if (rol === '__nuevo__') {
-    const nuevoRol = prompt('IngresÃ¡ el nombre del nuevo rol:');
+    const nuevoRol = prompt('Ingresá el nombre del nuevo rol:');
     if (!nuevoRol) return;
     await _agregarAPlanillaAPI(empId, nombre, apellido, nuevoRol.trim());
   } else {
@@ -3270,7 +3270,7 @@ async function agregarAPlanillaConRol(empId, nombre, apellido, rol) {
 }
 
 async function agregarAPlanilla(empId, nombre, apellido) {
-  const rol = prompt(`Â¿CuÃ¡l es el rol de ${nombre} ${apellido}? (ej: Cocina, SalÃ³n, Limpieza)`);
+  const rol = prompt(`¿Cuál es el rol de ${nombre} ${apellido}? (ej: Cocina, Salón, Limpieza)`);
   if (rol === null) return;
   await _agregarAPlanillaAPI(empId, nombre, apellido, rol.trim());
 }
@@ -3281,7 +3281,7 @@ async function _agregarAPlanillaAPI(empId, nombre, apellido, rol) {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ empleados: [{ nombre, apellido, rol }] })
     });
-    // Vincular automÃ¡ticamente
+    // Vincular automáticamente
     await cargarPlanillaEmpleados();
     const pe = planillaEmpleados.find(p =>
       normalizar(p.nombre) === normalizar(nombre) &&
@@ -3308,9 +3308,9 @@ async function vincularManual(planillaEmpId, empleadoId) {
   } catch(e) { alert('Error al vincular: ' + e.message); }
 }
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  EXPORTAR EXCEL
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 function exportarExcel() {
   const wb = XLSX.utils.book_new();
 
@@ -3329,7 +3329,7 @@ function exportarExcel() {
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(h1data), 'Fichajes');
 
   // Hoja 2: Resumen por empleado
-  const h2data = [['Empleado','DÃ­as trabajados','Horas totales','Llegadas tarde','Ausencias (vs planilla)']];
+  const h2data = [['Empleado','Días trabajados','Horas totales','Llegadas tarde','Ausencias (vs planilla)']];
   todosLosEmpleados.forEach(e => {
     const ff = todosLosFichajes.filter(f => f.empleado_id === e.id);
     const fechas = new Set(ff.map(f => f.fecha_hora?.split('T')[0]));
@@ -3343,7 +3343,7 @@ function exportarExcel() {
       fechas.size,
       horasStr(totalMin),
       tard,
-      'â'
+      '—'
     ]);
   });
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(h2data), 'Resumen empleados');
@@ -3351,9 +3351,9 @@ function exportarExcel() {
   XLSX.writeFile(wb, `Bar_Ideal_Fichajes_${hoy.toISOString().split('T')[0]}.xlsx`);
 }
 
-// ââââââââââââââââââââââââââââââââââ
-//  KPIs GENERALES DE NÃMINA
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
+//  KPIs GENERALES DE NÓMINA
+// ══════════════════════════════════
 
 let _nominaData = {};   // cache de resultados para popup
 
@@ -3378,9 +3378,9 @@ function calcularKpisNomina() {
   if (!vinculados.length) return;
 
   // Acumuladores globales
-  let totalPresencias = 0;     // (empleado, dÃ­a) con entrada registrada
-  let totalAusentes = 0;       // (empleado, dÃ­a) con horario pero sin entrada
-  let totalProgramados = 0;    // (empleado, dÃ­a) con horario esperado (no franco/nt)
+  let totalPresencias = 0;     // (empleado, día) con entrada registrada
+  let totalAusentes = 0;       // (empleado, día) con horario pero sin entrada
+  let totalProgramados = 0;    // (empleado, día) con horario esperado (no franco/nt)
   let totalTardanzas = 0;
   let sumaDiffTardes = 0;
   let totalPuntuales = 0;
@@ -3393,7 +3393,7 @@ function calcularKpisNomina() {
   const detallePuntuales  = [];
   const detalleHoras      = [];
 
-  // Fichajes en rango, agrupados por empleado_id â fecha
+  // Fichajes en rango, agrupados por empleado_id → fecha
   const fichajesRango = todosLosFichajes.filter(f =>
     f.fecha_hora && new Date(f.fecha_hora) >= inicio && new Date(f.fecha_hora) <= hoy
   );
@@ -3443,9 +3443,9 @@ function calcularKpisNomina() {
         totalAusentes++;
         ausentesEmp++;
         if (!detalleAusentes.find(d => d.id === pe.id)) {
-          detalleAusentes.push({ nombre: nombreDisplay, detalle: `${ausentesEmp} dÃ­a(s) sin fichar`, id: pe.id, count: 0 });
+          detalleAusentes.push({ nombre: nombreDisplay, detalle: `${ausentesEmp} día(s) sin fichar`, id: pe.id, count: 0 });
         }
-        detalleAusentes.filter(d => d.id === pe.id).forEach(d => { d.count++; d.detalle = `${d.count} dÃ­a(s) sin fichar`; });
+        detalleAusentes.filter(d => d.id === pe.id).forEach(d => { d.count++; d.detalle = `${d.count} día(s) sin fichar`; });
       } else {
         // Presente
         totalPresencias++;
@@ -3460,7 +3460,7 @@ function calcularKpisNomina() {
           if (diff > TOLERANCIA_MINUTOS) {
             totalTardanzas++;
             sumaDiffTardes += diff;
-            detalleTardanzas.push({ nombre: nombreDisplay, detalle: `${fmtFecha(fecha + 'T12:00')} Â· +${diff}m tarde`, diff });
+            detalleTardanzas.push({ nombre: nombreDisplay, detalle: `${fmtFecha(fecha + 'T12:00')} · +${diff}m tarde`, diff });
           } else {
             totalPuntuales++;
             // solo contar, no listar cada instancia individual
@@ -3471,7 +3471,7 @@ function calcularKpisNomina() {
           detallePresentes.push({ nombre: nombreDisplay, detalle: '', id: pe.id, count: 0, minDia: 0 });
         }
         const dp = detallePresentes.find(d => d.id === pe.id);
-        if (dp) { dp.count++; dp.minDia += minDia; dp.detalle = `${dp.count} dÃ­a(s) Â· ${horasStr(dp.minDia)}`; }
+        if (dp) { dp.count++; dp.minDia += minDia; dp.detalle = `${dp.count} día(s) · ${horasStr(dp.minDia)}`; }
       }
     });
 
@@ -3482,7 +3482,7 @@ function calcularKpisNomina() {
       const balance = minTrabEmp - minProgEmp;
       detalleHoras.push({
         nombre: nombreDisplay,
-        detalle: `${horasStr(minTrabEmp)} trabajadas Â· ${horasStr(minProgEmp)} prog Â· ${balance >= 0 ? '+' : ''}${horasStr(Math.abs(balance))} balance`,
+        detalle: `${horasStr(minTrabEmp)} trabajadas · ${horasStr(minProgEmp)} prog · ${balance >= 0 ? '+' : ''}${horasStr(Math.abs(balance))} balance`,
         balance
       });
     }
@@ -3520,10 +3520,10 @@ function calcularKpisNomina() {
   // Guardar para popup
   _nominaData = { detallePresentes, detalleAusentes, detalleTardanzas, detallePuntuales, detalleHoras };
 
-  // Actualizar label de perÃ­odo
-  const periodoLabel = { hoy: 'hoy', semana: 'Ãºltimos 7 dÃ­as', mes: 'este mes', todo: 'historial' }[periodo] || '';
+  // Actualizar label de período
+  const periodoLabel = { hoy: 'hoy', semana: 'últimos 7 días', mes: 'este mes', todo: 'historial' }[periodo] || '';
   const labelEl = document.getElementById('nomina-kpis-wrap')?.querySelector('.nomina-kpi-title');
-  if (labelEl) labelEl.textContent = `ð Toda la nÃ³mina â ${periodoLabel}`;
+  if (labelEl) labelEl.textContent = `📊 Toda la nómina — ${periodoLabel}`;
 
   // Tasa de presencia
   const pct = totalProgramados > 0 ? Math.round((totalPresencias / totalProgramados) * 100) : 0;
@@ -3564,11 +3564,11 @@ function calcularKpisNomina() {
 
 function abrirPopupNomina(tipo) {
   const titulos = {
-    presentes:  'â Empleados presentes',
-    ausentes:   'â Ausentes en el perÃ­odo',
-    tardanzas:  'â° Tardanzas',
-    puntuales:  'â Puntuales',
-    horas:      'â±ï¸ Horas por empleado',
+    presentes:  '✅ Empleados presentes',
+    ausentes:   '⛔ Ausentes en el período',
+    tardanzas:  '⏰ Tardanzas',
+    puntuales:  '✅ Puntuales',
+    horas:      '⏱️ Horas por empleado',
   };
   document.getElementById('popup-alerta-title').textContent = titulos[tipo] || tipo;
 
@@ -3584,7 +3584,7 @@ function abrirPopupNomina(tipo) {
   const body = document.getElementById('popup-alerta-body');
 
   if (!datos.length) {
-    body.innerHTML = '<div class="popup-alerta-empty">Sin registros para mostrar en este perÃ­odo</div>';
+    body.innerHTML = '<div class="popup-alerta-empty">Sin registros para mostrar en este período</div>';
   } else {
     const badgeColor = {
       presentes: 'rgba(76,175,80,0.15);color:var(--success)',
@@ -3599,7 +3599,7 @@ function abrirPopupNomina(tipo) {
       if (tipo === 'tardanzas') {
         badge = `<span class="popup-alerta-badge" style="background:rgba(255,152,0,0.15);color:var(--warning)">+${d.diff}m</span>`;
       } else if (tipo === 'ausentes') {
-        badge = `<span class="popup-alerta-badge" style="background:rgba(229,57,53,0.15);color:var(--danger)">${d.count || 'â'} dÃ­a(s)</span>`;
+        badge = `<span class="popup-alerta-badge" style="background:rgba(229,57,53,0.15);color:var(--danger)">${d.count || '–'} día(s)</span>`;
       } else if (tipo === 'horas') {
         const bc = d.balance >= 0 ? 'rgba(76,175,80,0.15);color:#4CAF50' : 'rgba(229,57,53,0.15);color:#EF5350';
         badge = `<span class="popup-alerta-badge" style="background:${bc}">${d.balance >= 0 ? '+' : ''}${horasStr(Math.abs(d.balance))}</span>`;
@@ -3617,9 +3617,9 @@ function abrirPopupNomina(tipo) {
   document.getElementById('popup-alerta').classList.add('show');
 }
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  ARRANQUE
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 (async function init() {
   // Cargar empleados de la app PRIMERO para que el dropdown de vincular funcione
   await cargarEmpleados();
@@ -3638,9 +3638,9 @@ function abrirPopupNomina(tipo) {
 // Cargar horarios desde la API al arrancar
 // cargarHorariosAPI reemplazado por cargarHorarios()
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  DRAWER FICHA EMPLEADO
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 let drawerEmpId = null;
 
 function abrirDrawerEmp(empId) {
@@ -3656,9 +3656,9 @@ function abrirDrawerEmp(empId) {
   const entradaHoy = fichajeHoyEmp.find(f => f.tipo === 'entrada');
   const salidaHoy = fichajeHoyEmp.find(f => f.tipo === 'salida');
   let estadoHoyStr = '';
-  if (entradaHoy && !salidaHoy) estadoHoyStr = ' Â· ð¢ Dentro desde ' + fmt(entradaHoy.fecha_hora);
-  else if (entradaHoy && salidaHoy) estadoHoyStr = ' Â· SaliÃ³ ' + fmt(salidaHoy.fecha_hora);
-  document.getElementById('drawer-emp-sub').textContent = rolStr + (emp.celular ? ' Â· ' + emp.celular : '') + estadoHoyStr;
+  if (entradaHoy && !salidaHoy) estadoHoyStr = ' · 🟢 Dentro desde ' + fmt(entradaHoy.fecha_hora);
+  else if (entradaHoy && salidaHoy) estadoHoyStr = ' · Salió ' + fmt(salidaHoy.fecha_hora);
+  document.getElementById('drawer-emp-sub').textContent = rolStr + (emp.celular ? ' · ' + emp.celular : '') + estadoHoyStr;
   actualizarDrawer();
   verificarTurnoAbierto(empId);
   document.getElementById('drawer-emp').classList.add('open');
@@ -3711,7 +3711,7 @@ async function forzarCierreTurno() {
       alert('Error al cerrar turno');
     }
   } catch(e) {
-    alert('Error de conexiÃ³n');
+    alert('Error de conexión');
   }
 
   if (btn) { btn.disabled = false; btn.textContent = 'Cerrar turno ahora'; }
@@ -3738,7 +3738,7 @@ function actualizarDrawer() {
     fin = new Date(hoy.getFullYear(), hoy.getMonth(), 0, 23, 59, 59);
   }
 
-  // Fichajes del perÃ­odo para este empleado
+  // Fichajes del período para este empleado
   const fichajes = todosLosFichajes.filter(f =>
     f.empleado_id === drawerEmpId &&
     new Date(f.fecha_hora) >= inicio &&
@@ -3808,7 +3808,7 @@ function actualizarDrawer() {
 
   const balance = minTrabajados - minAsignados;
   document.getElementById('drawer-hs-trabajadas').textContent = horasStr(minTrabajados);
-  document.getElementById('drawer-hs-asignadas').textContent = minAsignados > 0 ? horasStr(minAsignados) : 'â';
+  document.getElementById('drawer-hs-asignadas').textContent = minAsignados > 0 ? horasStr(minAsignados) : '—';
   document.getElementById('drawer-balance').textContent = balance === 0 ? '0h' : (balance > 0 ? '+' : '') + horasStr(Math.abs(balance));
   document.getElementById('drawer-balance').className = 'drawer-stat-val ' + (balance > 0 ? 'verde' : balance < 0 ? 'rojo' : '');
   document.getElementById('drawer-balance-sub').textContent = balance > 0 ? 'empresa debe' : balance < 0 ? 'empleado debe' : 'exacto';
@@ -3816,20 +3816,20 @@ function actualizarDrawer() {
 
   const lista = document.getElementById('drawer-tardanzas-list');
   if (!tardanzas.length) {
-    lista.innerHTML = '<div style="font-size:13px;color:var(--text3)">Sin tardanzas en el perÃ­odo</div>';
+    lista.innerHTML = '<div style="font-size:13px;color:var(--text3)">Sin tardanzas en el período</div>';
   } else {
     lista.innerHTML = tardanzas.map(t => `
       <div class="drawer-tardanza-item">
         <span>${fmtFecha(t.fecha + 'T12:00')}</span>
-        <span style="color:var(--text3)">Asignado: ${t.asignado} Â· EntrÃ³: ${t.hora}</span>
+        <span style="color:var(--text3)">Asignado: ${t.asignado} · Entró: ${t.hora}</span>
         <span style="color:var(--warning);font-weight:700">+${t.diff}m</span>
       </div>`).join('');
   }
 }
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  POPUP PUNTUALIDAD
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 function abrirPopupPunt(nombre, fecha, asignado, real, diffMin) {
   document.getElementById('popup-punt-nombre').textContent = nombre;
   document.getElementById('popup-punt-fecha').textContent = fmtFecha(fecha + 'T12:00');
@@ -3840,8 +3840,8 @@ function abrirPopupPunt(nombre, fecha, asignado, real, diffMin) {
   const estadoEl = document.getElementById('popup-punt-estado');
 
   if (!real) {
-    realEl.textContent = 'No fichÃ³';
-    diffEl.textContent = 'â';
+    realEl.textContent = 'No fichó';
+    diffEl.textContent = '—';
     estadoEl.textContent = 'Ausente';
     estadoEl.className = 'popup-punt-val rojo';
   } else {
@@ -3849,7 +3849,7 @@ function abrirPopupPunt(nombre, fecha, asignado, real, diffMin) {
     if (diffMin === null || diffMin === undefined || isNaN(diffMin) || asignado === '' || asignado === 'null') {
       diffEl.textContent = 'Sin horario asignado';
       diffEl.className = 'popup-punt-val';
-      estadoEl.textContent = 'FichÃ³';
+      estadoEl.textContent = 'Fichó';
       estadoEl.className = 'popup-punt-val';
     } else if (diffMin > TOLERANCIA_MINUTOS) {
       diffEl.textContent = `${diffMin} min tarde`;
@@ -3885,7 +3885,7 @@ function toggleMenuWsp(e) {
   m.style.display = isOpen ? 'none' : 'block';
   if (!isOpen) {
     setTimeout(() => document.addEventListener('click', function h(ev) {
-      // Solo cerrar si el clic fue FUERA del menÃº
+      // Solo cerrar si el clic fue FUERA del menú
       if (!document.getElementById('menu-wsp').contains(ev.target)) {
         document.getElementById('menu-wsp').style.display = 'none';
         document.removeEventListener('click', h);
@@ -3898,7 +3898,7 @@ function generarGrillaWsp() {
   document.getElementById('menu-wsp').style.display = 'none';
   const checks = document.querySelectorAll('.wsp-rol-check:checked');
   const rolesSeleccionados = Array.from(checks).map(c => c.value);
-  const diasNombres = ['Lun','Mar','MiÃ©','Jue','Vie','SÃ¡b','Dom'];
+  const diasNombres = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
   const ini = new Date(semanaActual[0] + 'T12:00');
   const fin = new Date(semanaActual[6] + 'T12:00');
   const semLabel = `Semana ${ini.getDate()}/${ini.getMonth()+1} al ${fin.getDate()}/${fin.getMonth()+1}`;
@@ -3907,7 +3907,7 @@ function generarGrillaWsp() {
   const empsFiltrados = rolesSeleccionados.length === 0
     ? planillaEmpleados
     : planillaEmpleados.filter(pe => rolesSeleccionados.includes(pe.rol));
-  const rolLabel = rolesSeleccionados.length === 0 ? 'Todos' : rolesSeleccionados.join(' Â· ');
+  const rolLabel = rolesSeleccionados.length === 0 ? 'Todos' : rolesSeleccionados.join(' · ');
   let filas = '';
   empsFiltrados.forEach(pe => {
     let celdas = '';
@@ -3931,7 +3931,7 @@ function generarGrillaWsp() {
 
   const html = `
     <div style="font-family:Arial,sans-serif;background:#fff;padding:16px;border-radius:8px;color:#111">
-      <div style="font-size:15px;font-weight:800;margin-bottom:12px;text-align:center">ðŸ º BAR IDEAL â€” ${semLabel} Â· ${rolLabel}</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:12px;text-align:center">ðŸ º BAR IDEAL â€” ${semLabel} · ${rolLabel}</div>
       <table style="width:100%;border-collapse:collapse;font-size:12px;border:1px solid #ccc">
         <thead>
           <tr style="background:#1A1A2E;color:#fff">
@@ -4057,7 +4057,7 @@ function expandirFilaAlerta(el, tipo, idx) {
     const inicioMes = new Date(); inicioMes.setDate(1); inicioMes.setHours(0,0,0,0);
     const fichajesMes = todosLosFichajes.filter(f => f.empleado_id === d.empId && new Date(f.fecha_hora) >= inicioMes);
     const diasConFichaje = new Set(fichajesMes.map(f => f.fecha_hora.split('T')[0])).size;
-    // DÃ­as programados del mes
+    // Días programados del mes
     let diasProg = 0;
     if (pe) {
       Object.entries(horariosSemana[pe.id] || {}).forEach(([f, hh]) => {
@@ -4066,14 +4066,14 @@ function expandirFilaAlerta(el, tipo, idx) {
       });
     }
     html = `<div class="popup-exp-grid">
-      <div class="popup-exp-item"><div class="popup-exp-label">Turno de hoy</div><div class="popup-exp-val">${entRef !== 'â' ? entRef.substring(0,5) + ' â ' + salRef.substring(0,5) : 'Sin horario asignado'}</div></div>
-      <div class="popup-exp-item"><div class="popup-exp-label">DÃ­as trabajados este mes</div><div class="popup-exp-val">${diasConFichaje} de ${diasProg}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Turno de hoy</div><div class="popup-exp-val">${entRef !== '—' ? entRef.substring(0,5) + ' – ' + salRef.substring(0,5) : 'Sin horario asignado'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Días trabajados este mes</div><div class="popup-exp-val">${diasConFichaje} de ${diasProg}</div></div>
     </div>
-    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa â</button>`;
+    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>`;
 
   } else if (tipo === 'tardes') {
     const entrada = d.entrada;
-    const hs = entrada ? fmt(entrada.fecha_hora) : 'â';
+    const hs = entrada ? fmt(entrada.fecha_hora) : '—';
     // Historial tardanzas del mes
     const inicioMes = new Date(); inicioMes.setDate(1); inicioMes.setHours(0,0,0,0);
     const pe = planillaEmpleados.find(p => p.empleado_id === d.empId);
@@ -4095,12 +4095,12 @@ function expandirFilaAlerta(el, tipo, idx) {
       <div class="popup-exp-item"><div class="popup-exp-label">Minutos tarde hoy</div><div class="popup-exp-val" style="color:var(--warning)">+${d.diff} min</div></div>
       <div class="popup-exp-item"><div class="popup-exp-label">Tardanzas este mes</div><div class="popup-exp-val">${tardMes}</div></div>
     </div>
-    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver historial completo â</button>`;
+    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver historial completo →</button>`;
 
   } else if (tipo === 'puntuales') {
     const entrada = d.entrada;
-    const hs = entrada ? fmt(entrada.fecha_hora) : 'â';
-    const entRef = d.entradaRef ? d.entradaRef.substring(0,5) : 'â';
+    const hs = entrada ? fmt(entrada.fecha_hora) : '—';
+    const entRef = d.entradaRef ? d.entradaRef.substring(0,5) : '—';
     const diff = (entrada && d.entradaRef)
       ? Math.round((new Date(entrada.fecha_hora) - new Date(hoy + 'T' + d.entradaRef)) / 60000)
       : null;
@@ -4127,9 +4127,9 @@ function expandirFilaAlerta(el, tipo, idx) {
       <div class="popup-exp-item"><div class="popup-exp-label">Hora de entrada hoy</div><div class="popup-exp-val" style="color:var(--success)">${hs}</div></div>
       <div class="popup-exp-item"><div class="popup-exp-label">Horario asignado</div><div class="popup-exp-val">${entRef}</div></div>
       ${diff !== null ? `<div class="popup-exp-item"><div class="popup-exp-label">Diferencia</div><div class="popup-exp-val" style="color:${diff <= 0 ? 'var(--success)' : 'var(--text)'}">${diff <= 0 ? diff + ' min' : '+' + diff + ' min'}</div></div>` : ''}
-      <div class="popup-exp-item"><div class="popup-exp-label">Puntualidad este mes</div><div class="popup-exp-val">${totalMes > 0 ? Math.round(puntMes/totalMes*100) + '% (' + puntMes + '/' + totalMes + ')' : 'â'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Puntualidad este mes</div><div class="popup-exp-val">${totalMes > 0 ? Math.round(puntMes/totalMes*100) + '% (' + puntMes + '/' + totalMes + ')' : '—'}</div></div>
     </div>
-    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa â</button>`;
+    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>`;
 
   } else if (tipo === 'incompletos') {
     const e1 = d.entrada, e2 = d.entrada2, s1 = d.salida, s2 = d.salida2;
@@ -4137,13 +4137,13 @@ function expandirFilaAlerta(el, tipo, idx) {
     const faltaS2 = e2 && !s2;
     const hsDesde = e1 ? Math.floor((Date.now() - new Date(e1.fecha_hora).getTime()) / 3600000) : null;
     html = `<div class="popup-exp-grid">
-      <div class="popup-exp-item"><div class="popup-exp-label">Entrada 1</div><div class="popup-exp-val">${e1 ? fmt(e1.fecha_hora) : 'â'}</div></div>
-      <div class="popup-exp-item"><div class="popup-exp-label">Salida 1</div><div class="popup-exp-val" style="${faltaS1 ? 'color:var(--danger)' : ''}">${s1 ? fmt(s1.fecha_hora) : faltaS1 ? 'â ï¸ Falta' : 'â'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Entrada 1</div><div class="popup-exp-val">${e1 ? fmt(e1.fecha_hora) : '—'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Salida 1</div><div class="popup-exp-val" style="${faltaS1 ? 'color:var(--danger)' : ''}">${s1 ? fmt(s1.fecha_hora) : faltaS1 ? '⚠️ Falta' : '—'}</div></div>
       ${e2 ? `<div class="popup-exp-item"><div class="popup-exp-label">Entrada 2</div><div class="popup-exp-val">${fmt(e2.fecha_hora)}</div></div>` : ''}
-      ${e2 ? `<div class="popup-exp-item"><div class="popup-exp-label">Salida 2</div><div class="popup-exp-val" style="${faltaS2 ? 'color:var(--danger)' : ''}">${s2 ? fmt(s2.fecha_hora) : faltaS2 ? 'â ï¸ Falta' : 'â'}</div></div>` : ''}
+      ${e2 ? `<div class="popup-exp-item"><div class="popup-exp-label">Salida 2</div><div class="popup-exp-val" style="${faltaS2 ? 'color:var(--danger)' : ''}">${s2 ? fmt(s2.fecha_hora) : faltaS2 ? '⚠️ Falta' : '—'}</div></div>` : ''}
       ${hsDesde !== null ? `<div class="popup-exp-item"><div class="popup-exp-label">Tiempo sin salida registrar</div><div class="popup-exp-val" style="color:var(--warning)">${hsDesde}h</div></div>` : ''}
     </div>
-    ${d.empId ? `<button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa â</button>` : ''}`;
+    ${d.empId ? `<button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>` : ''}`;
   }
 
   expandEl.innerHTML = html;
@@ -4156,18 +4156,18 @@ function cerrarPopupAlerta() {
 }
 
 
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 //  POPUP KPI CARDS
-// ââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════
 function abrirPopupKpi(tipo) {
   const hoy = fechaHoy();
   const fichajesHoy = todosLosFichajes.filter(f => f.fecha_hora && f.fecha_hora.startsWith(hoy));
 
   const titulos = {
-    'fichajes-hoy': 'ð Fichajes de hoy',
-    'empleados':    'ð¥ Empleados registrados',
-    'dentro':       'ð¢ Dentro ahora',
-    'total':        'ð Total histÃ³rico de fichajes',
+    'fichajes-hoy': '📋 Fichajes de hoy',
+    'empleados':    '👥 Empleados registrados',
+    'dentro':       '🟢 Dentro ahora',
+    'total':        '📊 Total histórico de fichajes',
   };
 
   let datos = [];
@@ -4246,7 +4246,7 @@ function abrirPopupKpi(tipo) {
         <div class="popup-alerta-nombre">${d.nombre}</div>
         ${d.detalle ? `<div class="popup-alerta-detalle">${d.detalle}</div>` : ''}
       </div>
-      ${clickable ? '<span class="popup-expand-icon">âº</span>' : ''}
+      ${clickable ? '<span class="popup-expand-icon">›</span>' : ''}
     </div>
     <div class="popup-alerta-detalle-expand" id="expand-kpi-${tipo}-${i}" style="display:none"></div>`;
   }).join('');
@@ -4265,11 +4265,11 @@ function expandirFilaKpi(el, tipo, idx) {
 
   const isOpen = expandEl.style.display !== 'none';
   document.querySelectorAll('.popup-alerta-detalle-expand').forEach(e => { e.style.display = 'none'; });
-  document.querySelectorAll('.popup-expand-icon').forEach(e => { e.textContent = 'âº'; e.style.transform = ''; });
+  document.querySelectorAll('.popup-expand-icon').forEach(e => { e.textContent = '›'; e.style.transform = ''; });
   if (isOpen) return;
 
   const icon = el.querySelector('.popup-expand-icon');
-  if (icon) { icon.textContent = 'âº'; icon.style.transform = 'rotate(90deg)'; }
+  if (icon) { icon.textContent = '›'; icon.style.transform = 'rotate(90deg)'; }
 
   const body = document.getElementById('popup-alerta-body');
   const d = (body._kpiDatos || [])[idx];
@@ -4286,13 +4286,13 @@ function expandirFilaKpi(el, tipo, idx) {
     if (e2 && s2) minHoy += minutosEntre(e2.fecha_hora, s2.fecha_hora);
     const dentro = (e1 && !s1) || (e2 && !s2);
     html = `<div class="popup-exp-grid">
-      <div class="popup-exp-item"><div class="popup-exp-label">Entrada 1</div><div class="popup-exp-val">${e1 ? fmt(e1.fecha_hora) : 'â'}</div></div>
-      <div class="popup-exp-item"><div class="popup-exp-label">Salida 1</div><div class="popup-exp-val">${s1 ? fmt(s1.fecha_hora) : dentro ? 'ð¢ Dentro' : 'â'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Entrada 1</div><div class="popup-exp-val">${e1 ? fmt(e1.fecha_hora) : '—'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Salida 1</div><div class="popup-exp-val">${s1 ? fmt(s1.fecha_hora) : dentro ? '🟢 Dentro' : '—'}</div></div>
       ${e2 ? `<div class="popup-exp-item"><div class="popup-exp-label">Entrada 2</div><div class="popup-exp-val">${fmt(e2.fecha_hora)}</div></div>` : ''}
-      ${e2 ? `<div class="popup-exp-item"><div class="popup-exp-label">Salida 2</div><div class="popup-exp-val">${s2 ? fmt(s2.fecha_hora) : 'ð¢ Dentro'}</div></div>` : ''}
-      <div class="popup-exp-item"><div class="popup-exp-label">Horas trabajadas hoy</div><div class="popup-exp-val">${minHoy > 0 ? horasStr(minHoy) : dentro ? 'En curso' : 'â'}</div></div>
+      ${e2 ? `<div class="popup-exp-item"><div class="popup-exp-label">Salida 2</div><div class="popup-exp-val">${s2 ? fmt(s2.fecha_hora) : '🟢 Dentro'}</div></div>` : ''}
+      <div class="popup-exp-item"><div class="popup-exp-label">Horas trabajadas hoy</div><div class="popup-exp-val">${minHoy > 0 ? horasStr(minHoy) : dentro ? 'En curso' : '—'}</div></div>
     </div>
-    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa â</button>`;
+    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>`;
 
   } else if (tipo === 'empleados') {
     const emp = todosLosEmpleados.find(e => e.id === d.empId);
@@ -4301,11 +4301,11 @@ function expandirFilaKpi(el, tipo, idx) {
     const ultimoF = fichajesEmp[0];
     html = `<div class="popup-exp-grid">
       <div class="popup-exp-item"><div class="popup-exp-label">Rol</div><div class="popup-exp-val">${d.detalle}</div></div>
-      <div class="popup-exp-item"><div class="popup-exp-label">Celular</div><div class="popup-exp-val">${emp?.celular || 'â'}</div></div>
-      <div class="popup-exp-item"><div class="popup-exp-label">DÃ­as con fichaje</div><div class="popup-exp-val">${fechasUnicas.size}</div></div>
-      <div class="popup-exp-item"><div class="popup-exp-label">Ãltimo fichaje</div><div class="popup-exp-val">${ultimoF ? fmtFecha(ultimoF.fecha_hora) + ' Â· ' + fmt(ultimoF.fecha_hora) : 'â'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Celular</div><div class="popup-exp-val">${emp?.celular || '—'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Días con fichaje</div><div class="popup-exp-val">${fechasUnicas.size}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Último fichaje</div><div class="popup-exp-val">${ultimoF ? fmtFecha(ultimoF.fecha_hora) + ' · ' + fmt(ultimoF.fecha_hora) : '—'}</div></div>
     </div>
-    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa â</button>`;
+    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>`;
 
   } else if (tipo === 'dentro') {
     const e1 = d.fichajes?.entrada, e2 = d.fichajes?.entrada2;
@@ -4315,11 +4315,11 @@ function expandirFilaKpi(el, tipo, idx) {
     const horario = pe ? (horariosSemana[pe.id] || {})[hoy] : null;
     const salRef = horario ? (horario.salida1 || horario.salida) : null;
     html = `<div class="popup-exp-grid">
-      <div class="popup-exp-item"><div class="popup-exp-label">EntrÃ³ a las</div><div class="popup-exp-val" style="color:var(--success)">${entradaActiva ? fmt(entradaActiva.fecha_hora) : 'â'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Entró a las</div><div class="popup-exp-val" style="color:var(--success)">${entradaActiva ? fmt(entradaActiva.fecha_hora) : '—'}</div></div>
       <div class="popup-exp-item"><div class="popup-exp-label">Tiempo dentro</div><div class="popup-exp-val">${horasStr(minDentro)}</div></div>
       ${salRef ? `<div class="popup-exp-item"><div class="popup-exp-label">Sale a las (asignado)</div><div class="popup-exp-val">${salRef.substring(0,5)}</div></div>` : ''}
     </div>
-    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa â</button>`;
+    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>`;
 
   } else if (tipo === 'total') {
     const fichajesDia = d.fichajes || [];
@@ -4330,9 +4330,9 @@ function expandirFilaKpi(el, tipo, idx) {
     });
     const tiposLabel = { entrada:'E1', salida:'S1', entrada2:'E2', salida2:'S2' };
     const filas = Object.values(grupos).slice(0, 8).map(g =>
-      `<div class="popup-exp-item"><div class="popup-exp-label">${g.nombre}</div><div class="popup-exp-val" style="font-size:11px">${g.tipos.map(t => tiposLabel[t] || t).join(' Â· ')}</div></div>`
+      `<div class="popup-exp-item"><div class="popup-exp-label">${g.nombre}</div><div class="popup-exp-val" style="font-size:11px">${g.tipos.map(t => tiposLabel[t] || t).join(' · ')}</div></div>`
     ).join('');
-    const resto = Object.values(grupos).length > 8 ? `<div style="font-size:11px;color:var(--text3);padding:6px 0">+ ${Object.values(grupos).length - 8} mÃ¡s</div>` : '';
+    const resto = Object.values(grupos).length > 8 ? `<div style="font-size:11px;color:var(--text3);padding:6px 0">+ ${Object.values(grupos).length - 8} más</div>` : '';
     html = `<div class="popup-exp-grid">${filas}</div>${resto}`;
   }
 
@@ -4342,28 +4342,28 @@ function expandirFilaKpi(el, tipo, idx) {
 
 </script>
 
-<!-- ââ DRAWER FICHA EMPLEADO ââ -->
+<!-- ── DRAWER FICHA EMPLEADO ── -->
 <div class="drawer-overlay" id="drawer-overlay" onclick="cerrarDrawer()"></div>
 <div id="drawer-emp">
   <div class="drawer-header">
     <div class="drawer-title" id="drawer-emp-title">Ficha del empleado</div>
-    <button class="drawer-close" onclick="cerrarDrawer()">Ã</button>
+    <button class="drawer-close" onclick="cerrarDrawer()">×</button>
   </div>
   <div class="drawer-body">
     <div class="drawer-emp-info">
-      <div class="drawer-avatar" id="drawer-avatar">â</div>
+      <div class="drawer-avatar" id="drawer-avatar">—</div>
       <div>
-        <div class="drawer-emp-name" id="drawer-emp-name">â</div>
-        <div class="drawer-emp-sub" id="drawer-emp-sub">â</div>
+        <div class="drawer-emp-name" id="drawer-emp-name">—</div>
+        <div class="drawer-emp-sub" id="drawer-emp-sub">—</div>
       </div>
     </div>
     <div id="drawer-turno-abierto-wrap" style="display:none;background:rgba(229,57,53,0.1);border:1px solid rgba(229,57,53,0.3);border-radius:10px;padding:12px 16px;margin-bottom:14px">
-      <div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:6px">â ï¸ Turno abierto sin salida</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Este empleado tiene una entrada sin salida registrada. PodÃ©s cerrar el turno manualmente para que pueda volver a fichar.</div>
+      <div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:6px">⚠️ Turno abierto sin salida</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Este empleado tiene una entrada sin salida registrada. Podés cerrar el turno manualmente para que pueda volver a fichar.</div>
       <button onclick="forzarCierreTurno()" style="width:100%;padding:9px;background:var(--danger);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Cerrar turno ahora</button>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between">
-      <div class="drawer-section-title">EstadÃ­sticas</div>
+      <div class="drawer-section-title">Estadísticas</div>
       <select class="drawer-period-select" id="drawer-period" onchange="actualizarDrawer()">
         <option value="hoy">Hoy</option>
         <option value="semana">Esta semana</option>
@@ -4374,70 +4374,70 @@ function expandirFilaKpi(el, tipo, idx) {
     <div class="drawer-stat-grid">
       <div class="drawer-stat-card">
         <div class="drawer-stat-label">Horas trabajadas</div>
-        <div class="drawer-stat-val" id="drawer-hs-trabajadas">â</div>
+        <div class="drawer-stat-val" id="drawer-hs-trabajadas">—</div>
         <div class="drawer-stat-sub" id="drawer-hs-trabajadas-sub"></div>
       </div>
       <div class="drawer-stat-card">
         <div class="drawer-stat-label">Horas asignadas</div>
-        <div class="drawer-stat-val" id="drawer-hs-asignadas">â</div>
+        <div class="drawer-stat-val" id="drawer-hs-asignadas">—</div>
         <div class="drawer-stat-sub" id="drawer-hs-asignadas-sub"></div>
       </div>
       <div class="drawer-stat-card">
         <div class="drawer-stat-label">Balance</div>
-        <div class="drawer-stat-val" id="drawer-balance">â</div>
+        <div class="drawer-stat-val" id="drawer-balance">—</div>
         <div class="drawer-stat-sub" id="drawer-balance-sub"></div>
       </div>
       <div class="drawer-stat-card">
         <div class="drawer-stat-label">Tardanzas</div>
-        <div class="drawer-stat-val" id="drawer-tardanzas">â</div>
-        <div class="drawer-stat-sub">en el perÃ­odo</div>
+        <div class="drawer-stat-val" id="drawer-tardanzas">—</div>
+        <div class="drawer-stat-sub">en el período</div>
       </div>
     </div>
     <div>
       <div class="drawer-section-title">Detalle de tardanzas</div>
       <div class="drawer-tardanzas-list" id="drawer-tardanzas-list">
-        <div style="font-size:13px;color:var(--text3)">Sin tardanzas en el perÃ­odo</div>
+        <div style="font-size:13px;color:var(--text3)">Sin tardanzas en el período</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ââ POPUP PUNTUALIDAD ââ -->
+<!-- ── POPUP PUNTUALIDAD ── -->
 <div id="popup-puntualidad">
   <div class="popup-puntualidad-box">
     <div class="popup-punt-header">
       <div>
-        <div class="popup-punt-title" id="popup-punt-nombre">â</div>
-        <div class="popup-punt-sub" id="popup-punt-fecha">â</div>
+        <div class="popup-punt-title" id="popup-punt-nombre">—</div>
+        <div class="popup-punt-sub" id="popup-punt-fecha">—</div>
       </div>
-      <button class="popup-punt-close" onclick="cerrarPopupPunt()">Ã</button>
+      <button class="popup-punt-close" onclick="cerrarPopupPunt()">×</button>
     </div>
     <div class="popup-punt-row">
       <span class="popup-punt-key">Horario asignado</span>
-      <span class="popup-punt-val" id="popup-punt-asignado">â</span>
+      <span class="popup-punt-val" id="popup-punt-asignado">—</span>
     </div>
     <div class="popup-punt-row">
       <span class="popup-punt-key">Hora real de entrada</span>
-      <span class="popup-punt-val" id="popup-punt-real">â</span>
+      <span class="popup-punt-val" id="popup-punt-real">—</span>
     </div>
     <div class="popup-punt-row">
       <span class="popup-punt-key">Diferencia</span>
-      <span class="popup-punt-val" id="popup-punt-diff">â</span>
+      <span class="popup-punt-val" id="popup-punt-diff">—</span>
     </div>
     <div class="popup-punt-row">
       <span class="popup-punt-key">Estado</span>
-      <span class="popup-punt-val" id="popup-punt-estado">â</span>
+      <span class="popup-punt-val" id="popup-punt-estado">—</span>
     </div>
   </div>
 </div>
 
 
-<!-- ââ POPUP ALERTAS ââ -->
+<!-- ── POPUP ALERTAS ── -->
 <div id="popup-alerta">
   <div class="popup-alerta-box">
     <div class="popup-alerta-header">
-      <div class="popup-alerta-title" id="popup-alerta-title">â</div>
-      <button class="popup-alerta-close" onclick="cerrarPopupAlerta()">Ã</button>
+      <div class="popup-alerta-title" id="popup-alerta-title">—</div>
+      <button class="popup-alerta-close" onclick="cerrarPopupAlerta()">×</button>
     </div>
     <div class="popup-alerta-body" id="popup-alerta-body"></div>
   </div>
