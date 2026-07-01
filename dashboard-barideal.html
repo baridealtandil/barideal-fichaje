@@ -3648,6 +3648,7 @@ function abrirDrawerEmp(empId) {
   else if (entradaHoy && salidaHoy) estadoHoyStr = ' · Salió ' + fmt(salidaHoy.fecha_hora);
   document.getElementById('drawer-emp-sub').textContent = rolStr + (emp.celular ? ' · ' + emp.celular : '') + estadoHoyStr;
   actualizarDrawer();
+  verificarTurnoAbierto(empId);
   document.getElementById('drawer-emp').classList.add('open');
   document.getElementById('drawer-overlay').classList.add('show');
 }
@@ -3656,6 +3657,52 @@ function cerrarDrawer() {
   document.getElementById('drawer-emp').classList.remove('open');
   document.getElementById('drawer-overlay').classList.remove('show');
   drawerEmpId = null;
+}
+
+function verificarTurnoAbierto(empId) {
+  // Buscar en todos los fichajes si tiene turno abierto (entrada sin salida)
+  const hoy = fechaHoy();
+  const ayerD = new Date(); ayerD.setDate(ayerD.getDate() - 1);
+  const ayer = fechaLocalStr(ayerD);
+
+  const fichajesRecientes = todosLosFichajes.filter(f =>
+    f.empleado_id === empId &&
+    (f.fecha_hora.startsWith(hoy) || f.fecha_hora.startsWith(ayer))
+  );
+
+  const tipos = fichajesRecientes.map(f => f.tipo);
+  const turnoAbierto =
+    (tipos.includes('entrada') && !tipos.includes('salida')) ||
+    (tipos.includes('entrada2') && !tipos.includes('salida2'));
+
+  const wrap = document.getElementById('drawer-turno-abierto-wrap');
+  if (wrap) wrap.style.display = turnoAbierto ? 'block' : 'none';
+}
+
+async function forzarCierreTurno() {
+  if (!drawerEmpId) return;
+  const btn = document.querySelector('#drawer-turno-abierto-wrap button');
+  if (btn) { btn.disabled = true; btn.textContent = 'Cerrando...'; }
+
+  try {
+    const r = await fetch(`${API}/api/fichajes/forzar-cierre`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ empleado_id: drawerEmpId })
+    });
+    const data = await r.json();
+    if (r.ok) {
+      alert(data.mensaje || 'Turno cerrado correctamente');
+      await actualizarTodo();
+      verificarTurnoAbierto(drawerEmpId);
+    } else {
+      alert('Error al cerrar turno');
+    }
+  } catch(e) {
+    alert('Error de conexión');
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Cerrar turno ahora'; }
 }
 
 function actualizarDrawer() {
@@ -4315,6 +4362,11 @@ function expandirFilaKpi(el, tipo, idx) {
         <div class="drawer-emp-name" id="drawer-emp-name">—</div>
         <div class="drawer-emp-sub" id="drawer-emp-sub">—</div>
       </div>
+    </div>
+    <div id="drawer-turno-abierto-wrap" style="display:none;background:rgba(229,57,53,0.1);border:1px solid rgba(229,57,53,0.3);border-radius:10px;padding:12px 16px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:6px">⚠️ Turno abierto sin salida</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Este empleado tiene una entrada sin salida registrada. Podés cerrar el turno manualmente para que pueda volver a fichar.</div>
+      <button onclick="forzarCierreTurno()" style="width:100%;padding:9px;background:var(--danger);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Cerrar turno ahora</button>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div class="drawer-section-title">Estadísticas</div>

@@ -228,19 +228,18 @@ app.post("/api/fichajes", async (c) => {
   const ayerD = new Date(ahoraAR); ayerD.setDate(ayerD.getDate() - 1);
   const ayer = ayerD.toISOString().split("T")[0];
 
-  // Ver si hay turno abierto de ayer
-  const turnoAbiertoAyer = await sql`
-    SELECT id FROM fichajes
+  // Ver si hay turno abierto de ayer (entrada sin su salida correspondiente)
+  const entradasAyer = await sql`
+    SELECT tipo FROM fichajes
     WHERE empleado_id = ${empleado_id}
       AND fecha_hora::date = ${ayer}::date
-      AND tipo IN ('entrada','entrada2')
-      AND NOT EXISTS (
-        SELECT 1 FROM fichajes f2
-        WHERE f2.empleado_id = ${empleado_id}
-          AND f2.fecha_hora::date = ${ayer}::date
-          AND f2.tipo = CASE tipo WHEN 'entrada' THEN 'salida' ELSE 'salida2' END
-      )
-    LIMIT 1`;
+    ORDER BY fecha_hora ASC`;
+
+  const tiposAyer = entradasAyer.map(f => f.tipo);
+  const turnoAbiertoAyer = (
+    (tiposAyer.includes('entrada')  && !tiposAyer.includes('salida')) ||
+    (tiposAyer.includes('entrada2') && !tiposAyer.includes('salida2'))
+  ) ? [true] : [];
 
   const fechaLaboral = turnoAbiertoAyer.length > 0 ? ayer : hoy;
 
@@ -279,6 +278,56 @@ app.post("/api/fichajes", async (c) => {
     VALUES (${empleado_id}, ${tipo}, ${lat}, ${lng}, NOW())
     RETURNING *`;
   return c.json(fichaje, 201);
+});
+
+// Forzar cierre de turno abierto (desde dashboard del encargado)
+app.post("/api/fichajes/forzar-cierre", async (c) => {
+  try {
+    const { empleado_id } = await c.req.json();
+    if (!empleado_id) return c.json({ error: "empleado_id requerido" }, 400);
+
+    const ahoraAR = new Date(Date.now() - 3 * 60 * 60 * 1000);
+    const hoy = ahoraAR.toISOString().split("T")[0];
+    const ayerD = new Date(ahoraAR); ayerD.setDate(ayerD.getDate() - 1);
+    const ayer = ayerD.toISOString().split("T")[0];
+
+    // Buscar en hoy y ayer
+    const fechas = [hoy, ayer];
+    let cerrados = 0;
+
+    for (const fecha of fechas) {
+      const fichajes = await sql`
+        SELECT tipo, lat, lng FROM fichajes
+        WHERE empleado_id = ${empleado_id} AND fecha_hora::date = ${fecha}::date
+        ORDER BY fecha_hora ASC`;
+
+      const tipos = fichajes.map(f => f.tipo);
+      const lastFichaje = fichajes[fichajes.length - 1];
+      const lat = lastFichaje?.lat || 0;
+      const lng = lastFichaje?.lng || 0;
+
+      // Cerrar entrada sin salida
+      if (tipos.includes('entrada') && !tipos.includes('salida')) {
+        await sql`INSERT INTO fichajes (empleado_id, tipo, lat, lng, fecha_hora)
+          VALUES (${empleado_id}, 'salida', ${lat}, ${lng}, NOW())`;
+        cerrados++;
+      }
+      // Cerrar entrada2 sin salida2
+      if (tipos.includes('entrada2') && !tipos.includes('salida2')) {
+        await sql`INSERT INTO fichajes (empleado_id, tipo, lat, lng, fecha_hora)
+          VALUES (${empleado_id}, 'salida2', ${lat}, ${lng}, NOW())`;
+        cerrados++;
+      }
+    }
+
+    if (cerrados === 0)
+      return c.json({ ok: true, mensaje: "No había turnos abiertos" });
+
+    return c.json({ ok: true, cerrados, mensaje: `${cerrados} turno(s) cerrado(s)` });
+  } catch(e) {
+    console.error("Error forzar-cierre:", e.message);
+    return c.json({ error: e.message }, 500);
+  }
 });
 
 app.get("/api/fichajes", async (c) => {
