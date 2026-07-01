@@ -427,7 +427,7 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
     <div style="font-size:12px;color:var(--warning);margin-bottom:8px;text-align:center">Ingresá la hora real en que saliste</div>
     <input type="time" id="incompleto-hora" style="width:100%;padding:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;font-size:18px;text-align:center;outline:none;margin-bottom:10px">
     <button class="incompleto-btn" onclick="informarSalidaManual()" style="background:var(--warning);color:#000">Confirmar salida</button>
-    <button class="incompleto-btn" onclick="cerrarIncompleto()" style="background:rgba(255,255,255,0.08);margin-top:8px;font-size:13px">El encargado lo resuelve</button>
+    <button class="incompleto-btn" onclick="cerrarIncompleto()" style="background:rgba(255,255,255,0.15);margin-top:12px;font-size:14px;border:1px solid rgba(255,255,255,0.3)">El encargado lo resuelve</button>
   </div>
 </div>
 
@@ -582,6 +582,7 @@ function verificarFichajeIncompletoOverlay() {
     if (!entradaAbierta) return;
 
     const hs = Math.floor((Date.now() - new Date(entradaAbierta.fecha_hora).getTime()) / 3600000);
+    if (hs < 10) return;
     const fechaEntrada = new Date(entradaAbierta.fecha_hora).toLocaleDateString('es-AR', {
       weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Argentina/Buenos_Aires'
     });
@@ -723,7 +724,7 @@ async function fichar() {
   // Verificar fichaje sospechoso: menos de 1 hora desde el último fichaje de cualquier tipo
   if (fichajesHoy.length > 0) {
     const ultimo = fichajesHoy[fichajesHoy.length - 1];
-    const minDesdeUltimo = (Date.now() - new Date(ultimo.fecha_hora).getTime()) / 60000;
+    const minDesdeUltimo = Math.abs((Date.now() - new Date(ultimo.fecha_hora).getTime()) / 60000);
     if (minDesdeUltimo < 60) {
       _posConfirmada = pos;
       _esSospechoso = true;
@@ -731,7 +732,9 @@ async function fichar() {
       btn.disabled = false;
       const seg = Math.round(minDesdeUltimo * 60);
       const min = Math.round(minDesdeUltimo);
-      const tiempoStr = minDesdeUltimo < 1 ? `${seg} segundo${seg !== 1 ? 's' : ''}` : `${min} minuto${min !== 1 ? 's' : ''}`;
+      const hrs = Math.floor(minDesdeUltimo / 60);
+      const minsRest = Math.round(minDesdeUltimo % 60);
+      const tiempoStr = minDesdeUltimo < 1 ? `${seg} segundo${seg !== 1 ? 's' : ''}` : minDesdeUltimo < 60 ? `${min} minuto${min !== 1 ? 's' : ''}` : hrs === 1 ? `1 hora y ${minsRest} minuto${minsRest !== 1 ? 's' : ''}` : `${hrs} horas y ${minsRest} minuto${minsRest !== 1 ? 's' : ''}`;
       document.getElementById('sospechoso-msg').textContent = `Pasaron solo ${tiempoStr} desde tu último fichaje. ¿Estás seguro?`;
       document.getElementById('overlay-sospechoso').classList.add('show');
       return;
