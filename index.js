@@ -319,7 +319,7 @@ app.post("/api/fichajes/cierre-manual", async (c) => {
       VALUES (${empleado_id}, ${tipo}, ${lat || 0}, ${lng || 0}, ${fecha_hora}, TRUE)
       RETURNING *`;
 
-    console.log(\`✏️ Cierre manual: empleado \${empleado_id} — \${tipo} — \${fecha_hora}\`);
+    console.log(`✏️ Cierre manual: empleado ${empleado_id} — ${tipo} — ${fecha_hora}`);
     return c.json(fichaje, 201);
   } catch(e) {
     console.error("Error cierre-manual:", e.message);
