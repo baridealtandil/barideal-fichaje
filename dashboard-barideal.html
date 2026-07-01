@@ -3913,8 +3913,8 @@ function generarGrillaWsp() {
     let celdas = '';
     semanaActual.forEach(fecha => {
       const h = (horariosSemana[pe.id] || {})[fecha];
-      const tdStyle = 'padding:5px 4px;border-right:1px solid #ccc;border-bottom:1px solid #ccc;text-align:center';
-      if (!h) { celdas += `<td style="${tdStyle};color:#aaa">â€”</td>`; return; }
+      const tdStyle = 'padding:5px 4px;border-right:1px solid #ccc;border-bottom:1px solid #ccc;text-align:center;white-space:nowrap';
+      if (!h) { celdas += `<td style="${tdStyle};color:#aaa">—</td>`; return; }
       if (h.estado === 'franco') { celdas += `<td style="${tdStyle};color:#4472C4;font-weight:700">FRANCO</td>`; return; }
       if (h.estado === 'ausente') { celdas += `<td style="${tdStyle};color:#E53935;font-weight:700">AUSENTE</td>`; return; }
       if (h.estado === 'nt') { celdas += `<td style="${tdStyle};color:#888;font-weight:700">NT</td>`; return; }
@@ -3922,8 +3922,8 @@ function generarGrillaWsp() {
       const s = (h.salida1 || h.salida || '').substring(0,5);
       const e2 = h.entrada2 ? h.entrada2.substring(0,5) : '';
       const s2 = h.salida2 ? h.salida2.substring(0,5) : '';
-      const t1 = `${e}${s ? 'â€“'+s : ''}`;
-      const t2 = e2 ? `${e2}${s2 ? 'â€“'+s2 : ''}` : '';
+      const t1 = `${e}${s ? '–'+s : ''}`;
+      const t2 = e2 ? `${e2}${s2 ? '–'+s2 : ''}` : '';
       celdas += `<td style="${tdStyle}">${t1}${t2 ? '<br>'+t2 : ''}</td>`;
     });
     filas += `<tr><td style="text-align:left;font-weight:600;padding:5px 8px;border-right:1px solid #ccc;border-bottom:1px solid #ccc">${pe.apellido} ${pe.nombre}</td><td style="color:#888;padding:5px 8px;border-right:1px solid #ccc;border-bottom:1px solid #ccc">${pe.rol||''}</td>${celdas}</tr>`;
@@ -3931,7 +3931,7 @@ function generarGrillaWsp() {
 
   const html = `
     <div style="font-family:Arial,sans-serif;background:#fff;padding:16px;border-radius:8px;color:#111">
-      <div style="font-size:15px;font-weight:800;margin-bottom:12px;text-align:center">ðŸ º BAR IDEAL â€” ${semLabel} · ${rolLabel}</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:12px;text-align:center">ðŸ º BAR IDEAL — ${semLabel} · ${rolLabel}</div>
       <table style="width:100%;border-collapse:collapse;font-size:12px;border:1px solid #ccc">
         <thead>
           <tr style="background:#1A1A2E;color:#fff">
@@ -3956,7 +3956,7 @@ function generarGrillaWsp() {
   preview.style.display = 'block';
   preview.innerHTML = html + `
     <div style="padding:12px 16px;display:flex;gap:10px;align-items:center">
-      <span style="font-size:12px;color:var(--text3)">CopiÃ¡ esta imagen con âŒ˜+Shift+4 (Mac) o la herramienta de captura</span>
+      <span style="font-size:12px;color:var(--text3)">Copiá esta imagen con ⌘+Shift+4 (Mac) o la herramienta de captura</span>
       <button onclick="document.getElementById('preview-grilla-wsp').style.display='none'"
         style="padding:6px 12px;background:transparent;border:1px solid var(--border);color:var(--text3);border-radius:6px;cursor:pointer;font-size:12px">Cerrar</button>
     </div>`;
@@ -3972,11 +3972,11 @@ let _alertaData = { ausentes: [], tardes: [], puntuales: [], incompletos: [], 't
 
 function abrirPopupAlerta(tipo) {
   const titulos = {
-    ausentes:       'â›” Ausentes hoy',
+    ausentes:       '⛔ Ausentes hoy',
     tardes:         'â ° Llegadas tarde hoy',
-    puntuales:      'âœ… Puntuales',
+    puntuales:      '✅ Puntuales',
     incompletos:    'âš ï¸  Fichajes incompletos',
-    'turno-largo':  'ðŸ”” Turnos con +10h sin salida',
+    'turno-largo':  '🔔 Turnos con +10h sin salida',
     'dudosos':      'ðŸ”  Fichajes dudosos (menos de 60 min)',
   };
   document.getElementById('popup-alerta-title').textContent = titulos[tipo] || tipo;
@@ -4017,7 +4017,7 @@ function abrirPopupAlerta(tipo) {
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         ${badge}
-        ${d.empId ? '<span class="popup-expand-icon">â€º</span>' : ''}
+        ${d.empId ? '<span class="popup-expand-icon">›</span>' : ''}
       </div>
     </div>
     <div class="popup-alerta-detalle-expand" id="expand-${tipo}-${i}" style="display:none"></div>`;
@@ -4035,7 +4035,7 @@ function expandirFilaAlerta(el, tipo, idx) {
 
   // Cerrar todos los otros
   document.querySelectorAll('.popup-alerta-detalle-expand').forEach(e => { e.style.display = 'none'; });
-  document.querySelectorAll('.popup-expand-icon').forEach(e => { e.textContent = 'â€º'; e.style.transform = ''; });
+  document.querySelectorAll('.popup-expand-icon').forEach(e => { e.textContent = '›'; e.style.transform = ''; });
 
   if (isOpen) return; // toggle off
 
@@ -4043,7 +4043,7 @@ function expandirFilaAlerta(el, tipo, idx) {
   if (!d) return;
 
   const icon = el.querySelector('.popup-expand-icon');
-  if (icon) { icon.textContent = 'â€º'; icon.style.transform = 'rotate(90deg)'; }
+  if (icon) { icon.textContent = '›'; icon.style.transform = 'rotate(90deg)'; }
 
   let html = '';
   const hoy = fechaHoy();
@@ -4051,8 +4051,8 @@ function expandirFilaAlerta(el, tipo, idx) {
   if (tipo === 'ausentes') {
     const pe = planillaEmpleados.find(p => p.empleado_id === d.empId);
     const h = d.horario || {};
-    const entRef = h.entrada1 || h.entrada || 'â€”';
-    const salRef = h.salida1  || h.salida  || 'â€”';
+    const entRef = h.entrada1 || h.entrada || '—';
+    const salRef = h.salida1  || h.salida  || '—';
     // Historial de ausencias del mes
     const inicioMes = new Date(); inicioMes.setDate(1); inicioMes.setHours(0,0,0,0);
     const fichajesMes = todosLosFichajes.filter(f => f.empleado_id === d.empId && new Date(f.fecha_hora) >= inicioMes);
