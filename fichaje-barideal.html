@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="ideal"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ideal · Fichaje</title>
+<title>ideal Â· Fichaje</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -299,7 +299,7 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 </head>
 <body>
 
-<!-- ── ONBOARDING ── -->
+<!-- ââ ONBOARDING ââ -->
 <div id="screen-onboarding" class="screen active">
   <div class="brand">
     <div class="brand-wordmark">
@@ -308,14 +308,14 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
   </div>
   <div class="onboarding-card">
     <h2>Bienvenido/a</h2>
-    <p>Registrá tus datos una sola vez para empezar a fichar.</p>
+    <p>RegistrÃ¡ tus datos una sola vez para empezar a fichar.</p>
     <div class="form-group">
       <label>Nombre</label>
-      <input type="text" id="input-nombre" placeholder="Ej: María" autocomplete="given-name">
+      <input type="text" id="input-nombre" placeholder="Ej: MarÃ­a" autocomplete="given-name">
     </div>
     <div class="form-group">
       <label>Apellido</label>
-      <input type="text" id="input-apellido" placeholder="Ej: González" autocomplete="family-name">
+      <input type="text" id="input-apellido" placeholder="Ej: GonzÃ¡lez" autocomplete="family-name">
     </div>
     <div class="form-group">
       <label>Celular</label>
@@ -326,7 +326,7 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
   </div>
 </div>
 
-<!-- ── MATCHING ── -->
+<!-- ââ MATCHING ââ -->
 <div id="screen-matching" class="screen">
   <div class="brand">
     <div class="brand-wordmark">
@@ -334,30 +334,30 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
     </div>
   </div>
   <div class="onboarding-card">
-    <h2>¿Sos vos?</h2>
-    <p>Encontramos tu nombre en la planilla. Confirmá para vincular tu cuenta.</p>
+    <h2>Â¿Sos vos?</h2>
+    <p>Encontramos tu nombre en la planilla. ConfirmÃ¡ para vincular tu cuenta.</p>
     <div id="matching-opciones" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px"></div>
     <button class="btn-primary" onclick="matchNoSoyYo()" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:var(--off);margin-top:4px">No soy ninguno de estos</button>
   </div>
 </div>
 
-<!-- ── APP ── -->
+<!-- ââ APP ââ -->
 <div id="screen-app" class="screen">
   <div class="app-header">
     <div class="header-user">
-      <div class="nombre" id="header-nombre">—</div>
-      <div class="id-tag" id="header-id">ID —</div>
+      <div class="nombre" id="header-nombre">â</div>
+      <div class="id-tag" id="header-id">ID â</div>
     </div>
   </div>
   <div class="app-body">
     <div class="clock-display">
       <div class="time" id="clock">--:--</div>
-      <div class="date" id="clock-date">—</div>
+      <div class="date" id="clock-date">â</div>
     </div>
 
     <div class="turno-info" id="turno-info">
       <div class="turno-label">Turno programado</div>
-      <div class="turno-hora" id="turno-hora">Cargando…</div>
+      <div class="turno-hora" id="turno-hora">Cargandoâ¦</div>
       <div class="turno-sub" id="turno-sub">Verificando planilla</div>
     </div>
 
@@ -376,34 +376,34 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 
     <div class="geo-status">
       <div class="geo-dot" id="geo-dot"></div>
-      <span id="geo-text">Obteniendo ubicación…</span>
+      <span id="geo-text">Obteniendo ubicaciÃ³nâ¦</span>
     </div>
 
     <div class="historial">
       <div class="historial-title">Fichajes de hoy</div>
       <div class="historial-list" id="historial-list">
-        <div style="font-size:12px;color:var(--dim);text-align:center;padding:14px">Cargando…</div>
+        <div style="font-size:12px;color:var(--dim);text-align:center;padding:14px">Cargandoâ¦</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ── OVERLAY ÉXITO ── -->
+<!-- ââ OVERLAY ÃXITO ââ -->
 <div id="overlay-success">
   <div class="success-logo">
     <img src="/logo-ideal.png" alt="ideal" style="width:180px;height:auto;filter:invert(1)"/>
   </div>
-  <div class="success-ring" id="success-ring">✓</div>
+  <div class="success-ring" id="success-ring">â</div>
   <div class="success-tipo" id="success-tipo">Entrada</div>
   <div class="success-hora" id="success-hora">--:--</div>
   <div class="success-msg" id="success-msg">Fichaje registrado</div>
-  <div class="success-id" id="success-id">ID #—</div>
+  <div class="success-id" id="success-id">ID #â</div>
 </div>
 
 <div id="overlay-sospechoso">
-  <div class="sospechoso-icon">⚠️</div>
+  <div class="sospechoso-icon">â ï¸</div>
   <div class="sospechoso-title">Fichaje sospechoso</div>
-  <div class="sospechoso-sub" id="sospechoso-msg">Pasó menos de 1 hora desde tu último fichaje.</div>
+  <div class="sospechoso-sub" id="sospechoso-msg">PasÃ³ menos de 1 hora desde tu Ãºltimo fichaje.</div>
   <div class="sospechoso-btns">
     <button class="sospechoso-btn-cancel" onclick="cancelarSospechoso()">Cancelar</button>
     <button class="sospechoso-btn-ok" onclick="confirmarSospechoso()">Confirmar de todas formas</button>
@@ -411,8 +411,8 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 </div>
 
 <div id="overlay-confirm">
-  <div class="confirm-icon">⚠️</div>
-  <div class="confirm-title">¿Estás seguro?</div>
+  <div class="confirm-icon">â ï¸</div>
+  <div class="confirm-title">Â¿EstÃ¡s seguro?</div>
   <div class="confirm-btns">
     <button class="confirm-btn-cancel" onclick="cancelarSalida()">Cancelar mi salida</button>
     <button class="confirm-btn-ok" onclick="confirmarSalida()">Confirmar mi salida</button>
@@ -420,11 +420,11 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 </div>
 
 <div id="overlay-incompleto">
-  <div class="incompleto-icon">⚠️</div>
+  <div class="incompleto-icon">â ï¸</div>
   <div class="incompleto-title">Turno sin cerrar</div>
-  <div class="incompleto-sub" id="incompleto-msg">Tenés una entrada sin salida registrada.</div>
+  <div class="incompleto-sub" id="incompleto-msg">TenÃ©s una entrada sin salida registrada.</div>
   <div id="incompleto-form" style="width:100%;max-width:300px;margin-top:8px">
-    <div style="font-size:12px;color:var(--warning);margin-bottom:8px;text-align:center">Ingresá la hora real en que saliste</div>
+    <div style="font-size:12px;color:var(--warning);margin-bottom:8px;text-align:center">IngresÃ¡ la hora real en que saliste</div>
     <input type="time" id="incompleto-hora" style="width:100%;padding:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;font-size:18px;text-align:center;outline:none;margin-bottom:10px">
     <button class="incompleto-btn" onclick="informarSalidaManual()" style="background:var(--warning);color:#000">Confirmar salida</button>
     <button class="incompleto-btn" onclick="cerrarIncompleto()" style="background:rgba(255,255,255,0.15);margin-top:12px;font-size:14px;border:1px solid rgba(255,255,255,0.3)">El encargado lo resuelve</button>
@@ -435,7 +435,6 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 
 <script>
 const API = 'https://magnificent-determination-production-1d42.up.railway.app';
-
 const BAR_LAT = -37.327500;
 const BAR_LNG = -59.135833;
 const RADIO_METROS = 40;
@@ -445,161 +444,190 @@ let geoOk = false, geoLat = null, geoLng = null;
 let fichajesHoy = [];
 let proximoTipo = 'entrada';
 
+// ─── HAVERSINE ───────────────────────────────────────────────────────────────
 function haversine(lat1, lng1, lat2, lng2) {
-  const R = 6371000, d2r = Math.PI / 180;
-  const dLat = (lat2 - lat1) * d2r, dLng = (lng2 - lng1) * d2r;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*d2r)*Math.cos(lat2*d2r)*Math.sin(dLng/2)**2;
+  const R = 6371000;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLng = (lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-function fmt(dt) { return new Date(dt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Argentina/Buenos_Aires' }); }
-
-function toast(msg, dur = 3500) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), dur);
+// ─── FORMATEAR HORA ──────────────────────────────────────────────────────────
+function fmt(dt) {
+  return new Date(dt).toLocaleTimeString('es-AR', {
+    hour: '2-digit', minute: '2-digit', hour12: false,
+    timeZone: 'America/Argentina/Buenos_Aires'
+  });
 }
 
+// ─── FORMATEAR DURACIÓN (minutos o h+min, NUNCA segundos, NUNCA negativo) ────
+function fmtDuracion(minutos) {
+  const m = Math.max(0, Math.round(minutos));
+  if (m < 60) return m + ' min';
+  const h = Math.floor(m / 60);
+  const rem = m % 60;
+  return rem > 0 ? h + 'h ' + rem + 'min' : h + 'h';
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function toast(msg, dur) {
+  dur = dur || 3500;
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, dur);
+}
+
+// ─── RELOJ ───────────────────────────────────────────────────────────────────
 function tickReloj() {
-  const n = new Date();
-  document.getElementById('clock').textContent = n.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-  document.getElementById('clock-date').textContent = n.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  const elT = document.getElementById('clock-time');
+  if (elT) elT.textContent = h+':'+m+':'+s;
+  const dias = ['Domingo','Lunes','Martes','Mi\u00e9rcoles','Jueves','Viernes','S\u00e1bado'];
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const elD = document.getElementById('clock-date');
+  if (elD) elD.textContent = dias[now.getDay()]+', '+now.getDate()+' de '+meses[now.getMonth()]+' de '+now.getFullYear();
 }
 setInterval(tickReloj, 1000); tickReloj();
 
+// ─── GEO ─────────────────────────────────────────────────────────────────────
 function iniciarGeo() {
-  if (!navigator.geolocation) {
-    document.getElementById('geo-text').textContent = 'GPS no disponible';
-    document.getElementById('geo-dot').className = 'geo-dot error'; return;
-  }
+  if (!navigator.geolocation) { geoOk = false; actualizarBoton(); return; }
   navigator.geolocation.watchPosition(onGeoOk, onGeoError, {
     enableHighAccuracy: true, maximumAge: 5000, timeout: 15000
   });
 }
 
 function onGeoOk(pos) {
-  geoLat = pos.coords.latitude; geoLng = pos.coords.longitude;
+  geoLat = pos.coords.latitude;
+  geoLng = pos.coords.longitude;
   const dist = haversine(geoLat, geoLng, BAR_LAT, BAR_LNG);
-  const metros = Math.round(dist);
   geoOk = dist <= RADIO_METROS;
-  const dot = document.getElementById('geo-dot'), txt = document.getElementById('geo-text');
-  if (geoOk) { dot.className = 'geo-dot ok'; txt.textContent = `Dentro del local (${metros}m)`; }
-  else { dot.className = 'geo-dot warning'; txt.textContent = `Fuera del local — ${metros}m`; }
+  const pill = document.getElementById('geo-pill');
+  if (pill) {
+    const dot = geoOk ? '<span class="geo-dot ok"></span>' : '<span class="geo-dot bad"></span>';
+    pill.className = 'geo-pill ' + (geoOk ? 'ok' : 'bad');
+    pill.innerHTML = dot + (geoOk ? 'Dentro del local ('+Math.round(dist)+'m)' : 'Fuera del local ('+Math.round(dist)+'m)');
+  }
   actualizarBoton();
 }
 
 function onGeoError() {
-  document.getElementById('geo-dot').className = 'geo-dot error';
-  document.getElementById('geo-text').textContent = 'Error al obtener ubicación'; geoOk = false;
+  geoOk = false;
+  const pill = document.getElementById('geo-pill');
+  if (pill) pill.innerHTML = '<span class="geo-dot bad"></span>Sin ubicaci\u00f3n';
+  actualizarBoton();
 }
 
-// ── DÍA LABORAL ACTIVO ──
-// Un turno pertenece al día en que empezó, aunque la salida sea al día siguiente.
-// Devuelve la fecha YYYY-MM-DD del turno activo (el de la última entrada sin salida),
-// o la fecha local de hoy si no hay turno abierto.
-let _fechaLaboralActiva = null;
-
+// ─── FECHA LOCAL YYYY-MM-DD ───────────────────────────────────────────────────
 function fechaLocal() {
   const d = new Date();
-  return d.getFullYear() + '-' +
-    String(d.getMonth()+1).padStart(2,'0') + '-' +
-    String(d.getDate()).padStart(2,'0');
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 
+// ─── RESOLVER FECHA LABORAL ───────────────────────────────────────────────────
+// Un turno pertenece al d\u00eda en que empez\u00f3.
+// Si hay entrada sin salida de ayer -> seguimos en ese d\u00eda laboral.
 async function resolverFechaLaboral() {
-  // Traer fichajes de hoy y ayer para detectar turno abierto
-  const hoy  = fechaLocal();
-  const ayer = (() => { const d = new Date(); d.setDate(d.getDate()-1);
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
-
+  const hoy = fechaLocal();
+  const ayerDate = new Date(); ayerDate.setDate(ayerDate.getDate()-1);
+  const ayer = ayerDate.getFullYear()+'-'+String(ayerDate.getMonth()+1).padStart(2,'0')+'-'+String(ayerDate.getDate()).padStart(2,'0');
   try {
     const [rH, rA] = await Promise.all([
-      fetch(`${API}/api/fichajes?empleado_id=${empleado.id}&fecha=${hoy}`),
-      fetch(`${API}/api/fichajes?empleado_id=${empleado.id}&fecha=${ayer}`)
+      fetch(API+'/api/fichajes?emp_id='+empleado.id+'&fecha='+hoy).then(function(r){return r.json();}),
+      fetch(API+'/api/fichajes?emp_id='+empleado.id+'&fecha='+ayer).then(function(r){return r.json();})
     ]);
-    const fHoy  = rH.ok  ? await rH.json()  : [];
-    const fAyer = rA.ok  ? await rA.json()  : [];
-
-    // Verificar si hay turno abierto de ayer (entrada sin salida)
-    const entradaAyer  = fAyer.find(f => f.tipo === 'entrada');
-    const salidaAyer   = fAyer.find(f => f.tipo === 'salida');
-    const entrada2Ayer = fAyer.find(f => f.tipo === 'entrada2');
-    const salida2Ayer  = fAyer.find(f => f.tipo === 'salida2');
-
-    const turnoAbiertoDeAyer =
-      (entradaAyer  && !salidaAyer)  ||
-      (entrada2Ayer && !salida2Ayer);
-
-    if (turnoAbiertoDeAyer) {
-      _fechaLaboralActiva = ayer;
-      return { fecha: ayer, fichajesActivos: fAyer };
-    }
-
-    _fechaLaboralActiva = hoy;
+    const fHoy = Array.isArray(rH) ? rH : [];
+    const fAyer = Array.isArray(rA) ? rA : [];
+    const tiposAyer = fAyer.map(function(f){return f.tipo;});
+    const turnoAbiertoAyer =
+      (tiposAyer.includes('entrada') && !tiposAyer.includes('salida')) ||
+      (tiposAyer.includes('entrada2') && !tiposAyer.includes('salida2'));
+    if (turnoAbiertoAyer) return { fecha: ayer, fichajesActivos: fAyer };
     return { fecha: hoy, fichajesActivos: fHoy };
-  } catch {
-    _fechaLaboralActiva = hoy;
+  } catch(e) {
     return { fecha: hoy, fichajesActivos: [] };
   }
 }
 
+// ─── CARGAR TURNO (planilla) ──────────────────────────────────────────────────
 async function cargarTurno() {
-  const { fecha } = await resolverFechaLaboral();
   try {
-    const r = await fetch(`${API}/api/horarios?empleado_id=${empleado.id}&fecha=${fecha}`);
-    const data = r.ok ? await r.json() : null;
-    const th = document.getElementById('turno-hora'), ts = document.getElementById('turno-sub');
-    if (data && (data.entrada1 || data.entrada)) {
-      const e1 = (data.entrada1||data.entrada).substring(0,5);
-      const s1 = (data.salida1||data.salida||'?').substring(0,5);
-      let txt = `${e1} — ${s1}`, sub = 'Turno simple';
-      if (data.entrada2) {
-        txt += ` / ${data.entrada2.substring(0,5)} — ${(data.salida2||'?').substring(0,5)}`;
-        sub = 'Doble turno';
-      }
-      th.textContent = txt; ts.textContent = sub;
-    } else { th.textContent = 'Sin turno asignado'; ts.textContent = 'Podés fichar igual'; }
-  } catch { document.getElementById('turno-hora').textContent = 'Sin datos'; }
+    const r = await fetch(API+'/api/horarios?fecha='+fechaLocal());
+    if (!r.ok) return;
+    const data = await r.json();
+    const e1 = data && (data.entrada1 || data.entrada);
+    if (e1) {
+      const s1 = data.salida1 || data.salida || '';
+      let txt = e1 + (s1 ? ' \u2013 ' + s1 : '');
+      if (data.entrada2) txt += ' / ' + data.entrada2 + (data.salida2 ? ' \u2013 ' + data.salida2 : '');
+      const el = document.getElementById('turno-value');
+      if (el) el.textContent = txt;
+    }
+  } catch(e) { /* sin turno */ }
 }
 
+// ─── CARGAR HISTORIAL ────────────────────────────────────────────────────────
 async function cargarHistorial() {
-  const { fecha, fichajesActivos } = await resolverFechaLaboral();
-  fichajesHoy = fichajesActivos;
-  renderHistorial(); actualizarBoton();
+  const res = await resolverFechaLaboral();
+  fichajesHoy = res.fichajesActivos;
+  renderHistorial();
+  actualizarBoton();
   verificarFichajeIncompletoOverlay();
 }
 
+// ─── OVERLAY TURNO SIN CERRAR ────────────────────────────────────────────────
+let _entradaAbiertaRef = null;
+
 function verificarFichajeIncompletoOverlay() {
   try {
-    const detectar = (tipoEntrada, tipoSalida) => {
-      const entrada = fichajesHoy.find(f => f.tipo === tipoEntrada);
-      const salida  = fichajesHoy.find(f => f.tipo === tipoSalida);
-      if (!entrada || salida) return null;
-      return entrada;
-    };
+    const tienes = function(tipo) { return fichajesHoy.some(function(f){return f.tipo===tipo;}); };
 
-    const entradaAbierta = detectar('entrada', 'salida') || detectar('entrada2', 'salida2');
+    var entradaAbierta = null;
+    // Secuencia: entrada -> salida -> entrada2 -> salida2
+    // Buscar la entrada m\u00e1s reciente sin su salida correspondiente
+    if (tienes('entrada2') && !tienes('salida2')) {
+      entradaAbierta = fichajesHoy.find(function(f){return f.tipo==='entrada2';});
+    } else if (tienes('entrada') && !tienes('salida')) {
+      entradaAbierta = fichajesHoy.find(function(f){return f.tipo==='entrada';});
+    }
+
     if (!entradaAbierta) return;
 
-    const hs = Math.floor((Date.now() - new Date(entradaAbierta.fecha_hora).getTime()) / 3600000);
+    const ahora = Date.now();
+    const msEntrada = new Date(entradaAbierta.fecha_hora).getTime();
+    const hs = (ahora - msEntrada) / 3600000;
+
+    // Solo mostrar si pasaron m\u00e1s de 10 horas
     if (hs < 10) return;
-    const fechaEntrada = new Date(entradaAbierta.fecha_hora).toLocaleDateString('es-AR', {
-      weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Argentina/Buenos_Aires'
-    });
+
+    _entradaAbiertaRef = entradaAbierta;
+
     const horaEntrada = fmt(entradaAbierta.fecha_hora);
+    const fechaEntrada = new Date(entradaAbierta.fecha_hora).toLocaleDateString('es-AR', {
+      weekday: 'long', day: 'numeric', month: 'long',
+      timeZone: 'America/Argentina/Buenos_Aires'
+    });
+    const hsRed = Math.floor(hs);
 
     document.getElementById('incompleto-msg').textContent =
-      `Entraste el ${fechaEntrada} a las ${horaEntrada} y no hay salida registrada (hace ${hs}h).`;
+      'Entraste el '+fechaEntrada+' a las '+horaEntrada+' y no hay salida registrada (hace '+hsRed+'h).';
 
-    // Pre-completar con hora actual como sugerencia
-    const ahora = new Date();
-    const hh = String(ahora.getHours()).padStart(2,'0');
-    const mm = String(ahora.getMinutes()).padStart(2,'0');
-    const input = document.getElementById('incompleto-hora');
-    if (input) input.value = `${hh}:${mm}`;
-
-    // Guardar referencia al fichaje abierto para el envío
-    window._entradaAbiertaParaCierre = entradaAbierta;
+    // Pre-completar con hora actual solo si el input est\u00e1 vac\u00edo
+    const horaInput = document.getElementById('incompleto-hora');
+    if (horaInput && !horaInput.value) {
+      const now = new Date();
+      // Hora Argentina (UTC-3)
+      const localMs = now.getTime() - 3*3600000;
+      const localDate = new Date(localMs);
+      const lh = String(localDate.getUTCHours()).padStart(2,'0');
+      const lm = String(localDate.getUTCMinutes()).padStart(2,'0');
+      horaInput.value = lh+':'+lm;
+    }
 
     document.getElementById('overlay-incompleto').classList.add('show');
   } catch(e) { console.warn('verificarFichajeIncompletoOverlay:', e); }
@@ -610,31 +638,35 @@ function cerrarIncompleto() {
 }
 
 async function informarSalidaManual() {
-  const horaInput = document.getElementById('incompleto-hora').value;
-  if (!horaInput) { toast('Ingresá la hora de salida'); return; }
+  const horaInput = document.getElementById('incompleto-hora');
+  if (!horaInput || !horaInput.value) { toast('Ingres\u00e1 la hora de salida'); return; }
 
-  const entrada = window._entradaAbiertaParaCierre;
-  if (!entrada) { toast('Error: no se encontró la entrada abierta'); return; }
+  const entrada = _entradaAbiertaRef;
+  if (!entrada) { toast('Error: no se encontr\u00f3 la entrada abierta'); return; }
 
-  // Construir fecha/hora de salida: misma fecha que la entrada, hora ingresada
-  // Si la hora de salida es menor a la de entrada, es del día siguiente
-  const fechaEntrada = new Date(entrada.fecha_hora);
-  const [hh, mm] = horaInput.split(':').map(Number);
+  const partes = horaInput.value.split(':');
+  const hh = parseInt(partes[0], 10);
+  const mm = parseInt(partes[1], 10);
 
-  // Fecha base: día de la entrada en hora local AR
-  const salidaDate = new Date(fechaEntrada);
-  salidaDate.setHours(hh + 3, mm, 0, 0); // sumar UTC offset para guardar en UTC
+  // Fecha base: d\u00eda de la entrada en Argentina (UTC-3)
+  const entradaDate = new Date(entrada.fecha_hora);
+  const salidaDate = new Date(entradaDate.getTime());
+  // Calcular fecha local Argentina de la entrada
+  const entradaLocalMs = entradaDate.getTime() - 3*3600000;
+  const entradaLocal = new Date(entradaLocalMs);
+  // Setear la fecha y hora en UTC para Argentina
+  salidaDate.setUTCFullYear(entradaLocal.getUTCFullYear(), entradaLocal.getUTCMonth(), entradaLocal.getUTCDate());
+  salidaDate.setUTCHours(hh + 3, mm, 0, 0);
 
-  // Si la salida quedó antes de la entrada, sumar un día
-  if (salidaDate <= fechaEntrada) salidaDate.setDate(salidaDate.getDate() + 1);
+  // Si la salida qued\u00f3 antes o igual a la entrada, sumar un d\u00eda
+  if (salidaDate.getTime() <= entradaDate.getTime()) {
+    salidaDate.setUTCDate(salidaDate.getUTCDate() + 1);
+  }
 
-  const tipoSalida = entrada.tipo === 'entrada' ? 'salida' : 'salida2';
-
-  const btn = document.querySelector('#overlay-incompleto .incompleto-btn');
-  if (btn) btn.disabled = true;
+  const tipoSalida = entrada.tipo === 'entrada2' ? 'salida2' : 'salida';
 
   try {
-    const r = await fetch(`${API}/api/fichajes/cierre-manual`, {
+    const r = await fetch(API+'/api/fichajes/cierre-manual', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -646,112 +678,136 @@ async function informarSalidaManual() {
         manual: true
       })
     });
-
     if (r.ok) {
       cerrarIncompleto();
       toast('Salida registrada correctamente');
       await cargarHistorial();
     } else {
-      const err = await r.json().catch(() => ({}));
+      const err = await r.json().catch(function(){return {};});
       toast(err.error || 'Error al registrar la salida');
     }
-  } catch {
-    toast('Error de conexión');
+  } catch(e) {
+    toast('Error de conexi\u00f3n');
   }
-
-  if (btn) btn.disabled = false;
 }
 
+// ─── HISTORIAL ───────────────────────────────────────────────────────────────
 function renderHistorial() {
-  const lista = document.getElementById('historial-list');
-  if (!fichajesHoy.length) { lista.innerHTML = `<div style="font-size:12px;color:var(--dim);text-align:center;padding:14px">Sin fichajes hoy</div>`; return; }
-  const labels = { entrada:'E1', salida:'S1', entrada2:'E2', salida2:'S2' };
-  lista.innerHTML = fichajesHoy.map(f => `
-    <div class="historial-item">
-      <span class="hist-badge ${f.tipo}">${labels[f.tipo]||f.tipo}</span>
-      <span class="hist-hora">${fmt(f.fecha_hora)}</span>
-      <span class="hist-timelabel">${{ entrada:'Entrada 1', salida:'Salida 1', entrada2:'Entrada 2', salida2:'Salida 2' }[f.tipo]||f.tipo}</span>
-    </div>`).join('');
+  const lista = document.getElementById('historial-lista');
+  if (!lista) return;
+  if (!fichajesHoy.length) {
+    lista.innerHTML = '<div class="historial-empty">Sin fichajes hoy</div>';
+    return;
+  }
+  const etiq = {entrada:'Entrada 1',salida:'Salida 1',entrada2:'Entrada 2',salida2:'Salida 2'};
+  const badges = {entrada:'entrada',salida:'salida',entrada2:'entrada2',salida2:'salida2'};
+  lista.innerHTML = fichajesHoy.map(function(f) {
+    return '<div class="historial-item">'+
+      '<span class="hist-badge '+( badges[f.tipo]||'' )+'">\u2713</span>'+
+      '<span class="hist-hora">'+fmt(f.fecha_hora)+'</span>'+
+      '<span class="hist-timelabel">'+(etiq[f.tipo]||f.tipo)+'</span>'+
+      '</div>';
+  }).join('');
 }
 
+// ─── ACTUALIZAR BOT\u00d3N ────────────────────────────────────────────────────────
+// Secuencia \u00danica: entrada -> salida -> entrada2 -> salida2
 function actualizarBoton() {
   const btn = document.getElementById('btn-fichar');
-  const label = document.getElementById('btn-label');
+  if (!btn) return;
 
-  const tipos = fichajesHoy.map(f => f.tipo);
+  const tipos = fichajesHoy.map(function(f){return f.tipo;});
+  const tienes = function(t) { return tipos.includes(t); };
 
-  if (!tipos.includes('entrada')) proximoTipo = 'entrada';
-  else if (!tipos.includes('salida')) proximoTipo = 'salida';
-  else if (!tipos.includes('entrada2')) proximoTipo = 'entrada2';
-  else if (!tipos.includes('salida2')) proximoTipo = 'salida2';
-  else {
+  if (!tienes('entrada')) {
+    proximoTipo = 'entrada';
+  } else if (!tienes('salida')) {
+    proximoTipo = 'salida';
+  } else if (!tienes('entrada2')) {
+    proximoTipo = 'entrada2';
+  } else if (!tienes('salida2')) {
+    proximoTipo = 'salida2';
+  } else {
+    // Turno completo
     btn.disabled = true;
-    btn.className = '';
-    label.textContent = 'Jornada completa';
+    const lbl = btn.querySelector('.btn-label');
+    if (lbl) lbl.textContent = 'Turno completo';
+    btn.className = btn.className.replace(/entrada2|salida2|entrada|salida/g, '').trim();
     return;
   }
 
   const map = {
-    entrada:  { label: 'Marcar entrada',    cls: 'entrada' },
-    salida:   { label: 'Marcar salida',     cls: 'salida' },
-    entrada2: { label: 'Entrada 2° turno',  cls: 'entrada2' },
-    salida2:  { label: 'Salida 2° turno',   cls: 'salida2' },
+    entrada:  { label: 'Marcar entrada',   cls: 'entrada'  },
+    salida:   { label: 'Marcar salida',    cls: 'salida'   },
+    entrada2: { label: 'Entrada 2\u00b0 turno', cls: 'entrada2' },
+    salida2:  { label: 'Salida 2\u00b0 turno',  cls: 'salida2'  }
   };
 
-  const m = map[proximoTipo];
-  btn.className = m.cls;
-  label.textContent = m.label;
-  btn.disabled = !geoOk;
+  const cfg = map[proximoTipo];
+  btn.disabled = !geoOk || !empleado;
+  btn.className = btn.className.replace(/entrada2|salida2|entrada|salida/g, '').trim();
+  btn.classList.add(cfg.cls);
+  const lbl = btn.querySelector('.btn-label');
+  if (lbl) lbl.textContent = cfg.label;
 }
 
-// Guarda la posición GPS verificada para usarla al confirmar
+// ─── POS CONFIRMADA (para overlays) ──────────────────────────────────────────
 let _posConfirmada = null;
 
+// ─── FICHAR ───────────────────────────────────────────────────────────────────
 async function fichar() {
   if (!geoOk || !empleado) return;
-  const btn = document.getElementById('btn-fichar'), ring = document.getElementById('btn-ring');
-  btn.disabled = true; ring.classList.add('active');
+  const ring = document.getElementById('ring');
+  if (ring) ring.classList.add('active');
 
-  const pos = await new Promise((res, rej) =>
-    navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 })
-  ).catch(() => null);
+  let pos = null;
+  try {
+    pos = await new Promise(function(res, rej) {
+      navigator.geolocation.getCurrentPosition(res, rej, {
+        enableHighAccuracy: true, timeout: 8000, maximumAge: 0
+      });
+    });
+  } catch(e) { pos = null; }
 
-  if (!pos) { ring.classList.remove('active'); toast('No se pudo verificar la ubicación. Intentá de nuevo.'); actualizarBoton(); return; }
+  if (!pos) {
+    if (ring) ring.classList.remove('active');
+    toast('No se pudo verificar la ubicaci\u00f3n. Intent\u00e1 de nuevo.');
+    actualizarBoton();
+    return;
+  }
 
   const dist = haversine(pos.coords.latitude, pos.coords.longitude, BAR_LAT, BAR_LNG);
-  if (dist > RADIO_METROS) { ring.classList.remove('active'); toast(`Estás a ${Math.round(dist)}m del local. Necesitás estar a menos de ${RADIO_METROS}m.`); actualizarBoton(); return; }
+  if (dist > RADIO_METROS) {
+    if (ring) ring.classList.remove('active');
+    toast('Est\u00e1s a '+Math.round(dist)+'m del local. Necesit\u00e1s estar a menos de '+RADIO_METROS+'m.');
+    actualizarBoton();
+    return;
+  }
 
-  // Verificar fichaje sospechoso: menos de 1 hora desde el último fichaje de cualquier tipo
+  _posConfirmada = pos;
+
+  // Verificar fichaje sospechoso: menos de 60 minutos desde el \u00faltimo fichaje
   if (fichajesHoy.length > 0) {
     const ultimo = fichajesHoy[fichajesHoy.length - 1];
-    const minDesdeUltimo = Math.abs((Date.now() - new Date(ultimo.fecha_hora).getTime()) / 60000);
-    if (minDesdeUltimo < 60) {
-      _posConfirmada = pos;
-      _esSospechoso = true;
-      ring.classList.remove('active');
-      btn.disabled = false;
-      const seg = Math.round(minDesdeUltimo * 60);
-      const min = Math.round(minDesdeUltimo);
-      const hrs = Math.floor(minDesdeUltimo / 60);
-      const minsRest = Math.round(minDesdeUltimo % 60);
-      const tiempoStr = minDesdeUltimo < 1 ? `${seg} segundo${seg !== 1 ? 's' : ''}` : minDesdeUltimo < 60 ? `${min} minuto${min !== 1 ? 's' : ''}` : hrs === 1 ? `1 hora y ${minsRest} minuto${minsRest !== 1 ? 's' : ''}` : `${hrs} horas y ${minsRest} minuto${minsRest !== 1 ? 's' : ''}`;
-      document.getElementById('sospechoso-msg').textContent = `Pasaron solo ${tiempoStr} desde tu último fichaje. ¿Estás seguro?`;
+    const msDesde = Date.now() - new Date(ultimo.fecha_hora).getTime();
+    const minDesde = msDesde / 60000;
+    if (minDesde >= 0 && minDesde < 60) {
+      if (ring) ring.classList.remove('active');
+      document.getElementById('sospechoso-msg').textContent =
+        'Pasaron solo '+fmtDuracion(minDesde)+' desde tu \u00faltimo fichaje. \u00bfEst\u00e1s seguro?';
       document.getElementById('overlay-sospechoso').classList.add('show');
       return;
     }
   }
 
-  // Si es salida, verificar si pasaron menos de 8 horas desde la entrada
+  // Verificar salida temprana (menos de 8h desde la entrada)
   if (proximoTipo === 'salida' || proximoTipo === 'salida2') {
-    const tipoEntrada = proximoTipo === 'salida' ? 'entrada' : 'entrada2';
-    const ultimaEntrada = fichajesHoy.find(f => f.tipo === tipoEntrada);
-    if (ultimaEntrada) {
-      const diff = (Date.now() - new Date(ultimaEntrada.fecha_hora).getTime()) / 3600000;
-      if (diff < 8) {
-        _posConfirmada = pos;
-        _esSospechoso = false;
-        ring.classList.remove('active');
-        btn.disabled = false;
+    const tipoEntrada = proximoTipo === 'salida2' ? 'entrada2' : 'entrada';
+    const ultEnt = fichajesHoy.find(function(f){return f.tipo===tipoEntrada;});
+    if (ultEnt) {
+      const hs = (Date.now() - new Date(ultEnt.fecha_hora).getTime()) / 3600000;
+      if (hs < 8) {
+        if (ring) ring.classList.remove('active');
         document.getElementById('overlay-confirm').classList.add('show');
         return;
       }
@@ -761,8 +817,7 @@ async function fichar() {
   await registrarFichaje(pos);
 }
 
-let _esSospechoso = false;
-
+// ─── OVERLAY SOSPECHOSO ───────────────────────────────────────────────────────
 function cancelarSospechoso() {
   document.getElementById('overlay-sospechoso').classList.remove('show');
   _posConfirmada = null;
@@ -771,24 +826,20 @@ function cancelarSospechoso() {
 
 async function confirmarSospechoso() {
   document.getElementById('overlay-sospechoso').classList.remove('show');
-  // Después del sospechoso, verificar si también aplica confirmación de salida
-  if (_posConfirmada) {
-    if (proximoTipo === 'salida' || proximoTipo === 'salida2') {
-      const tipoEntrada = proximoTipo === 'salida' ? 'entrada' : 'entrada2';
-      const ultimaEntrada = fichajesHoy.find(f => f.tipo === tipoEntrada);
-      if (ultimaEntrada) {
-        const diff = (Date.now() - new Date(ultimaEntrada.fecha_hora).getTime()) / 3600000;
-        if (diff < 8) {
-          document.getElementById('overlay-confirm').classList.add('show');
-          return;
-        }
-      }
+  if (!_posConfirmada) return;
+  // Verificar si tambi\u00e9n aplica confirmaci\u00f3n de salida
+  if (proximoTipo === 'salida' || proximoTipo === 'salida2') {
+    const tipoEntrada = proximoTipo === 'salida2' ? 'entrada2' : 'entrada';
+    const ultEnt = fichajesHoy.find(function(f){return f.tipo===tipoEntrada;});
+    if (ultEnt && (Date.now() - new Date(ultEnt.fecha_hora).getTime()) / 3600000 < 8) {
+      document.getElementById('overlay-confirm').classList.add('show');
+      return;
     }
-    await registrarFichaje(_posConfirmada);
-    _posConfirmada = null;
   }
+  await registrarFichaje(_posConfirmada);
 }
 
+// ─── OVERLAY CONFIRMAR SALIDA ────────────────────────────────────────────────
 function cancelarSalida() {
   document.getElementById('overlay-confirm').classList.remove('show');
   _posConfirmada = null;
@@ -798,90 +849,94 @@ function cancelarSalida() {
 async function confirmarSalida() {
   document.getElementById('overlay-confirm').classList.remove('show');
   if (_posConfirmada) await registrarFichaje(_posConfirmada);
-  _posConfirmada = null;
 }
 
+// ─── REGISTRAR FICHAJE ────────────────────────────────────────────────────────
 async function registrarFichaje(pos) {
-  const btn = document.getElementById('btn-fichar'), ring = document.getElementById('btn-ring');
-  btn.disabled = true; ring.classList.add('active');
+  const ring = document.getElementById('ring');
+  if (ring) ring.classList.add('active');
   try {
-    const r = await fetch(`${API}/api/fichajes`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ empleado_id: empleado.id, tipo: proximoTipo, lat: pos.coords.latitude, lng: pos.coords.longitude })
+    const r = await fetch(API+'/api/fichajes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        empleado_id: empleado.id,
+        tipo: proximoTipo,
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude
+      })
     });
     if (!r.ok) {
-      const err = await r.json().catch(() => ({}));
-      ring.classList.remove('active');
-      if (err.secuencia) {
-        toast(err.error || 'Error de secuencia de fichaje');
-      } else {
-        toast('Error al registrar. Verificá tu conexión.');
-      }
+      const err = await r.json().catch(function(){return {};});
+      if (ring) ring.classList.remove('active');
+      toast(err.error || 'Error al registrar. Verific\u00e1 tu conexi\u00f3n.');
       await cargarHistorial();
       return;
     }
     const f = await r.json();
-    ring.classList.remove('active');
-    mostrarExito(f); await cargarHistorial();
-  } catch { ring.classList.remove('active'); toast('Error al registrar. Verificá tu conexión.'); actualizarBoton(); }
+    if (ring) ring.classList.remove('active');
+    mostrarExito(f);
+    await cargarHistorial();
+  } catch(e) {
+    if (ring) ring.classList.remove('active');
+    toast('Error al registrar. Verific\u00e1 tu conexi\u00f3n.');
+    actualizarBoton();
+  }
 }
 
+// ─── \u00c9XITO ────────────────────────────────────────────────────────────────────
 function mostrarExito(f) {
-  const labels = { entrada:'Entrada', salida:'Salida', entrada2:'2ª Entrada', salida2:'2ª Salida' };
-  document.getElementById('success-tipo').textContent = labels[f.tipo] || f.tipo;
-  document.getElementById('success-hora').textContent = fmt(f.fecha_hora);
-  document.getElementById('success-id').textContent = `ID #${f.id}`;
-  const ov = document.getElementById('overlay-success');
-  ov.classList.add('show'); setTimeout(() => ov.classList.remove('show'), 3200);
+  const labels = {entrada:'Entrada',salida:'Salida',entrada2:'Entrada 2\u00b0',salida2:'Salida 2\u00b0'};
+  toast('\u2713 '+(labels[f.tipo]||f.tipo)+' registrada a las '+fmt(f.fecha_hora));
 }
 
+// ─── ONBOARDING ──────────────────────────────────────────────────────────────
 let matchingPendiente = null;
 
 async function registrar() {
-  const nombre = document.getElementById('input-nombre').value.trim();
-  const apellido = document.getElementById('input-apellido').value.trim();
-  const celular = document.getElementById('input-celular').value.trim();
-  if (!nombre || !apellido || !celular) { toast('Completá todos los campos'); return; }
-  const btn = document.getElementById('btn-registrar');
-  btn.disabled = true; btn.textContent = 'Registrando…';
+  const nombre   = document.getElementById('reg-nombre') ? document.getElementById('reg-nombre').value.trim() : '';
+  const apellido = document.getElementById('reg-apellido') ? document.getElementById('reg-apellido').value.trim() : '';
+  const celular  = document.getElementById('reg-celular') ? document.getElementById('reg-celular').value.trim() : '';
+  if (!nombre || !apellido || !celular) { toast('Complet\u00e1 todos los campos'); return; }
   try {
-    const r = await fetch(`${API}/api/empleados`, {
+    const r = await fetch(API+'/api/empleados', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre, apellido, celular })
+      body: JSON.stringify({ nombre: nombre, apellido: apellido, celular: celular })
     });
-    if (!r.ok) throw new Error();
+    if (!r.ok) throw new Error('Error registrando empleado');
     const emp = await r.json();
     localStorage.setItem('barideal_empleado', JSON.stringify(emp));
+    matchingPendiente = emp;
 
-    const mr = await fetch(`${API}/api/matching/buscar`, {
+    const mr = await fetch(API+'/api/matching/buscar', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre, apellido })
+      body: JSON.stringify({ nombre: nombre, apellido: apellido })
     });
-    const { matches } = await mr.json();
-    if (matches && matches.length > 0) {
-      matchingPendiente = emp;
-      const container = document.getElementById('matching-opciones');
-      container.innerHTML = matches.map(m => `
-        <div class="match-opcion" onclick="confirmarMatch(${m.id})">
-          <div class="match-nombre">${m.apellido} ${m.nombre}</div>
-          <div class="match-rol">${m.rol || 'Sin rol asignado'}</div>
-        </div>
-      `).join('');
+    const mData = await mr.json();
+    const matches = mData.matches || [];
+    if (matches.length > 0) {
+      const container = document.getElementById('matching-lista');
+      container.innerHTML = matches.map(function(m) {
+        return '<div class="match-opcion" onclick="confirmarMatch('+m.id+')">'+
+          '<div class="match-nombre">'+m.apellido+' '+m.nombre+'</div>'+
+          '<div class="match-rol">'+(m.rol||'Sin rol asignado')+'</div>'+
+          '</div>';
+      }).join('');
       document.getElementById('screen-onboarding').classList.remove('active');
       document.getElementById('screen-matching').classList.add('active');
     } else {
       iniciarApp(emp);
     }
   } catch(e) {
-    btn.disabled = false; btn.textContent = 'Ingresar';
-    toast('Error al registrar. Verificá tu conexión.');
+    console.error(e);
+    toast('Error al registrar. Verific\u00e1 tu conexi\u00f3n.');
   }
 }
 
 async function confirmarMatch(planillaEmpId) {
   if (!matchingPendiente) return;
   try {
-    await fetch(`${API}/api/matching/confirmar`, {
+    await fetch(API+'/api/matching/confirmar', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ planilla_emp_id: planillaEmpId, empleado_id: matchingPendiente.id })
     });
@@ -898,54 +953,48 @@ function matchNoSoyYo() {
 
 function iniciarApp(emp) {
   empleado = emp;
-  document.getElementById('header-nombre').textContent = `${emp.nombre} ${emp.apellido}`;
-  document.getElementById('header-id').textContent = `ID ${emp.id}`;
+  const elNombre = document.getElementById('header-nombre');
+  const elId = document.getElementById('header-id');
+  if (elNombre) elNombre.textContent = emp.nombre+' '+emp.apellido;
+  if (elId) elId.textContent = 'ID '+emp.id;
   document.getElementById('screen-onboarding').classList.remove('active');
   document.getElementById('screen-app').classList.add('active');
-  iniciarGeo(); cargarHistorial(); cargarTurno();
+  iniciarGeo();
+  cargarHistorial();
+  cargarTurno();
   setInterval(cargarHistorial, 30000);
-  // Registrar push notifications
   iniciarPushNotifications(emp.id);
 }
 
-// ── PUSH NOTIFICATIONS ──
-const VAPID_PUBLIC_KEY = 'BBw7l6n5jktroTSq8z5xAel5qH4gK5y4n5G4KCUFmmuXQ8jNKAy5gGkn5nuIU_ecETpJo5IfUcPyEI_F96E6cHM';
-
+// ─── PUSH NOTIFICATIONS ──────────────────────────────────────────────────────
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
   const rawData = window.atob(base64);
-  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+  const outputArray = new Uint8Array(rawData.length);
+  for (var i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
 }
 
 async function iniciarPushNotifications(empId) {
   try {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-
-    // Registrar service worker y forzar activación inmediata si hay update
     const reg = await navigator.serviceWorker.register('/sw.js');
-    // Si hay un SW nuevo esperando, activarlo ya
     if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-    reg.addEventListener('updatefound', () => {
+    reg.addEventListener('updatefound', function() {
       const nuevo = reg.installing;
       if (nuevo) {
-        nuevo.addEventListener('statechange', () => {
-          if (nuevo.state === 'installed' && navigator.serviceWorker.controller) {
-            nuevo.postMessage({ type: 'SKIP_WAITING' });
-          }
+        nuevo.addEventListener('statechange', function() {
+          if (nuevo.state === 'installed') nuevo.postMessage({ type: 'SKIP_WAITING' });
         });
       }
     });
     await navigator.serviceWorker.ready;
-
-    // Pedir permiso (solo si no está dado o denegado)
-    if (Notification.permission === 'denied') return;
     const permission = Notification.permission === 'granted'
       ? 'granted'
       : await Notification.requestPermission();
     if (permission !== 'granted') return;
-
-    // Suscribir al push
+    const VAPID_PUBLIC_KEY = 'BBw7l6n5jktroTSq8z5xAel5qH4gK5y4n5G4KCUFmmuXQ8jNKAy5gGkn5nuIU_ecETpJo5IfUcPyEI_F96E6cHM';
     let sub = await reg.pushManager.getSubscription();
     if (!sub) {
       sub = await reg.pushManager.subscribe({
@@ -953,9 +1002,7 @@ async function iniciarPushNotifications(empId) {
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
       });
     }
-
-    // Guardar token en el servidor
-    await fetch(`${API}/api/push/token`, {
+    await fetch(API+'/api/push/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ empleado_id: empId, subscription: sub })
@@ -965,11 +1012,16 @@ async function iniciarPushNotifications(empId) {
   }
 }
 
+// ─── ARRANQUE ─────────────────────────────────────────────────────────────────
 (function() {
   try {
-    const emp = JSON.parse(localStorage.getItem('barideal_empleado'));
-    if (emp) iniciarApp(emp);
-  } catch {}
+    const stored = localStorage.getItem('barideal_empleado');
+    if (stored) {
+      const emp = JSON.parse(stored);
+      if (emp && emp.id) { iniciarApp(emp); return; }
+    }
+  } catch(e) {}
+  document.getElementById('screen-onboarding').classList.add('active');
 })();
 </script>
 </body>
