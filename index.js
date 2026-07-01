@@ -235,7 +235,7 @@ app.post("/api/fichajes", async (c) => {
   const entradasAyer = await sql`
     SELECT tipo FROM fichajes
     WHERE empleado_id = ${empleado_id}
-      AND fecha_hora::date = ${ayer}::date
+      AND (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${ayer}::date
     ORDER BY fecha_hora ASC`;
 
   const tiposAyer = entradasAyer.map(f => f.tipo);
@@ -249,7 +249,7 @@ app.post("/api/fichajes", async (c) => {
   // Chequear duplicado dentro del día laboral activo
   const dup = await sql`
     SELECT id FROM fichajes
-    WHERE empleado_id = ${empleado_id} AND tipo = ${tipo} AND fecha_hora::date = ${fechaLaboral}::date
+    WHERE empleado_id = ${empleado_id} AND tipo = ${tipo} AND (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fechaLaboral}::date
     LIMIT 1`;
   if (dup.length > 0)
     return c.json({ error: `Ya existe un fichaje de tipo '${tipo}' en el turno activo`, existing: dup[0] }, 409);
@@ -257,7 +257,7 @@ app.post("/api/fichajes", async (c) => {
   // Validar secuencia lógica: el tipo debe ser el correcto según los fichajes del turno activo
   const fichajesActivos = await sql`
     SELECT tipo FROM fichajes
-    WHERE empleado_id = ${empleado_id} AND fecha_hora::date = ${fechaLaboral}::date
+    WHERE empleado_id = ${empleado_id} AND (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fechaLaboral}::date
     ORDER BY fecha_hora ASC`;
 
   const tipos = fichajesActivos.map(f => f.tipo);
@@ -345,7 +345,7 @@ app.post("/api/fichajes/forzar-cierre", async (c) => {
     for (const fecha of fechas) {
       const fichajes = await sql`
         SELECT tipo, lat, lng FROM fichajes
-        WHERE empleado_id = ${empleado_id} AND fecha_hora::date = ${fecha}::date
+        WHERE empleado_id = ${empleado_id} AND (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fecha}::date
         ORDER BY fecha_hora ASC`;
 
       const tipos = fichajes.map(f => f.tipo);
@@ -385,7 +385,7 @@ app.get("/api/fichajes", async (c) => {
     const fichajes = await sql`
       SELECT f.*, e.nombre, e.apellido, e.celular
       FROM fichajes f JOIN empleados e ON f.empleado_id = e.id
-      WHERE f.empleado_id = ${emp_id} AND f.fecha_hora::date = ${fecha}::date
+      WHERE f.empleado_id = ${emp_id} AND (f.fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fecha}::date
       ORDER BY f.fecha_hora ASC`;
     return c.json(fichajes);
   }
@@ -553,17 +553,17 @@ app.get("/api/metricas/hoy", async (c) => {
       COUNT(*) FILTER (WHERE tipo = 'entrada') AS entradas,
       COUNT(*) FILTER (WHERE tipo = 'salida')  AS salidas,
       COUNT(DISTINCT empleado_id) AS empleados_hoy
-    FROM fichajes WHERE fecha_hora::date = ${hoy}::date`;
+    FROM fichajes WHERE (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${hoy}::date`;
 
   const dentro = await sql`
     SELECT DISTINCT f.empleado_id, e.nombre, e.apellido
     FROM fichajes f JOIN empleados e ON f.empleado_id = e.id
-    WHERE f.fecha_hora::date = ${hoy}::date
+    WHERE (f.fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${hoy}::date
       AND f.tipo IN ('entrada','entrada2')
       AND NOT EXISTS (
         SELECT 1 FROM fichajes f2
         WHERE f2.empleado_id = f.empleado_id
-          AND f2.fecha_hora::date = ${hoy}::date
+          AND (f2.fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${hoy}::date
           AND f2.tipo = CASE f.tipo WHEN 'entrada' THEN 'salida' ELSE 'salida2' END
           AND f2.fecha_hora > f.fecha_hora
       )`;
@@ -653,7 +653,7 @@ async function cronNotificaciones() {
     // Fichajes de hoy
     const fichajes = await sql`
       SELECT empleado_id, tipo FROM fichajes
-      WHERE fecha_hora::date = ${fechaHoy}::date`;
+      WHERE (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fechaHoy}::date`;
 
     const fichajesPorEmp = {};
     fichajes.forEach(f => {
