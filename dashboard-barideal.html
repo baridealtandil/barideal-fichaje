@@ -1828,7 +1828,7 @@ function calcularAlertasHoy(fichajesHoy) {
       const prev = sorted[i-1];
       const curr = sorted[i];
       const minDiff = (new Date(curr.fecha_hora) - new Date(prev.fecha_hora)) / 60000;
-      if (minDiff < 60) {
+      if (minDiff < 60 && !curr.autorizado && !prev.autorizado) {
         const segDiff = Math.round(minDiff * 60);
         const tiempoStr = minDiff < 1 ? `${segDiff}s` : `${Math.round(minDiff)}m`;
         if (!dudososNombres.includes(emp.nombre)) dudososNombres.push(emp.nombre);
@@ -4144,6 +4144,33 @@ function expandirFilaAlerta(el, tipo, idx) {
       ${hsDesde !== null ? `<div class="popup-exp-item"><div class="popup-exp-label">Tiempo sin salida registrar</div><div class="popup-exp-val" style="color:var(--warning)">${hsDesde}h</div></div>` : ''}
     </div>
     ${d.empId ? `<button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>` : ''}`;
+  } else if (tipo === 'turno-largo') {
+    const e = d.entrada;
+    html = `<div class="popup-exp-grid">
+      <div class="popup-exp-item"><div class="popup-exp-label">Tipo de entrada</div><div class="popup-exp-val">${e.tipo === 'entrada' ? 'Entrada 1' : 'Entrada 2'}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Hora de entrada</div><div class="popup-exp-val">${fmt(e.fecha_hora)}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Fecha de entrada</div><div class="popup-exp-val">${fmtFecha(e.fecha_hora)}</div></div>
+      <div class="popup-exp-item"><div class="popup-exp-label">Tiempo transcurrido</div><div class="popup-exp-val" style="color:var(--danger)">${d.hs} horas</div></div>
+    </div>
+    <button class="popup-exp-btn" onclick="cerrarPopupAlerta();abrirDrawerEmp(${d.empId})">Ver ficha completa →</button>`;
+  } else if (tipo === 'dudosos') {
+    const fPrev = d.fichajePrev;
+    const fCurr = d.fichajeActual;
+    const etiq = {entrada:'Entrada 1', salida:'Salida 1', entrada2:'Entrada 2', salida2:'Salida 2'};
+    html = `<div class="popup-exp-grid" style="grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px">
+      <div class="popup-exp-item" style="border-right: 1px solid rgba(255,255,255,0.1); padding-right: 8px">
+        <div class="popup-exp-label">Fichaje anterior (${etiq[fPrev.tipo]||fPrev.tipo})</div>
+        <div class="popup-exp-val">${fmtFecha(fPrev.fecha_hora)} ${fmt(fPrev.fecha_hora)}</div>
+      </div>
+      <div class="popup-exp-item">
+        <div class="popup-exp-label">Fichaje actual (${etiq[fCurr.tipo]||fCurr.tipo})</div>
+        <div class="popup-exp-val" style="color:var(--warning)">${fmtFecha(fCurr.fecha_hora)} ${fmt(fCurr.fecha_hora)}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="popup-exp-btn" onclick="autorizarFichaje(${fCurr.id})" style="background:var(--success);color:#000;flex:1;margin-top:0">Autorizar</button>
+      <button class="popup-exp-btn" onclick="eliminarFichaje(${fCurr.id})" style="background:var(--danger);color:#fff;flex:1;margin-top:0">Eliminar</button>
+    </div>`;
   }
 
   expandEl.innerHTML = html;
@@ -4153,6 +4180,42 @@ function expandirFilaAlerta(el, tipo, idx) {
 function cerrarPopupAlerta() {
   document.getElementById('popup-alerta').classList.remove('show');
   document.querySelectorAll('.popup-alerta-detalle-expand').forEach(e => { e.style.display = 'none'; });
+}
+
+async function autorizarFichaje(id) {
+  if (!confirm('¿Estás seguro de que deseas autorizar este fichaje?')) return;
+  try {
+    const r = await fetch(`${API}/api/fichajes/${id}/autorizar`, {
+      method: 'POST'
+    });
+    if (r.ok) {
+      alert('Fichaje autorizado correctamente');
+      cerrarPopupAlerta();
+      await actualizarTodo();
+    } else {
+      alert('Error al autorizar el fichaje');
+    }
+  } catch (e) {
+    alert('Error de conexión: ' + e.message);
+  }
+}
+
+async function eliminarFichaje(id) {
+  if (!confirm('¿Estás seguro de que deseas eliminar este fichaje? Esta acción no se puede deshacer.')) return;
+  try {
+    const r = await fetch(`${API}/api/fichajes/${id}`, {
+      method: 'DELETE'
+    });
+    if (r.ok) {
+      alert('Fichaje eliminado correctamente');
+      cerrarPopupAlerta();
+      await actualizarTodo();
+    } else {
+      alert('Error al eliminar el fichaje');
+    }
+  } catch (e) {
+    alert('Error de conexión: ' + e.message);
+  }
 }
 
 

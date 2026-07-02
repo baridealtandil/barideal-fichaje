@@ -78,6 +78,7 @@ async function migrate() {
 
   // Agregar columna manual a fichajes si no existe
   await sql`ALTER TABLE fichajes ADD COLUMN IF NOT EXISTS manual BOOLEAN DEFAULT FALSE`;
+  await sql`ALTER TABLE fichajes ADD COLUMN IF NOT EXISTS autorizado BOOLEAN DEFAULT FALSE`;
 
   // Tabla push tokens para notificaciones
   await sql`
@@ -773,6 +774,30 @@ app.delete("/api/planilla/empleados/:id", async (c) => {
   await sql`DELETE FROM horarios WHERE planilla_emp_id=${id}`;
   await sql`DELETE FROM planilla_empleados WHERE id=${id}`;
   return c.json({ ok: true });
+});
+
+// Eliminar fichaje individual
+app.delete("/api/fichajes/:id", async (c) => {
+  try {
+    const id = c.req.param("id");
+    await sql`DELETE FROM fichajes WHERE id=${id}`;
+    return c.json({ ok: true, mensaje: "Fichaje eliminado correctamente" });
+  } catch (e) {
+    console.error("Error delete-fichaje:", e.message);
+    return c.json({ error: e.message }, 500);
+  }
+});
+
+// Autorizar fichaje individual
+app.post("/api/fichajes/:id/autorizar", async (c) => {
+  try {
+    const id = c.req.param("id");
+    await sql`UPDATE fichajes SET autorizado=TRUE WHERE id=${id}`;
+    return c.json({ ok: true, mensaje: "Fichaje autorizado correctamente" });
+  } catch (e) {
+    console.error("Error autorizar-fichaje:", e.message);
+    return c.json({ error: e.message }, 500);
+  }
 });
 
 app.get("/", (c) => c.json({ app: "Bar Ideal API", version: "2.1", status: "ok" }));

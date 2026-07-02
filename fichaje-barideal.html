@@ -343,11 +343,12 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 
 <!-- ── APP ── -->
 <div id="screen-app" class="screen">
-  <div class="app-header">
+  <div class="app-header" style="display:flex;align-items:center;justify-content:space-between">
     <div class="header-user">
       <div class="nombre" id="header-nombre">—</div>
       <div class="id-tag" id="header-id">ID —</div>
     </div>
+    <button onclick="refreshManual(this)" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;outline:none;transition:transform 0.3s ease">↻</button>
   </div>
   <div class="app-body">
     <div class="clock-display">
@@ -425,7 +426,7 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
   <div class="incompleto-sub" id="incompleto-msg">Tenés una entrada sin salida registrada.</div>
   <div id="incompleto-form" style="width:100%;max-width:300px;margin-top:8px">
     <div style="font-size:12px;color:var(--warning);margin-bottom:8px;text-align:center">Ingresá la hora real en que saliste</div>
-    <input type="time" id="incompleto-hora" style="width:100%;padding:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;font-size:18px;text-align:center;outline:none;margin-bottom:10px">
+    <input type="time" id="incompleto-hora" style="width:100%;padding:12px;padding-left:20px;padding-right:20px;box-sizing:border-box;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;font-size:18px;text-align:left;outline:none;margin-bottom:10px">
     <button class="incompleto-btn" onclick="informarSalidaManual()" style="background:var(--warning);color:#000">Confirmar salida</button>
     <button class="incompleto-btn" onclick="cerrarIncompleto()" style="background:rgba(255,255,255,0.15);margin-top:12px;font-size:14px;border:1px solid rgba(255,255,255,0.3)">El encargado lo resuelve</button>
   </div>
@@ -602,6 +603,19 @@ async function cargarHistorial() {
   verificarFichajeIncompletoOverlay();
 }
 
+async function refreshManual(btn) {
+  if (btn) {
+    btn.style.transform = 'rotate(360deg)';
+    setTimeout(function() { btn.style.transform = ''; }, 300);
+  }
+  try {
+    await Promise.all([cargarHistorial(), cargarTurno()]);
+    toast('Datos actualizados');
+  } catch(e) {
+    toast('Error al actualizar');
+  }
+}
+
 
 // Overlay turno sin cerrar
 // Muestra si hay una entrada sin salida de MAS de 10 horas
@@ -619,7 +633,10 @@ function verificarFichajeIncompletoOverlay() {
       entradaAbierta = fichajesHoy.find(function(f){return f.tipo==='entrada';});
     }
 
-    if (!entradaAbierta) return;
+    if (!entradaAbierta) {
+      cerrarIncompleto();
+      return;
+    }
 
     const ahora = Date.now();
     const msEntrada = new Date(entradaAbierta.fecha_hora).getTime();
