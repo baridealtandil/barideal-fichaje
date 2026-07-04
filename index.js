@@ -312,8 +312,10 @@ app.post("/api/fichajes/cierre-manual", async (c) => {
         AND fecha_hora > ${entrada[0].fecha_hora}
       LIMIT 1`;
 
-    if (yaExiste.length)
-      return c.json({ error: "Ya existe una salida para este turno" }, 409);
+if (yaExiste.length) {
+const [existente] = await sql`SELECT * FROM fichajes WHERE id = ${yaExiste[0].id}`;
+return c.json(existente, 200);
+}
 
     const [fichaje] = await sql`
       INSERT INTO fichajes (empleado_id, tipo, lat, lng, fecha_hora, manual)
