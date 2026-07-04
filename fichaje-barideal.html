@@ -151,30 +151,33 @@ pointer-events: none; opacity: 0; transition: opacity 0.4s;
 }
 .radar-sweep.active { opacity: 1; }
 @keyframes radar-spin { to { transform: rotate(360deg); } }
-#btn-fichar {
-position: relative; z-index: 2;
+#btn-fichar-wrap {
+position: relative; z-index: 2; overflow: hidden;
 width: 148px; height: 148px; border-radius: 50%;
 background: var(--card); border: 1.5px solid var(--border);
-display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-cursor: pointer; transition: border-color 0.2s, transform 0.1s, background 0.2s;
+display: flex; align-items: stretch; justify-content: center;
 outline: none; -webkit-tap-highlight-color: transparent;
 }
-#btn-fichar:not(:disabled):active { transform: scale(0.94); }
-#btn-fichar:disabled { opacity: 0.35; cursor: not-allowed; }
-#btn-fichar.entrada { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.04); }
-#btn-fichar.salida { border-color: rgba(76,175,80,0.7); background: rgba(76,175,80,0.05); }
-#btn-fichar.entrada2 { border-color: rgba(66,165,245,0.7); background: rgba(66,165,245,0.05); }
-#btn-fichar.salida2 { border-color: rgba(156,39,176,0.7); background: rgba(156,39,176,0.05); }
-.btn-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--dim); margin-top: 2px; }
-#btn-fichar.entrada .btn-label { color: rgba(255,255,255,0.9); }
-#btn-fichar.salida .btn-label { color: var(--success); }
-#btn-fichar.entrada2 .btn-label { color: var(--info); }
-#btn-fichar.salida2 .btn-label { color: #CE93D8; }
-#btn-fichar.entrada .coffee-cup { stroke: rgba(255,255,255,0.9); }
-#btn-fichar.salida .coffee-cup { stroke: var(--success); }
-#btn-fichar.entrada2 .coffee-cup { stroke: var(--info); }
-#btn-fichar.salida2 .coffee-cup { stroke: #CE93D8; }
-#btn-fichar:disabled .coffee-cup { stroke: var(--dim); }
+.btn-mitad {
+flex: 1; height: 100%; display: flex; flex-direction: column;
+align-items: center; justify-content: center; gap: 4px;
+cursor: pointer; border: none; background: transparent; padding: 0;
+transition: background 0.2s, opacity 0.2s, transform 0.1s;
+outline: none; -webkit-tap-highlight-color: transparent;
+}
+.btn-mitad:not(:disabled):active { transform: scale(0.94); }
+.btn-mitad:disabled { cursor: not-allowed; opacity: 0.25; }
+#btn-entrada { border-right: 1px solid var(--border); }
+.btn-mitad.tenue { opacity: 0.35; }
+.btn-mitad.destacado { opacity: 1; }
+.btn-mitad.entrada-mitad.destacado { background: rgba(255,255,255,0.05); }
+.btn-mitad.salida-mitad.destacado { background: rgba(76,175,80,0.07); }
+.btn-mitad .btn-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-top: 2px; }
+.btn-mitad.entrada-mitad.destacado .btn-label { color: rgba(255,255,255,0.9); }
+.btn-mitad.salida-mitad.destacado .btn-label { color: var(--success); }
+.btn-mitad.entrada-mitad .coffee-cup { stroke: rgba(255,255,255,0.9); }
+.btn-mitad.salida-mitad .coffee-cup { stroke: var(--success); }
+.btn-mitad.tenue .coffee-cup { stroke: var(--dim); }
 .geo-status {
 display: flex; align-items: center; gap: 8px;
 font-size: 12px; color: var(--off);
@@ -225,6 +228,7 @@ animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 .success-tipo { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--dim); }
 .success-hora { font-size: 52px; font-weight: 100; color: var(--white); letter-spacing: -2px; }
 .success-msg { font-size: 14px; color: var(--off); }
+.success-warning { font-size: 13px; color: var(--warning); text-align: center; max-width: 280px; line-height: 1.4; margin-top: 2px; display: none; }
 .success-id { font-size: 11px; color: var(--dim); background: var(--card); padding: 5px 14px; border-radius: 7px; }
 
 #overlay-sospechoso {
@@ -369,10 +373,16 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
       <div class="radar-pulse"></div>
       <div class="radar-pulse"></div>
       <div class="radar-sweep" id="btn-ring"></div>
-      <button id="btn-fichar" class="entrada" onclick="fichar()" disabled>
-        <img src="/logo-ideal.png" alt="ideal" style="width:90px;height:auto;filter:invert(1);opacity:0.9"/>
-        <span class="btn-label" id="btn-label">Cargando</span>
-      </button>
+      <div id="btn-fichar-wrap">
+<button id="btn-entrada" class="btn-mitad entrada-mitad tenue" onclick="fichar(tipoEntradaActual)" disabled>
+<img src="/logo-ideal.png" alt="ideal" style="width:44px;height:auto;filter:invert(1);opacity:0.9"/>
+<span class="btn-label">Entrada</span>
+</button>
+<button id="btn-salida" class="btn-mitad salida-mitad tenue" onclick="fichar(tipoSalidaActual)" disabled>
+<img src="/logo-ideal.png" alt="ideal" style="width:44px;height:auto;filter:invert(1);opacity:0.9"/>
+<span class="btn-label">Salida</span>
+</button>
+</div>
     </div>
 
     <div class="geo-status">
@@ -397,6 +407,7 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
   <div class="success-ring" id="success-ring">✓</div>
   <div class="success-tipo" id="success-tipo">Entrada</div>
   <div class="success-hora" id="success-hora">--:--</div>
+  <div class="success-warning" id="success-warning"></div>
   <div class="success-msg" id="success-msg">Fichaje registrado</div>
   <div class="success-id" id="success-id">ID #—</div>
 </div>
@@ -446,6 +457,10 @@ let geoOk = false, geoLat = null, geoLng = null;
 let fichajesHoy = [];
 let fichajesDisplay = [];
 let proximoTipo = 'entrada';
+let tipoEntradaActual = 'entrada';
+let tipoSalidaActual = 'salida';
+let turnoHoyData = null;
+let secuenciaRota = false;
 
 function haversine(lat1, lng1, lat2, lng2) {
   const R = 6371000;
@@ -565,6 +580,7 @@ async function cargarTurno() {
     const r = await fetch(API+'/api/horarios?empleado_id='+empleado.id+'&fecha='+fechaLocal());
     if (!r.ok) return;
     const data = await r.json();
+    turnoHoyData = data;
     const e1 = data && (data.entrada1 || data.entrada);
     const elH = document.getElementById('turno-hora');
     const elS = document.getElementById('turno-sub');
@@ -580,6 +596,7 @@ async function cargarTurno() {
     }
   } catch(e) {
     const elS = document.getElementById('turno-sub');
+    turnoHoyData = null;
     if (elS) elS.textContent = 'Sin turno programado';
   }
 }
@@ -767,11 +784,15 @@ function renderHistorial() {
 
 // Actualizar boton - Secuencia UNICA: entrada -> salida -> entrada2 -> salida2
 function actualizarBoton() {
-  const btn = document.getElementById('btn-fichar');
-  if (!btn) return;
+  const btnEntrada = document.getElementById('btn-entrada');
+  const btnSalida = document.getElementById('btn-salida');
+  if (!btnEntrada || !btnSalida) return;
 
   const tipos = fichajesHoy.map(function(f){return f.tipo;});
   const tienes = function(t) { return tipos.includes(t); };
+
+  tipoEntradaActual = !tienes('entrada') ? 'entrada' : 'entrada2';
+  tipoSalidaActual = !tienes('salida') ? 'salida' : 'salida2';
 
   if (!tienes('entrada')) {
     proximoTipo = 'entrada';
@@ -782,30 +803,28 @@ function actualizarBoton() {
   } else if (!tienes('salida2')) {
     proximoTipo = 'salida2';
   } else {
-    btn.disabled = true;
-    btn.className = 'turno-completo';
-    const lbl = btn.querySelector('.btn-label') || document.getElementById('btn-label');
-    if (lbl) lbl.textContent = 'Turno completo';
+    proximoTipo = null;
+    btnEntrada.disabled = true;
+    btnSalida.disabled = true;
+    btnEntrada.classList.remove('destacado'); btnEntrada.classList.add('tenue');
+    btnSalida.classList.remove('destacado'); btnSalida.classList.add('tenue');
     return;
   }
 
-  const map = {
-    entrada:  { label: 'Marcar entrada',   cls: 'entrada'  },
-    salida:   { label: 'Marcar salida',    cls: 'salida'   },
-    entrada2: { label: 'Entrada 2 turno',  cls: 'entrada2' },
-    salida2:  { label: 'Salida 2 turno',   cls: 'salida2'  }
-  };
+  const familiaEntrada = (proximoTipo === 'entrada' || proximoTipo === 'entrada2');
+  btnEntrada.classList.toggle('destacado', familiaEntrada);
+  btnEntrada.classList.toggle('tenue', !familiaEntrada);
+  btnSalida.classList.toggle('destacado', !familiaEntrada);
+  btnSalida.classList.toggle('tenue', familiaEntrada);
 
-  const cfg = map[proximoTipo];
-  btn.disabled = !geoOk || !empleado;
-  btn.className = cfg.cls;
-  const lbl = btn.querySelector('.btn-label') || document.getElementById('btn-label');
-  if (lbl) lbl.textContent = cfg.label;
+  btnEntrada.disabled = !geoOk || !empleado;
+  btnSalida.disabled = !geoOk || !empleado;
 }
 
 let _posConfirmada = null;
 
-async function fichar() {
+async function fichar(tipoElegido) {
+  if (tipoElegido) proximoTipo = tipoElegido;
   if (!geoOk || !empleado) return;
   const ring = document.getElementById('btn-ring');
   if (ring) ring.classList.add('active');
@@ -931,15 +950,32 @@ async function registrarFichaje(pos) {
 }
 
 function mostrarExito(f) {
+  secuenciaRota = !!(f && f.secuencia_irregular);
   const labels = {entrada:'Entrada',salida:'Salida',entrada2:'Entrada 2',salida2:'Salida 2'};
   const overlay = document.getElementById('overlay-success');
   const tipoEl = document.getElementById('success-tipo');
   const horaEl = document.getElementById('success-hora');
+  const warnEl = document.getElementById('success-warning');
   if (tipoEl) tipoEl.textContent = labels[f.tipo] || f.tipo;
   if (horaEl) horaEl.textContent = fmt(f.fecha_hora);
+  if (warnEl) {
+    if (f && f.secuencia_irregular) {
+      const horaTurno = turnoHoyData && (turnoHoyData.entrada1 || turnoHoyData.entrada);
+      warnEl.textContent = horaTurno
+        ? '⚠️ No registraste tu entrada de hoy a las ' + horaTurno + '. Este olvido será considerado una llegada tarde. Recordá que 3 llegadas tarde significan la pérdida del presentismo.'
+        : '⚠️ No registraste tu entrada de hoy. Este olvido será considerado una llegada tarde. Recordá que 3 llegadas tarde significan la pérdida del presentismo.';
+      warnEl.style.display = 'block';
+    } else {
+      warnEl.textContent = '';
+      warnEl.style.display = 'none';
+    }
+  }
   if (overlay) {
     overlay.classList.add('show');
-    setTimeout(function() { overlay.classList.remove('show'); }, 3000);
+    setTimeout(function() {
+      overlay.classList.remove('show');
+      if (warnEl) { warnEl.textContent = ''; warnEl.style.display = 'none'; }
+    }, 3000);
   } else {
     toast('Fichaje registrado: '+(labels[f.tipo]||f.tipo)+' a las '+fmt(f.fecha_hora));
   }

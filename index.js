@@ -79,6 +79,7 @@ async function migrate() {
   // Agregar columna manual a fichajes si no existe
   await sql`ALTER TABLE fichajes ADD COLUMN IF NOT EXISTS manual BOOLEAN DEFAULT FALSE`;
   await sql`ALTER TABLE fichajes ADD COLUMN IF NOT EXISTS autorizado BOOLEAN DEFAULT FALSE`;
+await sql`ALTER TABLE fichajes ADD COLUMN IF NOT EXISTS secuencia_irregular BOOLEAN DEFAULT FALSE`;
 
   // Tabla push tokens para notificaciones
   await sql`
@@ -247,41 +248,29 @@ app.post("/api/fichajes", async (c) => {
 
   const fechaLaboral = turnoAbiertoAyer.length > 0 ? ayer : hoy;
 
-  // Chequear duplicado dentro del día laboral activo
-  const dup = await sql`
-    SELECT id FROM fichajes
-    WHERE empleado_id = ${empleado_id} AND tipo = ${tipo} AND (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fechaLaboral}::date
-    LIMIT 1`;
-  if (dup.length > 0)
-    return c.json({ error: `Ya existe un fichaje de tipo '${tipo}' en el turno activo`, existing: dup[0] }, 409);
+// Detectar si la secuencia esta rota, SIN bloquear el registro (el fichaje siempre se guarda)
+    const fichajesActivos = await sql`
+      SELECT tipo FROM fichajes
+      WHERE empleado_id = ${empleado_id} AND (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fechaLaboral}::date
+      ORDER BY fecha_hora ASC`;
 
-  // Validar secuencia lógica: el tipo debe ser el correcto según los fichajes del turno activo
-  const fichajesActivos = await sql`
-    SELECT tipo FROM fichajes
-    WHERE empleado_id = ${empleado_id} AND (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fechaLaboral}::date
-    ORDER BY fecha_hora ASC`;
+    const tipos = fichajesActivos.map(f => f.tipo);
+    const tieneEntrada = tipos.includes('entrada');
+    const tieneSalida = tipos.includes('salida');
+    const tieneEntrada2 = tipos.includes('entrada2');
+    const tieneSalida2 = tipos.includes('salida2');
 
-  const tipos = fichajesActivos.map(f => f.tipo);
-  const tieneEntrada  = tipos.includes('entrada');
-  const tieneSalida   = tipos.includes('salida');
-  const tieneEntrada2 = tipos.includes('entrada2');
-  const tieneSalida2  = tipos.includes('salida2');
-
-  // Reglas de secuencia
-  if (tipo === 'salida' && !tieneEntrada)
-    return c.json({ error: 'No podés registrar salida sin haber fichado entrada', secuencia: true }, 422);
-  if (tipo === 'entrada2' && !tieneSalida)
-    return c.json({ error: 'No podés registrar segunda entrada sin haber fichado la salida del primer turno', secuencia: true }, 422);
-  if (tipo === 'salida2' && !tieneEntrada2)
-    return c.json({ error: 'No podés registrar segunda salida sin haber fichado la segunda entrada', secuencia: true }, 422);
-  if (tipo === 'entrada' && tieneEntrada && !tieneSalida)
-    return c.json({ error: 'Ya tenés una entrada registrada sin salida. Primero fichá la salida', secuencia: true }, 422);
-
+    // Secuencia esperada: entrada -> salida -> entrada2 -> salida2
+    let secuenciaIrregular = false;
+    if (tipo === 'salida' && !tieneEntrada) secuenciaIrregular = true;
+    if (tipo === 'entrada2' && !tieneSalida) secuenciaIrregular = true;
+    if (tipo === 'salida2' && !tieneEntrada2) secuenciaIrregular = true;
+    if (tipo === 'entrada' && tieneEntrada && !tieneSalida) secuenciaIrregular = true;
   const [fichaje] = await sql`
-    INSERT INTO fichajes (empleado_id, tipo, lat, lng, fecha_hora)
-    VALUES (${empleado_id}, ${tipo}, ${lat}, ${lng}, NOW())
-    RETURNING *`;
-  return c.json(fichaje, 201);
+      INSERT INTO fichajes (empleado_id, tipo, lat, lng, fecha_hora, secuencia_irregular)
+      VALUES (${empleado_id}, ${tipo}, ${lat}, ${lng}, NOW(), ${secuenciaIrregular})
+      RETURNING *`;
+    return c.json(fichaje, 201);
 });
 
 // Cierre manual por el empleado con hora real informada
@@ -291,31 +280,44 @@ app.post("/api/fichajes/cierre-manual", async (c) => {
     if (!empleado_id || !tipo || !fecha_hora)
       return c.json({ error: "Faltan datos" }, 400);
 
-    const tiposValidos = ["salida", "salida2"];
+const tiposValidos = ["entrada", "salida", "entrada2", "salida2"];
     if (!tiposValidos.includes(tipo))
-      return c.json({ error: "tipo inválido para cierre manual" }, 400);
+      return c.json({ error: "tipo invalido para cierre manual" }, 400);
 
-    // Verificar que existe la entrada correspondiente
-    const tipoEntrada = tipo === 'salida' ? 'entrada' : 'entrada2';
-    const entrada = await sql`
-      SELECT id, fecha_hora FROM fichajes
-      WHERE empleado_id = ${empleado_id} AND tipo = ${tipoEntrada}
-      ORDER BY fecha_hora DESC LIMIT 1`;
+    if (tipo === "salida" || tipo === "salida2") {
+      // Flujo de autoservicio del empleado: verificar que existe la entrada correspondiente
+      const tipoEntrada = tipo === 'salida' ? 'entrada' : 'entrada2';
+      const entrada = await sql`
+        SELECT id, fecha_hora FROM fichajes
+        WHERE empleado_id = ${empleado_id} AND tipo = ${tipoEntrada}
+        ORDER BY fecha_hora DESC LIMIT 1`;
 
-    if (!entrada.length)
-      return c.json({ error: "No se encontró la entrada correspondiente" }, 404);
+      if (!entrada.length)
+        return c.json({ error: "No se encontro la entrada correspondiente" }, 404);
 
-    // Verificar que no haya ya una salida
-    const yaExiste = await sql`
-      SELECT id FROM fichajes
-      WHERE empleado_id = ${empleado_id} AND tipo = ${tipo}
+      // Verificar que no haya ya una salida (idempotente: si existe, la devuelve)
+      const yaExiste = await sql`
+        SELECT id FROM fichajes
+        WHERE empleado_id = ${empleado_id} AND tipo = ${tipo}
         AND fecha_hora > ${entrada[0].fecha_hora}
-      LIMIT 1`;
+        LIMIT 1`;
 
-if (yaExiste.length) {
-const [existente] = await sql`SELECT * FROM fichajes WHERE id = ${yaExiste[0].id}`;
-return c.json(existente, 200);
-}
+      if (yaExiste.length) {
+        const [existente] = await sql`SELECT * FROM fichajes WHERE id = ${yaExiste[0].id}`;
+        return c.json(existente, 200);
+      }
+    } else {
+      // Carga manual desde el dashboard del encargado (entrada/entrada2 faltante): idempotente por fecha_hora exacta
+      const yaExiste = await sql`
+        SELECT id FROM fichajes
+        WHERE empleado_id = ${empleado_id} AND tipo = ${tipo} AND fecha_hora = ${fecha_hora}
+        LIMIT 1`;
+
+      if (yaExiste.length) {
+        const [existente] = await sql`SELECT * FROM fichajes WHERE id = ${yaExiste[0].id}`;
+        return c.json(existente, 200);
+      }
+    }
 
     const [fichaje] = await sql`
       INSERT INTO fichajes (empleado_id, tipo, lat, lng, fecha_hora, manual)
