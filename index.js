@@ -81,6 +81,15 @@ async function migrate() {
   await sql`ALTER TABLE fichajes ADD COLUMN IF NOT EXISTS autorizado BOOLEAN DEFAULT FALSE`;
 await sql`ALTER TABLE fichajes ADD COLUMN IF NOT EXISTS secuencia_irregular BOOLEAN DEFAULT FALSE`;
 
+// PIN de seguridad para encargados (permite autorizar ediciones de fichajes) y trazabilidad de ediciones
+await sql`ALTER TABLE planilla_empleados ADD COLUMN IF NOT EXISTS pin TEXT`;
+await sql`ALTER TABLE empleados ADD COLUMN IF NOT EXISTS pin TEXT`;
+await sql`UPDATE planilla_empleados SET pin = '1234' WHERE LOWER(nombre) = 'almendra' AND pin IS NULL`;
+await sql`UPDATE planilla_empleados SET pin = '0000' WHERE LOWER(nombre) = 'lucas' AND pin IS NULL`;
+await sql`UPDATE empleados SET pin = '1234' WHERE LOWER(nombre) = 'almendra' AND pin IS NULL`;
+await sql`UPDATE empleados SET pin = '0000' WHERE LOWER(nombre) = 'lucas' AND pin IS NULL`;
+await sql`ALTER TABLE fichajes ADD COLUMN IF NOT EXISTS editado_por TEXT`;
+
   // Tabla push tokens para notificaciones
   await sql`
     CREATE TABLE IF NOT EXISTS push_tokens (
@@ -749,9 +758,9 @@ setTimeout(cronNotificaciones, 30000);
 // ══════════════════════════════════════════════════
 // Editar empleado de la app
 app.put("/api/empleados/:id", async (c) => {
-  const id = c.req.param("id");
-  const { nombre, apellido, celular } = await c.req.json();
-  await sql`UPDATE empleados SET nombre=${nombre}, apellido=${apellido}, celular=${celular} WHERE id=${id}`;
+    const id = c.req.param("id");
+  const { nombre, apellido, celular, pin } = await c.req.json();
+  await sql`UPDATE empleados SET nombre=${nombre}, apellido=${apellido}, celular=${celular}, pin=${pin || null} WHERE id=${id}`;
   return c.json({ ok: true });
 });
 
@@ -767,8 +776,8 @@ app.delete("/api/empleados/:id", async (c) => {
 // Editar empleado de planilla
 app.put("/api/planilla/empleados/:id", async (c) => {
   const id = c.req.param("id");
-  const { nombre, apellido, rol } = await c.req.json();
-  await sql`UPDATE planilla_empleados SET nombre=${nombre}, apellido=${apellido}, rol=${rol} WHERE id=${id}`;
+  const { nombre, apellido, rol, pin } = await c.req.json();
+  await sql`UPDATE planilla_empleados SET nombre=${nombre}, apellido=${apellido}, rol=${rol}, pin=${pin || null} WHERE id=${id}`;
   return c.json({ ok: true });
 });
 
@@ -804,6 +813,63 @@ app.post("/api/fichajes/:id/autorizar", async (c) => {
   }
 });
 
+// Editar fichaje existente (requiere PIN de un encargado para autorizar el cambio)
+app.put("/api/fichajes/:id", async (c) => {
+  try {
+    const id = c.req.param("id");
+    const { tipo, fecha_hora, pin } = await c.req.json();
+    if (!tipo || !fecha_hora || !pin)
+      return c.json({ error: "Faltan datos (tipo, fecha_hora, pin)" }, 400);
+
+    const tiposValidos = ["entrada", "salida", "entrada2", "salida2"];
+    if (!tiposValidos.includes(tipo))
+      return c.json({ error: "tipo inválido" }, 400);
+
+    // Buscar encargado (rol Encargado) que tenga ese PIN
+    const [encargado] = await sql`
+      SELECT * FROM planilla_empleados
+      WHERE rol = 'Encargado' AND pin = ${pin}
+      LIMIT 1`;
+
+    if (!encargado)
+      return c.json({ error: "PIN incorrecto" }, 403);
+
+    const [fichajeActual] = await sql`SELECT * FROM fichajes WHERE id = ${id}`;
+    if (!fichajeActual) return c.json({ error: "Fichaje no encontrado" }, 404);
+
+    // Recalcular secuencia_irregular con el nuevo tipo/fecha_hora
+    const fecha = new Date(fecha_hora).toISOString().split("T")[0];
+    const otrosFichajes = await sql`
+      SELECT tipo FROM fichajes
+      WHERE empleado_id = ${fichajeActual.empleado_id} AND id != ${id}
+      AND (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fecha}::date
+      ORDER BY fecha_hora ASC`;
+
+    const tiposDia = otrosFichajes.map(f => f.tipo);
+    const tieneEntrada = tiposDia.includes('entrada');
+    const tieneSalida = tiposDia.includes('salida');
+    const tieneEntrada2 = tiposDia.includes('entrada2');
+
+    let secuenciaIrregular = false;
+    if (tipo === 'salida' && !tieneEntrada) secuenciaIrregular = true;
+    if (tipo === 'entrada2' && !tieneSalida) secuenciaIrregular = true;
+    if (tipo === 'salida2' && !tieneEntrada2) secuenciaIrregular = true;
+
+    const [fichajeActualizado] = await sql`
+      UPDATE fichajes
+      SET tipo = ${tipo}, fecha_hora = ${fecha_hora}, manual = TRUE,
+          editado_por = ${encargado.nombre}, secuencia_irregular = ${secuenciaIrregular}
+      WHERE id = ${id}
+      RETURNING *`;
+
+    console.log(`✏️ Fichaje ${id} editado por ${encargado.nombre}`);
+    return c.json(fichajeActualizado, 200);
+  } catch (e) {
+    console.error("Error PUT /api/fichajes/:id:", e.message);
+    return c.json({ error: e.message }, 500);
+  }
+});
+  
 app.get("/", (c) => c.json({ app: "Bar Ideal API", version: "2.1", status: "ok" }));
 
 await migrate();

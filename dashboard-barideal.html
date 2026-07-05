@@ -1389,6 +1389,10 @@ canvas { max-height: 240px; }
         <label>Rol</label>
         <input class="modal-edit-input" id="edit-emp-rol" type="text"/>
       </div>
+<div class="modal-edit-field" id="edit-pin-field">
+<label>PIN de Seguridad (4 dígitos)</label>
+<input class="modal-edit-input" id="edit-emp-pin" type="text" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="1234"/>
+</div>
     </div>
     <div class="modal-edit-footer">
       <button class="modal-edit-danger" id="edit-delete-btn" onclick="confirmarEliminar()">🗑 Eliminar</button>
@@ -1396,6 +1400,44 @@ canvas { max-height: 240px; }
       <button class="modal-edit-save" onclick="guardarEdicion()">Guardar</button>
     </div>
   </div>
+</div>
+
+<!-- ── MODAL EDITAR FICHAJE ── -->
+<div class="modal-bg" id="modal-edit-fichaje">
+<div class="modal-edit-emp">
+<div class="modal-edit-header">
+<div class="modal-edit-title">Editar fichaje</div>
+<button class="modal-close-btn" onclick="cerrarEditarFichaje()">×</button>
+</div>
+<div class="modal-edit-body">
+<input type="hidden" id="edit-fichaje-id"/>
+<div class="modal-edit-field">
+<label>Tipo</label>
+<select class="modal-edit-input" id="edit-fichaje-tipo">
+<option value="entrada">Entrada 1</option>
+<option value="salida">Salida 1</option>
+<option value="entrada2">Entrada 2</option>
+<option value="salida2">Salida 2</option>
+</select>
+</div>
+<div class="modal-edit-field">
+<label>Fecha</label>
+<input class="modal-edit-input" id="edit-fichaje-fecha" type="date"/>
+</div>
+<div class="modal-edit-field">
+<label>Hora</label>
+<input class="modal-edit-input" id="edit-fichaje-hora" type="time"/>
+</div>
+<div class="modal-edit-field">
+<label>PIN de Encargado</label>
+<input class="modal-edit-input" id="edit-fichaje-pin" type="password" maxlength="4" inputmode="numeric" placeholder="••••"/>
+</div>
+</div>
+<div class="modal-edit-footer">
+<button class="modal-edit-cancel" onclick="cerrarEditarFichaje()">Cancelar</button>
+<button class="modal-edit-save" onclick="guardarEdicionFichaje()">Guardar</button>
+</div>
+</div>
 </div>
 
 <!-- ── MODAL NUEVO EMPLEADO ── -->
@@ -2035,7 +2077,7 @@ function renderEmpleados() {
           <div class="emp-actions">
             ${!enPlanilla ? `<button onclick="agregarAPlanilla(${e.id}, '${e.nombre}', '${e.apellido}')"
               title="Agregar a la planilla" class="emp-action-btn" style="background:rgba(255,107,0,0.2);color:#FF9944;font-size:16px">+</button>` : ''}
-            <button class="emp-action-btn btn-edit-emp" onclick="abrirEditarEmp(${e.id}, '${e.nombre}', '${e.apellido}', '${e.celular}')" title="Editar">✏️</button>
+            <button class="emp-action-btn btn-edit-emp" onclick="abrirEditarEmp(${e.id}, '${e.nombre}', '${e.apellido}', '${e.celular}', '${e.pin || ""}')" title="Editar">✏️</button>
             <button class="emp-action-btn btn-del-emp" onclick="eliminarEmp(${e.id}, '${e.nombre} ${e.apellido}')" title="Eliminar">🗑️</button>
           </div>
         </div>
@@ -2820,25 +2862,27 @@ function encontrarEnPlanilla(nombre, apellido) {
 // ══════════════════════════════════
 let editContext = {}; // { tipo, id, nombre, apellido, celular, rol }
 
-function abrirEditarEmp(id, nombre, apellido, celular) {
-  editContext = { tipo: 'app', id, nombre, apellido, celular };
+function abrirEditarEmp(id, nombre, apellido, celular, pin) {
+  editContext = { tipo: 'app', id, nombre, apellido, celular, pin };
   document.getElementById('edit-emp-id').value = id;
   document.getElementById('edit-emp-tipo').value = 'app';
   document.getElementById('edit-emp-nombre').value = nombre;
   document.getElementById('edit-emp-apellido').value = apellido;
   document.getElementById('edit-emp-celular').value = celular;
+  document.getElementById('edit-emp-pin').value = pin || '';
   document.getElementById('edit-celular-field').style.display = 'block';
   document.getElementById('edit-rol-field').style.display = 'none';
   document.getElementById('modal-edit-emp').classList.add('show');
 }
 
-function abrirEditarPlanilla(id, nombre, apellido, rol) {
-  editContext = { tipo: 'planilla', id, nombre, apellido, rol };
+function abrirEditarPlanilla(id, nombre, apellido, rol, pin) {
+  editContext = { tipo: 'planilla', id, nombre, apellido, rol, pin };
   document.getElementById('edit-emp-id').value = id;
   document.getElementById('edit-emp-tipo').value = 'planilla';
   document.getElementById('edit-emp-nombre').value = nombre;
   document.getElementById('edit-emp-apellido').value = apellido;
   document.getElementById('edit-emp-rol').value = rol;
+  document.getElementById('edit-emp-pin').value = pin || '';
   document.getElementById('edit-celular-field').style.display = 'none';
   document.getElementById('edit-rol-field').style.display = 'block';
   document.getElementById('modal-edit-emp').classList.add('show');
@@ -2858,17 +2902,19 @@ async function guardarEdicion() {
 
   try {
     if (tipo === 'app') {
-      const celular = document.getElementById('edit-emp-celular').value.trim();
+const celular = document.getElementById('edit-emp-celular').value.trim();
+      const pin = document.getElementById('edit-emp-pin').value.trim();
       await fetch(`${API}/api/empleados/${id}`, {
         method: 'PUT', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ nombre, apellido, celular })
+        body: JSON.stringify({ nombre, apellido, celular, pin })
       });
       await actualizarTodo();
     } else {
-      const rol = document.getElementById('edit-emp-rol').value.trim();
+const rol = document.getElementById('edit-emp-rol').value.trim();
+      const pin = document.getElementById('edit-emp-pin').value.trim();
       await fetch(`${API}/api/planilla/empleados/${id}`, {
         method: 'PUT', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ nombre, apellido, rol })
+        body: JSON.stringify({ nombre, apellido, rol, pin })
       });
       await cargarPlanillaEmpleados();
     }
@@ -3210,7 +3256,7 @@ function renderTablaPlanilla() {
       <td>${pe.apellido} ${pe.nombre}
         <span style="margin-left:6px">
           <button class="emp-action-btn btn-edit-emp" style="display:inline-flex;width:22px;height:22px;font-size:11px"
-            onclick="abrirEditarPlanilla(${pe.id}, '${pe.nombre}', '${pe.apellido}', '${pe.rol||''}')">✏️</button>
+            onclick="abrirEditarPlanilla(${pe.id}, '${pe.nombre}', '${pe.apellido}', '${pe.rol||''}', '${pe.pin || ""}')">✏️</button>
           <button class="emp-action-btn btn-del-emp" style="display:inline-flex;width:22px;height:22px;font-size:11px"
             onclick="eliminarPlanilla(${pe.id}, '${pe.apellido} ${pe.nombre}')">🗑️</button>
         </span>
@@ -3753,6 +3799,57 @@ alert('Error de conexion');
 if (btn) { btn.disabled = false; btn.textContent = 'Guardar fichaje'; }
 }
 
+// ── Edición de fichajes con trazabilidad y PIN de encargado ──
+let fichajeEditId = null;
+function abrirEditarFichaje(id) {
+  const f = todosLosFichajes.find(x => x.id === id);
+  if (!f) return;
+  fichajeEditId = id;
+  document.getElementById('edit-fichaje-id').value = id;
+  document.getElementById('edit-fichaje-tipo').value = f.tipo;
+  const partes = f.fecha_hora.split('T');
+  document.getElementById('edit-fichaje-fecha').value = partes[0];
+  document.getElementById('edit-fichaje-hora').value = (partes[1] || '00:00:00').substring(0,5);
+  document.getElementById('edit-fichaje-pin').value = '';
+  document.getElementById('modal-edit-fichaje').classList.add('show');
+}
+
+function cerrarEditarFichaje() {
+  document.getElementById('modal-edit-fichaje').classList.remove('show');
+  fichajeEditId = null;
+}
+
+async function guardarEdicionFichaje() {
+  if (!fichajeEditId) return;
+  const tipo = document.getElementById('edit-fichaje-tipo').value;
+  const fecha = document.getElementById('edit-fichaje-fecha').value;
+  const hora = document.getElementById('edit-fichaje-hora').value;
+  const pin = document.getElementById('edit-fichaje-pin').value.trim();
+  if (!fecha || !hora) { alert('Completa la fecha y la hora del fichaje'); return; }
+  if (!pin) { alert('Ingresá el PIN del encargado para autorizar el cambio'); return; }
+  const fecha_hora = `${fecha}T${hora}:00`;
+  const btn = document.querySelector('#modal-edit-fichaje .modal-edit-save');
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
+  try {
+    const r = await fetch(`${API}/api/fichajes/${fichajeEditId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo, fecha_hora, pin })
+    });
+    const data = await r.json();
+    if (r.ok) {
+      cerrarEditarFichaje();
+      await actualizarTodo();
+      if (drawerEmpId) actualizarDrawer();
+    } else {
+      alert(data.error || 'Error al guardar el fichaje');
+    }
+  } catch(e) {
+    alert('Error de conexión: ' + e.message);
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Guardar'; }
+}
+
 function actualizarDrawer() {
   if (!drawerEmpId) return;
   const periodo = document.getElementById('drawer-period').value;
@@ -3860,6 +3957,22 @@ function actualizarDrawer() {
         <span style="color:var(--text3)">Asignado: ${t.asignado} · Entró: ${t.hora}</span>
         <span style="color:var(--warning);font-weight:700">+${t.diff}m</span>
       </div>`).join('');
+  }
+
+  // Historial de fichajes del período (clic para editar)
+  const tiposLabelDrawer = { entrada: 'Entrada 1', salida: 'Salida 1', entrada2: 'Entrada 2', salida2: 'Salida 2' };
+  const historialOrdenado = [...fichajes].sort((a, b) => new Date(b.fecha_hora) - new Date(a.fecha_hora));
+  const histEl = document.getElementById('drawer-historial-list');
+  if (histEl) {
+    if (!historialOrdenado.length) {
+      histEl.innerHTML = '<div style="font-size:13px;color:var(--text3)">Sin fichajes en el período</div>';
+    } else {
+      histEl.innerHTML = historialOrdenado.map(f => `
+        <div class="drawer-tardanza-item" style="cursor:pointer" onclick="abrirEditarFichaje(${f.id})">
+          <span>${fmtFecha(f.fecha_hora)} · ${tiposLabelDrawer[f.tipo] || f.tipo}</span>
+          <span style="color:var(--text3)">${fmt(f.fecha_hora)}${f.editado_por ? ` · ✏️ Editado por ${f.editado_por}` : ''}</span>
+        </div>`).join('');
+    }
   }
 }
 
@@ -4516,6 +4629,12 @@ function expandirFilaKpi(el, tipo, idx) {
       <div class="drawer-tardanzas-list" id="drawer-tardanzas-list">
         <div style="font-size:13px;color:var(--text3)">Sin tardanzas en el período</div>
       </div>
+<div>
+<div class="drawer-section-title">Historial de fichajes</div>
+<div class="drawer-tardanzas-list" id="drawer-historial-list">
+<div style="font-size:13px;color:var(--text3)">Sin fichajes en el período</div>
+</div>
+</div>
     </div>
   </div>
 </div>
