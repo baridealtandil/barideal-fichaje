@@ -886,6 +886,9 @@ canvas { max-height: 240px; }
   font-size: 26px; font-weight: 700; color: var(--text); line-height: 1;
 }
 .nomina-kpi-sub { font-size: 11px; color: var(--text2); margin-top: 5px; }
+#tabla-reciente tr:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
 </style>
 </head>
 <body>
@@ -1909,7 +1912,7 @@ function renderRecientes() {
   }
   const tiposLabel = { entrada: 'Entrada 1', salida: 'Salida 1', entrada2: 'Entrada 2', salida2: 'Salida 2' };
   tbody.innerHTML = recientes.map(f => `
-    <tr>
+        <tr style="cursor:pointer" onclick="abrirEditarFichaje(${f.id})">
       <td class="td-nombre">${f.nombre || ''} ${f.apellido || ''}</td>
       <td><span class="badge badge-${f.tipo}">${tiposLabel[f.tipo] || f.tipo}</span></td>
       <td>${fmtFecha(f.fecha_hora)}</td>
