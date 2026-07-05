@@ -228,7 +228,7 @@ app.post("/api/fichajes", async (c) => {
   if (!emp) return c.json({ error: "Empleado no encontrado" }, 404);
 
   // Determinar el día laboral activo: si hay una entrada abierta de ayer, ese es el día activo
-  const ahoraAR = new Date(Date.now() - 3 * 60 * 60 * 1000); // UTC-3
+  const ahoraAR = new Date(Date.now() - 3 * 60 * 60 * 1000 - 5 * 60 * 60 * 1000); // UTC-3, jornada laboral divide a las 05:00
   const hoy = ahoraAR.toISOString().split("T")[0];
   const ayerD = new Date(ahoraAR); ayerD.setDate(ayerD.getDate() - 1);
   const ayer = ayerD.toISOString().split("T")[0];
@@ -237,7 +237,7 @@ app.post("/api/fichajes", async (c) => {
   const entradasAyer = await sql`
     SELECT tipo FROM fichajes
     WHERE empleado_id = ${empleado_id}
-      AND (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${ayer}::date
+      AND ((fecha_hora - INTERVAL '5 hours') AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${ayer}::date
     ORDER BY fecha_hora ASC`;
 
   const tiposAyer = entradasAyer.map(f => f.tipo);
@@ -251,7 +251,7 @@ app.post("/api/fichajes", async (c) => {
 // Detectar si la secuencia esta rota, SIN bloquear el registro (el fichaje siempre se guarda)
     const fichajesActivos = await sql`
       SELECT tipo FROM fichajes
-      WHERE empleado_id = ${empleado_id} AND (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fechaLaboral}::date
+      WHERE empleado_id = ${empleado_id} AND ((fecha_hora - INTERVAL '5 hours') AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fechaLaboral}::date
       ORDER BY fecha_hora ASC`;
 
     const tipos = fichajesActivos.map(f => f.tipo);
@@ -338,7 +338,7 @@ app.post("/api/fichajes/forzar-cierre", async (c) => {
     const { empleado_id } = await c.req.json();
     if (!empleado_id) return c.json({ error: "empleado_id requerido" }, 400);
 
-    const ahoraAR = new Date(Date.now() - 3 * 60 * 60 * 1000);
+    const ahoraAR = new Date(Date.now() - 3 * 60 * 60 * 1000 - 5 * 60 * 60 * 1000); // jornada laboral divide a las 05:00
     const hoy = ahoraAR.toISOString().split("T")[0];
     const ayerD = new Date(ahoraAR); ayerD.setDate(ayerD.getDate() - 1);
     const ayer = ayerD.toISOString().split("T")[0];
@@ -350,7 +350,7 @@ app.post("/api/fichajes/forzar-cierre", async (c) => {
     for (const fecha of fechas) {
       const fichajes = await sql`
         SELECT tipo, lat, lng FROM fichajes
-        WHERE empleado_id = ${empleado_id} AND (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fecha}::date
+        WHERE empleado_id = ${empleado_id} AND ((fecha_hora - INTERVAL '5 hours') AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fecha}::date
         ORDER BY fecha_hora ASC`;
 
       const tipos = fichajes.map(f => f.tipo);
@@ -390,7 +390,7 @@ app.get("/api/fichajes", async (c) => {
     const fichajes = await sql`
       SELECT f.*, e.nombre, e.apellido, e.celular
       FROM fichajes f JOIN empleados e ON f.empleado_id = e.id
-      WHERE f.empleado_id = ${emp_id} AND (f.fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fecha}::date
+      WHERE f.empleado_id = ${emp_id} AND ((f.fecha_hora - INTERVAL '5 hours') AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fecha}::date
       ORDER BY f.fecha_hora ASC`;
     return c.json(fichajes);
   }
@@ -551,24 +551,24 @@ app.post("/api/horarios/batch", async (c) => {
 //  MÉTRICAS
 // ══════════════════════════════════════════════════
 app.get("/api/metricas/hoy", async (c) => {
-  const ahoraAR2 = new Date(Date.now() - 3 * 60 * 60 * 1000);
+  const ahoraAR2 = new Date(Date.now() - 3 * 60 * 60 * 1000 - 5 * 60 * 60 * 1000); // jornada laboral divide a las 05:00
   const hoy = ahoraAR2.toISOString().split("T")[0];
   const [totales] = await sql`
     SELECT
       COUNT(*) FILTER (WHERE tipo = 'entrada') AS entradas,
       COUNT(*) FILTER (WHERE tipo = 'salida')  AS salidas,
       COUNT(DISTINCT empleado_id) AS empleados_hoy
-    FROM fichajes WHERE (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${hoy}::date`;
+    FROM fichajes WHERE ((fecha_hora - INTERVAL '5 hours') AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${hoy}::date`;
 
   const dentro = await sql`
     SELECT DISTINCT f.empleado_id, e.nombre, e.apellido
     FROM fichajes f JOIN empleados e ON f.empleado_id = e.id
-    WHERE (f.fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${hoy}::date
+    WHERE ((f.fecha_hora - INTERVAL '5 hours') AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${hoy}::date
       AND f.tipo IN ('entrada','entrada2')
       AND NOT EXISTS (
         SELECT 1 FROM fichajes f2
         WHERE f2.empleado_id = f.empleado_id
-          AND (f2.fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${hoy}::date
+          AND ((f2.fecha_hora - INTERVAL '5 hours') AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${hoy}::date
           AND f2.tipo = CASE f.tipo WHEN 'entrada' THEN 'salida' ELSE 'salida2' END
           AND f2.fecha_hora > f.fecha_hora
       )`;
@@ -635,7 +635,7 @@ async function cronNotificaciones() {
   const ahora = new Date();
   const ahoraAR = new Date(ahora.getTime() - 3 * 60 * 60 * 1000);
   const horaActualMin = ahoraAR.getUTCHours() * 60 + ahoraAR.getUTCMinutes();
-  const fechaHoy = ahoraAR.toISOString().split("T")[0];
+  const fechaHoy = new Date(ahora.getTime() - 8 * 60 * 60 * 1000).toISOString().split("T")[0]; // jornada laboral divide a las 05:00
 
   try {
     // Traer todos los horarios de hoy con empleados vinculados y sus tokens
@@ -658,7 +658,7 @@ async function cronNotificaciones() {
     // Fichajes de hoy
     const fichajes = await sql`
       SELECT empleado_id, tipo FROM fichajes
-      WHERE (fecha_hora AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fechaHoy}::date`;
+      WHERE ((fecha_hora - INTERVAL '5 hours') AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fechaHoy}::date`;
 
     const fichajesPorEmp = {};
     fichajes.forEach(f => {

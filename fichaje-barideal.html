@@ -544,7 +544,7 @@ function onGeoError() {
 }
 
 function fechaLocal() {
-  const d = new Date();
+  const d = new Date(Date.now() - 5*60*60*1000); // jornada laboral divide a las 05:00
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 
@@ -552,7 +552,7 @@ function fechaLocal() {
 // Si hay entrada sin salida de ayer, ese es el dia activo.
 async function resolverFechaLaboral() {
   const hoy = fechaLocal();
-  const ayerDate = new Date(); ayerDate.setDate(ayerDate.getDate()-1);
+  const ayerDate = new Date(Date.now() - 5*60*60*1000); ayerDate.setDate(ayerDate.getDate()-1); // jornada laboral divide a las 05:00
   const ayer = ayerDate.getFullYear()+'-'+String(ayerDate.getMonth()+1).padStart(2,'0')+'-'+String(ayerDate.getDate()).padStart(2,'0');
   try {
     const [rH, rA] = await Promise.all([
