@@ -3,891 +3,452 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ideal · Dashboard</title>
-  <link rel="apple-touch-icon" href="/logo-ideal.png"/>
-  <link rel="icon" type="image/png" href="/logo-ideal.png"/>
-  <meta name="theme-color" content="#0A0A0A"/>
+<title>ideal · Dashboard Moderno</title>
+<link rel="apple-touch-icon" href="/logo-ideal.png"/>
+<link rel="icon" type="image/png" href="/logo-ideal.png"/>
+<meta name="theme-color" content="#0B0F19"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg:       #0A0A0A;
-  --bg2:      #111111;
-  --card:     #181818;
-  --card2:    #202020;
-  --gold:     #FFFFFF;
-  --gold2:    #E0E0E0;
-  --gold-dim: #444444;
-  --text:     #F0F0F0;
-  --text2:    #909090;
-  --text3:    #555555;
-  --border:   rgba(255,255,255,0.1);
-  --border2:  rgba(255,255,255,0.05);
-  --success:  #4CAF50;
-  --danger:   #EF5350;
-  --warning:  #FFA726;
-  --info:     #42A5F5;
-  --r:        12px;
+--bg: #0A0A0A; --bg2: #111111; --card: #181818; --card2: #202020;
+--gold: #FFFFFF; --gold2: #E0E0E0; --gold-dim: #444444;
+--text: #F0F0F0; --text2: #909090; --text3: #555555;
+--border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.05);
+--success: #4CAF50; --danger: #EF5350; --warning: #FFA726; --info: #42A5F5;
+--r: 12px;
 }
-
 html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, 'Inter', 'Segoe UI', sans-serif;
-  font-size: 14px;
-  min-height: 100vh;
-}
-
-/* ── SIDEBAR ── */
-.sidebar {
-  position: fixed; top: 0; left: 0; bottom: 0;
-  width: 220px;
-  background: #0D0D0D;
-  border-right: 1px solid rgba(255,255,255,0.08);
-  display: flex; flex-direction: column;
-  z-index: 50;
-}
-.sidebar-brand {
-  padding: 28px 20px 20px;
-  border-bottom: 1px solid var(--border);
-}
+body { background: var(--bg); color: var(--text); font-family: -apple-system, 'Inter', 'Segoe UI', sans-serif; font-size: 14px; min-height: 100vh; }
+.sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 220px; background: #0D0D0D; border-right: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; z-index: 50; }
+.sidebar-brand { padding: 28px 20px 20px; border-bottom: 1px solid var(--border); }
 .sidebar-brand p { font-size: 10px; color: #444; letter-spacing:1px; text-transform:uppercase; margin-top: 2px; }
-
 .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; }
-.nav-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 10px; border-radius: 8px;
-  color: var(--text2); font-size: 13px; font-weight: 500;
-  cursor: pointer; transition: all 0.15s;
-  text-decoration: none; border: none; background: none; width: 100%; text-align: left;
-}
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; color: var(--text2); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; text-decoration: none; border: none; background: none; width: 100%; text-align: left; }
 .nav-item:hover { background: var(--border2); color: var(--text); }
 .nav-item.active { background: rgba(255,255,255,0.1); color: #FFFFFF; }
 .nav-icon { font-size: 16px; width: 20px; text-align: center; }
-
-.sidebar-footer {
-  padding: 16px 20px;
-  border-top: 1px solid var(--border);
-  font-size: 11px; color: var(--text3);
-}
-
-/* ── MAIN ── */
+.sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text3); }
 .main { margin-left: 220px; min-height: 100vh; }
-
-.topbar {
-  position: sticky; top: 0; z-index: 40;
-  background: var(--bg2); border-bottom: 1px solid var(--border);
-  padding: 16px 28px;
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 16px;
-}
+.topbar { position: sticky; top: 0; z-index: 40; background: var(--bg2); border-bottom: 1px solid var(--border); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .topbar h2 { font-size: 16px; font-weight: 600; color: var(--text); }
 .topbar-actions { display: flex; gap: 10px; align-items: center; }
-
-.btn {
-  padding: 8px 16px; border-radius: 8px;
-  font-size: 13px; font-weight: 600;
-  border: none; cursor: pointer; transition: all 0.15s;
-  display: flex; align-items: center; gap: 6px;
-}
-.btn-outline {
-  background: transparent; color: var(--text2);
-  border: 1px solid var(--border); 
-}
+.btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
+.btn-outline { background: transparent; color: var(--text2); border: 1px solid var(--border); }
 .btn-outline:hover { background: var(--border2); color: var(--text); border-color: var(--gold-dim); }
-.btn-gold {
-  background: #FFFFFF; color: #0A0A0A; font-weight: 700;
-}
+.btn-gold { background: #FFFFFF; color: #0A0A0A; font-weight: 700; }
 .btn-gold:hover { background: #E0E0E0; }
-
 .content { padding: 28px; }
-
-/* ── SECTIONS ── */
 .section { display: none; }
 .section.active { display: block; }
-
-/* ── KPI GRID ── */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 14px; margin-bottom: 28px;
-}
-.kpi-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r); padding: 18px 20px;
-  cursor: pointer; transition: border-color 0.15s;
-}
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
+.kpi-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 18px 20px; cursor: pointer; transition: border-color 0.15s; }
 .kpi-card:hover { border-color: rgba(255,255,255,0.3); }
-.kpi-label { font-size: 11px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.5px; color: var(--text3); margin-bottom: 8px; }
+.kpi-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 8px; }
 .kpi-value { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; }
 .kpi-sub { font-size: 11px; color: var(--text2); margin-top: 6px; }
 .kpi-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
-
-/* ── ALERT CARDS ── */
-.alert-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 14px; margin-bottom: 28px;
-}
-.alert-card {
-  background: var(--card); border-radius: var(--r);
-  padding: 16px 18px; border-left: 3px solid;
-}
+.alert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 28px; }
+.alert-card { background: var(--card); border-radius: var(--r); padding: 16px 18px; border-left: 3px solid; }
 .alert-card.danger { border-color: var(--danger); }
 .alert-card.warning { border-color: var(--warning); }
 .alert-card.success { border-color: var(--success); }
 .alert-card.incompleto { border-color: rgba(255,152,0,0.5); background: rgba(255,152,0,0.07); }
 .badge-incompleto { display:inline-block; background: var(--warning); color:#000; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px; margin-left:6px; vertical-align:middle; }
-.alert-card .alert-title { font-size: 12px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px; margin-bottom: 6px; }
+.alert-card .alert-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
 .alert-card.danger .alert-title { color: var(--danger); }
 .alert-card.warning .alert-title { color: var(--warning); }
 .alert-card.success .alert-title { color: var(--success); }
 .alert-card .alert-value { font-size: 22px; font-weight: 700; color: var(--text); }
 .alert-card .alert-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
-
-/* ── PANEL / TABLE ── */
-.panel {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  overflow: hidden; margin-bottom: 24px;
-}
-.panel-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  flex-wrap: wrap;
-}
+.panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 24px; }
+.panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .panel-title { font-size: 14px; font-weight: 600; color: var(--text); }
 .panel-body { padding: 0; }
 .panel-body-p { padding: 20px; }
-
 table { width: 100%; border-collapse: collapse; }
-th {
-  background: var(--bg2); padding: 10px 14px;
-  text-align: left; font-size: 11px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3);
-  white-space: nowrap;
-}
-td {
-  padding: 10px 14px; border-top: 1px solid var(--border2);
-  font-size: 13px; color: var(--text2); vertical-align: middle;
-}
+th { background: var(--bg2); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); white-space: nowrap; }
+td { padding: 10px 14px; border-top: 1px solid var(--border2); font-size: 13px; color: var(--text2); vertical-align: middle; }
 tr:hover td { background: rgba(200,146,42,0.03); }
 .td-nombre { color: var(--text); font-weight: 500; }
-
-/* Badges */
-.badge {
-  display: inline-flex; align-items: center;
-  padding: 3px 9px; border-radius: 6px;
-  font-size: 11px; font-weight: 700; white-space: nowrap;
-}
-.badge-entrada  { background: rgba(200,146,42,0.15); color: var(--gold2); }
-.badge-salida   { background: rgba(76,175,80,0.12);  color: #81C784; }
+.badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 6px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.badge-entrada { background: rgba(200,146,42,0.15); color: var(--gold2); }
+.badge-salida { background: rgba(76,175,80,0.12); color: #81C784; }
 .badge-entrada2 { background: rgba(66,165,245,0.12); color: #64B5F6; }
-.badge-salida2  { background: rgba(186,104,200,0.12);color: #CE93D8; }
-.badge-tarde    { background: rgba(239,83,80,0.15);  color: #EF9A9A; }
-.badge-ausente  { background: rgba(239,83,80,0.2);   color: var(--danger); }
-.badge-puntual  { background: rgba(76,175,80,0.12);  color: #81C784; }
-.badge-ok       { background: rgba(76,175,80,0.12);  color: #81C784; }
-.badge-dentro   { background: rgba(76,175,80,0.12);  color: #81C784; }
-.badge-fuera    { background: rgba(239,83,80,0.12);  color: #EF9A9A; }
-.badge-turno    { background: var(--border2); color: var(--text2); }
-
-/* ── FILTERS ── */
-.filters {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-}
-select, input[type=date], input[type=text] {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 8px; padding: 7px 12px;
-  color: var(--text); font-size: 13px; outline: none;
-  transition: border-color 0.15s;
-}
+.badge-salida2 { background: rgba(186,104,200,0.12);color: #CE93D8; }
+.badge-tarde { background: rgba(239,83,80,0.15); color: #EF9A9A; }
+.badge-ausente { background: rgba(239,83,80,0.2); color: var(--danger); }
+.badge-puntual { background: rgba(76,175,80,0.12); color: #81C784; }
+.badge-ok { background: rgba(76,175,80,0.12); color: #81C784; }
+.badge-dentro { background: rgba(76,175,80,0.12); color: #81C784; }
+.badge-fuera { background: rgba(239,83,80,0.12); color: #EF9A9A; }
+.badge-turno { background: var(--border2); color: var(--text2); }
+.filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+select, input[type=date], input[type=text] { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; color: var(--text); font-size: 13px; outline: none; transition: border-color 0.15s; }
 select:focus, input:focus { border-color: var(--gold-dim); }
 select option { background: var(--bg2); }
-
-/* ── PAGINATION ── */
-.pagination {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 16px;
-}
-.page-btn {
-  padding: 6px 14px; border-radius: 7px;
-  background: transparent; border: 1px solid var(--border);
-  color: var(--text2); font-size: 13px; cursor: pointer;
-  transition: all 0.15s;
-}
+.pagination { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; }
+.page-btn { padding: 6px 14px; border-radius: 7px; background: transparent; border: 1px solid var(--border); color: var(--text2); font-size: 13px; cursor: pointer; transition: all 0.15s; }
 .page-btn:hover { background: var(--border2); }
 .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 .page-info { font-size: 12px; color: var(--text3); }
-
-/* ── CHART ── */
 .chart-wrap { padding: 20px; position: relative; }
 canvas { max-height: 240px; }
 
-/* ── EMPLEADOS CARDS ── */
-.emp-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 14px; padding: 20px;
-}
-.emp-card {
-  background: var(--bg2); border-radius: 10px;
-  border: 1px solid var(--border); padding: 16px;
-}
-.emp-card-header {
-  display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
-}
-.emp-avatar {
-  width: 40px; height: 40px; border-radius: 50%;
-  background: var(--gold-dim); display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 700; color: var(--gold2); flex-shrink: 0;
-}
+.emp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; padding: 20px; }
+.emp-card { background: var(--bg2); border-radius: 10px; border: 1px solid var(--border); padding: 16px; cursor: pointer; transition: border-color 0.15s; }
+.emp-card:hover { border-color: var(--gold); }
+.emp-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.emp-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--gold-dim); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--gold2); flex-shrink: 0; }
 .emp-card-name { font-size: 14px; font-weight: 600; color: var(--text); }
 .emp-card-cel { font-size: 11px; color: var(--text3); margin-top: 2px; }
 .emp-stats { display: flex; flex-direction: column; gap: 6px; }
-.emp-stat {
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 12px; color: var(--text2);
-}
+.emp-stat { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text2); }
 .emp-stat-val { font-weight: 600; color: var(--text); }
-
-/* ── RESUMEN EMPLEADO ── */
-.resumen-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 12px; margin-bottom: 20px;
-}
-.resumen-card {
-  background: var(--bg2); border-radius: 10px;
-  border: 1px solid var(--border); padding: 14px 16px; text-align: center;
-}
-.resumen-label { font-size: 11px; color: var(--text3); text-transform: uppercase;
-  letter-spacing: 0.5px; margin-bottom: 6px; }
+.resumen-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.resumen-card { background: var(--bg2); border-radius: 10px; border: 1px solid var(--border); padding: 14px 16px; text-align: center; }
+.resumen-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
 .resumen-value { font-size: 22px; font-weight: 700; color: var(--text); }
 .resumen-value.danger { color: var(--danger); }
 .resumen-value.warning { color: var(--warning); }
 .resumen-value.success { color: var(--success); }
 .resumen-value.gold { color: var(--gold2); }
 .resumen-sub { font-size: 11px; color: var(--text2); margin-top: 4px; }
-
-/* Bolsa de horas */
-.bolsa-card {
-  background: var(--card); border-radius: var(--r);
-  border: 1px solid var(--border); padding: 20px;
-  display: flex; align-items: center; gap: 20px;
-  margin-bottom: 20px;
-}
+.bolsa-card { background: var(--card); border-radius: var(--r); border: 1px solid var(--border); padding: 20px; display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
 .bolsa-main { flex: 1; }
-.bolsa-title { font-size: 12px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px; color: var(--text3); margin-bottom: 8px; }
+.bolsa-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 8px; }
 .bolsa-value { font-size: 36px; font-weight: 700; line-height: 1; }
 .bolsa-value.positivo { color: #4CAF50; }
 .bolsa-value.negativo { color: #EF5350; }
 .bolsa-sub { font-size: 13px; color: var(--text2); margin-top: 6px; }
-.bolsa-breakdown { text-align: right; font-size: 13px; color: var(--text2);
-  display: flex; flex-direction: column; gap: 4px; }
+.bolsa-breakdown { text-align: right; font-size: 13px; color: var(--text2); display: flex; flex-direction: column; gap: 4px; }
 .bolsa-breakdown span { color: var(--text); font-weight: 600; }
-
-/* ── EDIT / DELETE BUTTONS ── */
-.emp-actions {
-  display: flex; gap: 4px; flex-shrink: 0;
-}
-.emp-action-btn {
-  width: 26px; height: 26px; border-radius: 6px; border: none;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  font-size: 13px; transition: opacity 0.15s;
-}
+.emp-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.emp-action-btn { width: 26px; height: 26px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: opacity 0.15s; }
 .emp-action-btn:hover { opacity: 0.75; }
 .btn-edit-emp { background: rgba(255,255,255,0.08); color: var(--text2); }
-.btn-del-emp  { background: rgba(255,60,60,0.12); color: #FF6060; }
-
-/* Modal editar empleado */
-.modal-edit-emp {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 14px; width: 340px; overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-}
-.modal-edit-header {
-  padding: 16px 20px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
+.btn-del-emp { background: rgba(255,60,60,0.12); color: #FF6060; }
+.modal-edit-emp { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; width: 340px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.modal-edit-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .modal-edit-title { font-size: 15px; font-weight: 600; color: var(--text); }
 .modal-edit-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
-.modal-edit-field label {
-  display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px; color: var(--text3); margin-bottom: 5px;
-}
-.modal-edit-input {
-  width: 100%; background: var(--bg); border: 1px solid var(--border);
-  border-radius: 8px; padding: 8px 12px; color: var(--text);
-  font-family: inherit; font-size: 14px; outline: none;
-}
+.modal-edit-field label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 5px; }
+.modal-edit-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; color: var(--text); font-family: inherit; font-size: 14px; outline: none; }
 .modal-edit-input:focus { border-color: rgba(255,255,255,0.3); }
-.modal-edit-footer {
-  padding: 12px 20px 16px; display: flex; gap: 8px;
-}
-.modal-edit-danger {
-  padding: 9px 14px; background: rgba(255,60,60,0.12); color: #FF6060;
-  border: 1px solid rgba(255,60,60,0.25); border-radius: 8px;
-  font-size: 12px; font-weight: 600; cursor: pointer;
-}
-.modal-edit-save {
-  flex: 1; padding: 9px; background: var(--gold); color: #000;
-  border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;
-}
-.modal-edit-cancel {
-  padding: 9px 14px; background: transparent; color: var(--text3);
-  border: 1px solid var(--border); border-radius: 8px; font-size: 13px; cursor: pointer;
-}
-
-/* ── BUSCADOR DE EMPLEADOS ── */
-.emp-search-wrap {
-  position: relative; margin-bottom: 0;
-}
-.emp-search-input {
-  width: 100%; background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 10px; padding: 10px 44px 10px 16px;
-  color: var(--text); font-family: inherit; font-size: 14px; outline: none;
-  transition: border-color 0.15s;
-}
+.modal-edit-footer { padding: 12px 20px 16px; display: flex; gap: 8px; }
+.modal-edit-danger { padding: 9px 14px; background: rgba(255,60,60,0.12); color: #FF6060; border: 1px solid rgba(255,60,60,0.25); border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.modal-edit-save { flex: 1; padding: 9px; background: var(--gold); color: #000; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.modal-edit-cancel { padding: 9px 14px; background: transparent; color: var(--text3); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; cursor: pointer; }
+.emp-search-wrap { position: relative; margin-bottom: 0; }
+.emp-search-input { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 44px 10px 16px; color: var(--text); font-family: inherit; font-size: 14px; outline: none; transition: border-color 0.15s; }
 .emp-search-input:focus { border-color: rgba(255,255,255,0.3); }
 .emp-search-input::placeholder { color: var(--text3); }
-.emp-search-icon {
-  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-  color: var(--text3); font-size: 16px; pointer-events: none;
-}
-.emp-search-results {
-  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 999;
-  background: #1A1A1A; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px;
-  overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-  display: none; max-height: 300px; overflow-y: auto;
-}
+.emp-search-icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 16px; pointer-events: none; }
+.emp-search-results { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 999; background: #1A1A1A; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.6); display: none; max-height: 300px; overflow-y: auto; }
 .emp-search-results.visible { display: block; }
-.emp-search-item {
-  padding: 10px 16px; cursor: pointer; display: flex; align-items: center;
-  gap: 10px; transition: background 0.1s;
-}
+.emp-search-item { padding: 10px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.1s; }
 .emp-search-item:hover { background: rgba(255,255,255,0.06); }
-.emp-search-item-avatar {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: rgba(255,255,255,0.08); display: flex; align-items: center;
-  justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0;
-}
+.emp-search-item-avatar { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
 .emp-search-item-name { font-size: 13px; color: var(--text); font-weight: 500; }
 .emp-search-item-rol { font-size: 11px; color: var(--text3); }
-.emp-search-add {
-  padding: 10px 16px; cursor: pointer; display: flex; align-items: center;
-  gap: 10px; color: var(--gold); font-size: 13px; font-weight: 600;
-  border-top: 1px solid var(--border); transition: background 0.1s;
-}
+.emp-search-add { padding: 10px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: var(--gold); font-size: 13px; font-weight: 600; border-top: 1px solid var(--border); transition: background 0.1s; }
 .emp-search-add:hover { background: rgba(255,200,0,0.06); }
-
-/* Modal agregar empleado */
-.modal-emp-new {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 14px; padding: 0; width: 360px; overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-}
-.modal-emp-header {
-  padding: 18px 20px 16px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
+.modal-emp-new { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 0; width: 360px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.modal-emp-header { padding: 18px 20px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .modal-emp-title { font-size: 15px; font-weight: 600; color: var(--text); }
 .modal-emp-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
-.modal-emp-field label {
-  display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px; color: var(--text3); margin-bottom: 6px;
-}
-.modal-emp-input {
-  width: 100%; background: var(--bg); border: 1px solid var(--border);
-  border-radius: 8px; padding: 9px 12px; color: var(--text);
-  font-family: inherit; font-size: 14px; outline: none; transition: border-color 0.15s;
-}
+.modal-emp-field label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 6px; }
+.modal-emp-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: inherit; font-size: 14px; outline: none; transition: border-color 0.15s; }
 .modal-emp-input:focus { border-color: rgba(255,255,255,0.3); }
-.rol-suggestions {
-  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
-}
-.rol-chip {
-  padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border);
-  font-size: 11px; color: var(--text2); cursor: pointer; transition: all 0.1s;
-  background: transparent;
-}
+.rol-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.rol-chip { padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); font-size: 11px; color: var(--text2); cursor: pointer; transition: all 0.1s; background: transparent; }
 .rol-chip:hover,.rol-chip.active { background: rgba(255,255,255,0.1); color: var(--text); border-color: rgba(255,255,255,0.3); }
-.modal-emp-footer {
-  padding: 12px 20px 18px; display: flex; gap: 8px;
-}
-.btn-guardar-emp {
-  flex: 1; padding: 10px; background: var(--gold); color: #000;
-  border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
-  cursor: pointer; transition: opacity 0.15s;
-}
+.modal-emp-footer { padding: 12px 20px 18px; display: flex; gap: 8px; }
+.btn-guardar-emp { flex: 1; padding: 10px; background: var(--gold); color: #000; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
 .btn-guardar-emp:hover { opacity: 0.85; }
-.btn-cancelar-emp {
-  padding: 10px 16px; background: transparent; color: var(--text3);
-  border: 1px solid var(--border); border-radius: 8px; font-size: 13px;
-  cursor: pointer;
-}
+.btn-cancelar-emp { padding: 10px 16px; background: transparent; color: var(--text3); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; cursor: pointer; }
 
-/* ── HORARIOS ── */
 .horarios-table { border-collapse: collapse; width: 100%; min-width: 700px; }
-.horarios-table th {
-  padding: 8px 6px; font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px; color: var(--text3); border-bottom: 2px solid var(--border);
-  text-align: center; white-space: nowrap; position: sticky; top: 0; background: var(--bg);
-}
+.horarios-table th { padding: 8px 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); border-bottom: 2px solid var(--border); text-align: center; white-space: nowrap; position: sticky; top: 0; background: var(--bg); }
 .horarios-table th.th-nombre { text-align: left; min-width: 160px; padding-left: 12px; }
 .horarios-table th.th-rol { text-align: left; min-width: 100px; color: var(--text3); }
-.horarios-table .sector-row td {
-  padding: 6px 12px; font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1px; color: var(--text3); background: rgba(255,255,255,0.03);
-  border-top: 1px solid var(--border);
-}
+.horarios-table .sector-row td { padding: 6px 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); background: rgba(255,255,255,0.03); border-top: 1px solid var(--border); }
 .horarios-table td { border-bottom: 1px solid rgba(255,255,255,0.04); }
-.td-nombre { padding: 0 8px 0 12px; font-size: 13px; color: var(--text); font-weight: 500; white-space: nowrap; }
 .td-rol { padding: 0 8px; font-size: 11px; color: var(--text3); white-space: nowrap; }
-
-/* Celda de turno */
-.turno-cell {
-  padding: 4px 3px; text-align: center; cursor: pointer;
-  transition: background 0.1s; min-width: 88px;
-}
+.turno-cell { padding: 4px 3px; text-align: center; cursor: pointer; transition: background 0.1s; min-width: 88px; }
 .turno-cell:hover .cell-inner { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); }
-.cell-inner {
-  border: 1.5px dashed rgba(255,255,255,0.1);
-  border-radius: 7px; padding: 5px 4px; min-height: 44px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 2px; transition: all 0.15s; position: relative;
-}
+.cell-inner { border: 1.5px dashed rgba(255,255,255,0.1); border-radius: 7px; padding: 5px 4px; min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: all 0.15s; position: relative; }
 .cell-inner.has-turno { border-style: solid; border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.05); }
 .cell-inner.is-franco { border-color: rgba(100,180,255,0.3); background: rgba(100,180,255,0.06); }
 .cell-inner.is-ausente { border-color: rgba(255,80,80,0.3); background: rgba(255,80,80,0.06); }
 .cell-inner.is-nt { border-color: rgba(120,120,120,0.3); background: rgba(120,120,120,0.06); }
 .cell-inner.is-hoy { border-color: rgba(255,200,0,0.4); background: rgba(255,200,0,0.05); }
-
 .turno-hora { font-size: 11px; color: #DDD; font-weight: 500; line-height: 1.3; white-space: nowrap; }
 .turno-hora2 { font-size: 11px; color: #DDD; font-weight: 500; line-height: 1.3; white-space: nowrap; opacity: 0.85; }
-.turno-badge {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.5px; padding: 1px 6px;
-  border-radius: 4px; text-transform: uppercase;
-}
+.turno-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; padding: 1px 6px; border-radius: 4px; text-transform: uppercase; }
 .turno-badge.franco { color: #64B4FF; background: rgba(100,180,255,0.15); }
 .turno-badge.ausente { color: #FF5050; background: rgba(255,80,80,0.15); }
 .cell-add { font-size: 18px; color: rgba(255,255,255,0.15); line-height: 1; }
-
-/* Quick action buttons en la celda */
-.cell-actions {
-  display: none; position: absolute; top: -2px; right: -2px;
-  gap: 2px;
-}
+.cell-actions { display: none; position: absolute; top: -2px; right: -2px; gap: 2px; }
 .turno-cell:hover .cell-actions { display: flex; }
-.cell-btn {
-  width: 18px; height: 18px; border-radius: 4px; border: none; cursor: pointer;
-  font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center;
-  transition: opacity 0.1s;
-}
+.cell-btn { width: 18px; height: 18px; border-radius: 4px; border: none; cursor: pointer; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: opacity 0.1s; }
 .cell-btn:hover { opacity: 0.8; }
 .cell-btn-f { background: rgba(100,180,255,0.3); color: #64B4FF; }
 .cell-btn-a { background: rgba(255,80,80,0.3); color: #FF5050; }
-
-/* Modal turno mejorado */
-.modal-turno-new {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 14px; padding: 0; width: 340px; overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-}
-.modal-turno-header {
-  padding: 16px 20px 14px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: flex-start; justify-content: space-between;
-}
-.modal-turno-title { font-size: 15px; font-weight: 600; color: var(--text); }
-.modal-turno-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
-.modal-close-btn {
-  background: none; border: none; color: var(--text3); cursor: pointer;
-  font-size: 20px; line-height: 1; padding: 0; margin-top: -2px;
-}
-.modal-quick-btns {
-  display: flex; gap: 8px; padding: 14px 20px 0;
-}
-.mqb {
-  flex: 1; padding: 8px; border-radius: 8px; border: 1.5px solid;
-  cursor: pointer; font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
-  text-transform: uppercase; transition: all 0.15s; text-align: center;
-}
-.mqb-franco { color: #64B4FF; border-color: rgba(100,180,255,0.3); background: rgba(100,180,255,0.08); }
-.mqb-franco:hover,.mqb-franco.active { background: rgba(100,180,255,0.2); }
-.mqb-ausente { color: #FF5050; border-color: rgba(255,80,80,0.3); background: rgba(255,80,80,0.08); }
-.mqb-ausente:hover,.mqb-ausente.active { background: rgba(255,80,80,0.2); }
-.mqb-borrar { color: var(--text3); border-color: var(--border); background: transparent; }
-.mqb-borrar:hover { background: rgba(255,255,255,0.05); }
-.modal-time-section { padding: 14px 20px; }
-.modal-time-group { margin-bottom: 12px; }
-.modal-time-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 6px; }
-.modal-time-row { display: flex; gap: 8px; align-items: center; }
-.modal-time-sep { font-size: 12px; color: var(--text3); }
-.time-input {
-  flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 7px;
-  padding: 8px 10px; color: var(--text); font-size: 14px; font-family: inherit;
-  text-align: center; outline: none; transition: border-color 0.15s;
-}
-.time-input:focus { border-color: rgba(255,255,255,0.3); }
-.modal-footer { padding: 12px 20px 16px; display: flex; gap: 8px; }
-.modal-dias-section { padding: 0 20px 14px; }
-.modal-dias-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 8px; }
-.dias-checkboxes { display: flex; gap: 6px; flex-wrap: wrap; }
-.dia-chip { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--border); cursor: pointer; font-size: 11px; font-weight: 700; color: var(--text3); transition: all 0.15s; user-select: none; }
-.dia-chip:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
-.dia-chip.checked { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.12); color: var(--text); }
-.dia-chip.es-hoy { border-color: rgba(255,200,0,0.5); color: #FFD740; }
-.dia-chip.es-hoy.checked { background: rgba(255,200,0,0.12); }
-.btn-guardar-turno {
-  flex: 1; padding: 10px; background: var(--gold); color: #000;
-  border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
-  cursor: pointer; transition: opacity 0.15s;
-}
-.btn-guardar-turno:hover { opacity: 0.85; }
-.btn-cancelar-turno {
-  padding: 10px 16px; background: transparent; color: var(--text3);
-  border: 1px solid var(--border); border-radius: 8px; font-size: 13px;
-  cursor: pointer; transition: all 0.15s;
-}
-.btn-cancelar-turno:hover { color: var(--text); }
-
+.modal-turno-new, .modal-emp-new, .modal-edit-emp { }
+.mqb { flex: 1; padding: 8px; border-radius: 8px; border: 1.5px solid; cursor: pointer; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; transition: all 0.15s; text-align: center; }
 .semana-nav { display: flex; align-items: center; gap: 8px; }
-.semana-nav-btn {
-  background: var(--border2); border: 1px solid var(--border); color: var(--text2);
-  border-radius: 6px; padding: 5px 10px; cursor: pointer; font-size: 14px;
-  transition: background 0.15s;
-}
+.semana-nav-btn { background: var(--border2); border: 1px solid var(--border); color: var(--text2); border-radius: 6px; padding: 5px 10px; cursor: pointer; font-size: 14px; transition: background 0.15s; }
 .semana-nav-btn:hover { background: rgba(255,255,255,0.1); }
 .semana-label { font-size: 13px; color: var(--text2); min-width: 160px; text-align: center; }
-
-.turno-slot.t2 {
-  background: rgba(66,165,245,0.1);
-  border-color: rgba(66,165,245,0.3);
-  color: #64B5F6;
-}
-.btn-add-turno {
-  font-size: 18px; color: #444; cursor: pointer;
-  transition: color 0.15s;
-}
-.btn-add-turno:hover { color: #FFF; }
-
-/* ── MODAL ── */
-.modal-bg {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.7);
-  display: none; align-items: center; justify-content: center;
-  z-index: 200;
-}
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 200; }
 .modal-bg.show { display: flex; }
-.modal {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 16px; padding: 28px;
-  width: 400px; max-width: calc(100vw - 40px);
-}
-.modal h3 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 20px; }
-.modal .form-row { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
-.modal .form-group { flex: 1; min-width: 120px; }
-.modal .form-group label {
-  display: block; font-size: 11px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.5px;
-  color: var(--text3); margin-bottom: 6px;
-}
-.modal input[type=time], .modal select {
-  width: 100%; background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px; padding: 8px 12px;
-  color: var(--text); font-size: 14px;
-}
-.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-.modal-actions .btn { flex: 1; justify-content: center; }
-.btn-danger { background: rgba(239,83,80,0.15); color: var(--danger); border: 1px solid rgba(239,83,80,0.3); }
-.btn-danger:hover { background: rgba(239,83,80,0.25); }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 768px) {
-  .sidebar { display: none; }
-  .main { margin-left: 0; }
-  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-  .content { padding: 16px; }
-  .topbar { padding: 12px 16px; }
-}
-
-/* Divider */
-.section-title {
-  font-size: 12px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px; color: var(--text3);
-  margin: 24px 0 14px;
-}
-
-.empty-state {
-  padding: 40px 20px; text-align: center; color: var(--text3); font-size: 13px;
-}
-
-/* Upload area */
-.upload-area {
-  border: 2px dashed #333;
-  border-radius: var(--r); padding: 32px; text-align: center;
-  cursor: pointer; transition: all 0.2s;
-  color: var(--text2); font-size: 13px;
-}
+.section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin: 24px 0 14px; }
+.empty-state { padding: 40px 20px; text-align: center; color: var(--text3); font-size: 13px; }
+.upload-area { border: 2px dashed #333; border-radius: var(--r); padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s; color: var(--text2); font-size: 13px; }
 .upload-area:hover { border-color: #888; color: #FFF; background: rgba(255,255,255,0.04); }
-.upload-area .upload-icon { font-size: 32px; margin-bottom: 10px; }
-
-/* Horas positivo/negativo */
 .horas-pos { color: var(--success); }
 .horas-neg { color: var(--danger); }
-
-/* Live dot */
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
-.live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%;
-  background: #4CAF50; margin-right: 6px; animation: pulse 2s infinite; }
-
-/* ── Drawer ficha empleado ── */
-#drawer-emp {
-  position: fixed; top: 0; right: -480px; width: 460px; height: 100vh;
-  background: var(--bg2); border-left: 1px solid var(--border);
-  z-index: 500; transition: right 0.3s ease; overflow-y: auto;
-  display: flex; flex-direction: column;
-}
+.live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #4CAF50; margin-right: 6px; animation: pulse 2s infinite; }
+#drawer-emp { position: fixed; top: 0; right: -480px; width: 460px; height: 100vh; background: var(--bg2); border-left: 1px solid var(--border); z-index: 500; transition: right 0.3s ease; overflow-y: auto; display: flex; flex-direction: column; }
 #drawer-emp.open { right: 0; }
-.drawer-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-  z-index: 499; display: none;
-}
+.drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 499; display: none; }
 .drawer-overlay.show { display: block; }
-.drawer-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 20px 24px; border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; background: var(--bg2); z-index: 1;
-}
+.drawer-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg2); z-index: 1; }
 .drawer-title { font-size: 16px; font-weight: 700; color: var(--text); }
 .drawer-close { background: none; border: none; color: var(--text3); font-size: 22px; cursor: pointer; }
 .drawer-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; }
-.drawer-avatar {
-  width: 64px; height: 64px; border-radius: 50%;
-  background: var(--gold); color: #000; font-size: 22px; font-weight: 800;
-  display: flex; align-items: center; justify-content: center;
-}
+.drawer-avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--gold); color: #000; font-size: 22px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
 .drawer-emp-info { display: flex; align-items: center; gap: 16px; }
 .drawer-emp-name { font-size: 18px; font-weight: 700; color: var(--text); }
 .drawer-emp-sub { font-size: 13px; color: var(--text3); margin-top: 2px; }
-.drawer-stat-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-}
-.drawer-stat-card {
-  background: var(--bg); border: 1px solid var(--border);
-  border-radius: 10px; padding: 14px 16px;
-}
+.drawer-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.drawer-stat-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
 .drawer-stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
 .drawer-stat-val { font-size: 22px; font-weight: 700; color: var(--text); }
 .drawer-stat-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
-.drawer-period-select {
-  background: var(--bg); border: 1px solid var(--border);
-  color: var(--text); border-radius: 8px; padding: 6px 10px;
-  font-size: 13px; cursor: pointer;
-}
-.drawer-section-title {
-  font-size: 12px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px; color: var(--text3); margin-bottom: 10px;
-}
+.drawer-period-select { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 6px 10px; font-size: 13px; cursor: pointer; }
+.drawer-section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 10px; }
 .drawer-tardanzas-list { display: flex; flex-direction: column; gap: 6px; }
-.drawer-tardanza-item {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 8px 12px; background: var(--bg); border-radius: 8px;
-  border: 1px solid var(--border); font-size: 13px;
-}
-.emp-card { cursor: pointer; transition: border-color 0.15s; }
-.emp-card:hover { border-color: var(--gold); }
+.drawer-tardanza-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border); font-size: 13px; }
 
-/* ── Popup puntualidad ── */
-#popup-puntualidad {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-  display: none; align-items: center; justify-content: center; z-index: 600;
-}
+#popup-puntualidad { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 600; }
 #popup-puntualidad.show { display: flex; }
-.popup-puntualidad-box {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 14px; padding: 24px; width: 380px; max-width: 95vw;
-}
-.popup-punt-header {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  margin-bottom: 16px;
-}
+.popup-puntualidad-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 24px; width: 380px; max-width: 95vw; }
+.popup-punt-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
 .popup-punt-title { font-size: 15px; font-weight: 700; color: var(--text); }
 .popup-punt-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
 .popup-punt-close { background: none; border: none; color: var(--text3); font-size: 20px; cursor: pointer; }
-.popup-punt-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 0; border-bottom: 1px solid var(--border);
-}
+.popup-punt-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
 .popup-punt-row:last-child { border-bottom: none; }
 .popup-punt-key { font-size: 13px; color: var(--text3); }
 .popup-punt-val { font-size: 14px; font-weight: 600; color: var(--text); }
 .popup-punt-val.verde { color: var(--success); }
 .popup-punt-val.rojo { color: var(--danger); }
 .popup-punt-val.amarillo { color: var(--warning); }
-
-/* ── Botón grilla WhatsApp ── */
-.btn-wsp {
-  display: flex; align-items: center; gap: 6px;
-  padding: 8px 14px; background: #25D366; color: #fff;
-  border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
-  cursor: pointer; transition: opacity 0.15s;
-}
+.btn-wsp { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: #25D366; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
 .btn-wsp:hover { opacity: 0.85; }
-.menu-wsp-btn {
-  display: block; width: 100%; text-align: left;
-  padding: 8px 12px; background: none; border: none;
-  color: var(--text); cursor: pointer; border-radius: 6px;
-  font-size: 13px; transition: background 0.1s;
-}
+.menu-wsp-btn { display: block; width: 100%; text-align: left; padding: 8px 12px; background: none; border: none; color: var(--text); cursor: pointer; border-radius: 6px; font-size: 13px; transition: background 0.1s; }
 .menu-wsp-btn:hover { background: rgba(255,255,255,0.08); }
-#preview-grilla-wsp {
-  display: none; margin-top: 16px;
-  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
-}
-
-.wsp-check-label {
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 4px; font-size: 13px; color: var(--text);
-  cursor: pointer; border-radius: 6px; transition: background 0.1s;
-}
+#preview-grilla-wsp { display: none; margin-top: 16px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.wsp-check-label { display: flex; align-items: center; gap: 8px; padding: 6px 4px; font-size: 13px; color: var(--text); cursor: pointer; border-radius: 6px; transition: background 0.1s; }
 .wsp-check-label:hover { background: rgba(255,255,255,0.06); }
 .wsp-check-label input[type="checkbox"] { accent-color: #25D366; width: 15px; height: 15px; cursor: pointer; }
-
-/* ── Popup alertas ── */
-#popup-alerta {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
-  display: none; align-items: center; justify-content: center; z-index: 600;
-}
+#popup-alerta { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 600; }
 #popup-alerta.show { display: flex; }
-.popup-alerta-box {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 14px; padding: 0; width: 420px; max-width: 95vw;
-  max-height: 80vh; display: flex; flex-direction: column;
-}
-.popup-alerta-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 16px 20px; border-bottom: 1px solid var(--border);
-}
+.popup-alerta-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 0; width: 420px; max-width: 95vw; max-height: 80vh; display: flex; flex-direction: column; }
+.popup-alerta-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border); }
 .popup-alerta-title { font-size: 15px; font-weight: 700; color: var(--text); }
 .popup-alerta-close { background: none; border: none; color: var(--text3); font-size: 22px; cursor: pointer; line-height: 1; }
 .popup-alerta-body { padding: 8px 0; overflow-y: auto; flex: 1; }
-.popup-alerta-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 11px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
-  font-size: 14px;
-}
+.popup-alerta-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
 .popup-alerta-row:last-child { border-bottom: none; }
 .popup-alerta-nombre { font-weight: 600; color: var(--text); }
 .popup-alerta-detalle { font-size: 12px; color: var(--text3); margin-top: 2px; }
 .popup-alerta-badge { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
 .popup-alerta-empty { padding: 24px 20px; text-align: center; color: var(--text3); font-size: 13px; }
-
-/* ── Filas clickeables en popup ── */
 .popup-alerta-row-clickable { transition: background 0.1s; }
 .popup-alerta-row-clickable:hover { background: rgba(255,255,255,0.04); }
-.popup-expand-icon {
-  color: var(--text3); font-size: 18px; font-weight: 300;
-  transition: transform 0.2s; display: inline-block; line-height: 1; flex-shrink: 0;
-}
-.popup-alerta-detalle-expand {
-  background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border);
-  padding: 14px 20px; animation: fadeSlideIn 0.15s ease;
-}
+.popup-expand-icon { color: var(--text3); font-size: 18px; font-weight: 300; transition: transform 0.2s; display: inline-block; line-height: 1; flex-shrink: 0; }
+.popup-alerta-detalle-expand { background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border); padding: 14px 20px; animation: fadeSlideIn 0.15s ease; }
 @keyframes fadeSlideIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
 .popup-exp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
 .popup-exp-item { background: var(--bg); border-radius: 8px; padding: 10px 12px; }
 .popup-exp-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 4px; }
 .popup-exp-val { font-size: 14px; font-weight: 600; color: var(--text); }
-.popup-exp-btn {
-  width: 100%; padding: 9px; background: rgba(255,255,255,0.06);
-  border: 1px solid var(--border); border-radius: 8px;
-  color: var(--text2); font-size: 12px; font-weight: 600;
-  cursor: pointer; transition: all 0.15s; text-align: center;
-}
+.popup-exp-btn { width: 100%; padding: 9px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px; color: var(--text2); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; text-align: center; }
 .popup-exp-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
-
-/* ── Filas clickeables en popup ── */
-.popup-alerta-row-clickable { transition: background 0.1s; border-radius: 0; }
-.popup-alerta-row-clickable:hover { background: rgba(255,255,255,0.04); }
-.popup-expand-icon {
-  color: var(--text3); font-size: 18px; font-weight: 300;
-  transition: transform 0.2s; display: inline-block; line-height: 1;
-  flex-shrink: 0;
-}
-
-/* Panel expandido dentro del popup */
-.popup-alerta-detalle-expand {
-  background: rgba(255,255,255,0.03);
-  border-bottom: 1px solid var(--border);
-  padding: 14px 20px;
-  animation: fadeSlideIn 0.15s ease;
-}
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.popup-exp-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 10px; margin-bottom: 12px;
-}
-.popup-exp-item { background: var(--bg); border-radius: 8px; padding: 10px 12px; }
-.popup-exp-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 4px; }
-.popup-exp-val { font-size: 14px; font-weight: 600; color: var(--text); }
-.popup-exp-btn {
-  width: 100%; padding: 9px; background: rgba(255,255,255,0.06);
-  border: 1px solid var(--border); border-radius: 8px;
-  color: var(--text2); font-size: 12px; font-weight: 600;
-  cursor: pointer; transition: all 0.15s; text-align: center;
-}
-.popup-exp-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
-
-/* ── KPIs NÓMINA GENERAL ── */
-.nomina-kpi-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 14px;
-}
-.nomina-kpi-title {
-  font-size: 12px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px; color: var(--text3);
-}
-.nomina-kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-  gap: 12px; margin-bottom: 24px;
-}
-.nomina-kpi-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 16px 18px;
-  cursor: pointer; transition: border-color 0.15s, transform 0.1s;
-  position: relative; overflow: hidden;
-}
-.nomina-kpi-card::before {
-  content: ''; position: absolute; top: 0; left: 0;
-  width: 3px; height: 100%; border-radius: var(--r) 0 0 var(--r);
-  background: var(--nomina-accent, #555);
-}
+.nomina-kpi-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.nomina-kpi-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); }
+.nomina-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.nomina-kpi-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 18px; cursor: pointer; transition: border-color 0.15s, transform 0.1s; position: relative; overflow: hidden; }
+.nomina-kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; border-radius: var(--r) 0 0 var(--r); background: var(--nomina-accent, #555); }
 .nomina-kpi-card:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-1px); }
-.nomina-kpi-label {
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px; color: var(--text3); margin-bottom: 8px;
-}
-.nomina-kpi-value {
-  font-size: 26px; font-weight: 700; color: var(--text); line-height: 1;
-}
+.nomina-kpi-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 8px; }
+.nomina-kpi-value { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
 .nomina-kpi-sub { font-size: 11px; color: var(--text2); margin-top: 5px; }
-#tabla-reciente tr:hover {
-  background: rgba(255, 255, 255, 0.04);
+
+/* ══════════════════════════════════════════════
+   PREMIUM MODERN THEME OVERRIDES — Bar Ideal SaaS
+   ══════════════════════════════════════════════ */
+:root {
+  --bg: #0B0F19;
+  --bg2: #10141F;
+  --card: rgba(255,255,255,0.045);
+  --card2: rgba(255,255,255,0.07);
+  --gold: #F5C542;
+  --gold2: #F5C542;
+  --gold-dim: rgba(245,197,66,0.35);
+  --text: #F1F4FA;
+  --text2: #98A2B8;
+  --text3: #616B82;
+  --border: rgba(255,255,255,0.09);
+  --border2: rgba(255,255,255,0.05);
+  --emerald: #10B981;
+  --amber: #F59E0B;
+  --violet: #8B5CF6;
+  --pink: #EC4899;
+  --success: #10B981;
+  --danger: #EC4899;
+  --warning: #F59E0B;
+  --info: #38BDF8;
+  --r: 16px;
+  --glass-blur: blur(22px);
+}
+html, body {
+  background: radial-gradient(1100px 700px at 8% -10%, rgba(139,92,246,0.16), transparent 60%),
+              radial-gradient(900px 600px at 110% 10%, rgba(16,185,129,0.10), transparent 55%),
+              radial-gradient(1200px 800px at 50% 120%, rgba(245,197,66,0.06), transparent 60%),
+              var(--bg);
+  background-attachment: fixed;
+}
+body { font-family: 'Outfit', -apple-system, 'Segoe UI', sans-serif; letter-spacing: 0.1px; }
+h1,h2,h3,h4,.drawer-title,.modal-edit-title,.modal-emp-title,.popup-alerta-title,.popup-punt-title { font-family: 'Outfit', sans-serif; }
+
+/* Glass surfaces */
+.sidebar { background: rgba(11,15,25,0.75); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border-right: 1px solid var(--border); }
+.topbar { background: rgba(11,15,25,0.55); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--border); }
+.kpi-card, .alert-card, .panel, .emp-card, .nomina-kpi-card, .resumen-card, .bolsa-card, .drawer-stat-card,
+.modal-edit-emp, .modal-emp-new, #drawer-emp, .popup-puntualidad-box, .popup-alerta-box {
+  background: var(--card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+}
+.panel-header, .th, th { background: rgba(255,255,255,0.02); }
+th { background: rgba(255,255,255,0.03); color: var(--text3); }
+
+/* Sidebar nav */
+.sidebar-brand { border-bottom: 1px solid var(--border); }
+.nav-item { border-radius: 10px; }
+.nav-item.active { background: linear-gradient(135deg, rgba(245,197,66,0.18), rgba(139,92,246,0.12)); color: var(--gold); box-shadow: inset 0 0 0 1px rgba(245,197,66,0.25); }
+.nav-item:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+
+.btn-legacy-link {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 10px 12px; margin-top: 10px;
+  background: rgba(236,72,153,0.12); border: 1px solid rgba(236,72,153,0.3);
+  color: #F9A8D4; border-radius: 10px; font-size: 12px; font-weight: 600;
+  text-decoration: none; cursor: pointer; transition: all 0.15s;
+}
+.btn-legacy-link:hover { background: rgba(236,72,153,0.22); color: #fff; }
+
+/* Buttons */
+.btn-gold { background: linear-gradient(135deg,#F5C542,#F0A500); color: #12100A; box-shadow: 0 4px 16px rgba(245,197,66,0.25); }
+.btn-gold:hover { filter: brightness(1.08); }
+.btn-outline { border: 1px solid var(--border); }
+.btn-outline:hover { background: rgba(255,255,255,0.06); }
+
+/* ── HERO KPIs con glow ── */
+.hero-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 18px; margin-bottom: 28px; }
+.hero-kpi-card {
+  position: relative; overflow: hidden;
+  background: var(--card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border); border-radius: 20px; padding: 22px 24px;
+  transition: transform 0.2s ease;
+}
+.hero-kpi-card:hover { transform: translateY(-2px); }
+.hero-kpi-card.glow-emerald { box-shadow: 0 0 0 1px rgba(16,185,129,0.25), 0 0 40px -6px rgba(16,185,129,0.45); }
+.hero-kpi-card.glow-amber { box-shadow: 0 0 0 1px rgba(245,158,11,0.25), 0 0 40px -6px rgba(245,158,11,0.45); }
+.hero-kpi-card.glow-pink { box-shadow: 0 0 0 1px rgba(236,72,153,0.25), 0 0 40px -6px rgba(236,72,153,0.45); }
+.hero-kpi-icon { font-size: 22px; margin-bottom: 10px; display: inline-block; }
+.hero-kpi-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text3); margin-bottom: 6px; }
+.hero-kpi-value { font-size: 36px; font-weight: 700; line-height: 1; }
+.hero-kpi-card.glow-emerald .hero-kpi-value { color: var(--emerald); }
+.hero-kpi-card.glow-amber .hero-kpi-value { color: var(--amber); }
+.hero-kpi-card.glow-pink .hero-kpi-value { color: var(--pink); }
+.hero-kpi-sub { font-size: 12px; color: var(--text2); margin-top: 6px; }
+
+/* ── ACTION CENTER ── */
+.action-center-wrap { margin-bottom: 28px; }
+.ac-list { display: flex; flex-direction: column; gap: 10px; }
+.ac-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  background: var(--card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border); border-left: 3px solid var(--text3);
+  border-radius: 14px; padding: 14px 18px;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.ac-card:hover { transform: translateX(2px); }
+.ac-card.ac-violet { border-left-color: var(--violet); }
+.ac-card.ac-amber { border-left-color: var(--amber); }
+.ac-card.ac-pink { border-left-color: var(--pink); }
+.ac-card-main { display: flex; align-items: center; gap: 12px; }
+.ac-card-icon { font-size: 20px; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); flex-shrink: 0; }
+.ac-card-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.ac-card-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.ac-card-actions { display: flex; gap: 8px; }
+.ac-btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.ac-btn-primary { background: rgba(139,92,246,0.18); color: #C4B5FD; border: 1px solid rgba(139,92,246,0.35); }
+.ac-btn-primary:hover { background: rgba(139,92,246,0.32); color: #fff; }
+.ac-btn-emerald { background: rgba(16,185,129,0.18); color: #6EE7B7; border: 1px solid rgba(16,185,129,0.35); }
+.ac-btn-emerald:hover { background: rgba(16,185,129,0.32); color: #fff; }
+.ac-btn-ghost { background: transparent; color: var(--text3); border: 1px solid var(--border); }
+.ac-btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.25); }
+
+/* ── TABLA FICHAJES RECIENTES: filas amplias interactivas con avatar ── */
+#tabla-reciente tr, .fichaje-row-modern { cursor: pointer; transition: background 0.15s, transform 0.1s; }
+#tabla-reciente td, #tabla-fichajes td { padding: 14px; }
+.fichaje-row-modern:hover td, #tabla-fichajes tr:hover td { background: rgba(255,255,255,0.045); }
+.fichaje-row-modern:hover { transform: translateX(2px); }
+.row-avatar-mini {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 50%; margin-right: 10px;
+  background: linear-gradient(135deg, rgba(245,197,66,0.35), rgba(139,92,246,0.35));
+  color: #fff; font-size: 11px; font-weight: 700; vertical-align: middle;
+}
+#tabla-fichajes tr { cursor: default; }
+
+/* ── DRAWER: anillo de puntualidad + timeline ── */
+.drawer-punt-wrap { display: flex; align-items: center; gap: 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.drawer-punt-ring-outer { width: 66px; height: 66px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); }
+#drawer-punt-ring { width: 66px; height: 66px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient(var(--text3) 0%, rgba(255,255,255,0.08) 0); }
+.drawer-punt-ring-inner { width: 50px; height: 50px; border-radius: 50%; background: var(--bg2); display: flex; align-items: center; justify-content: center; }
+#drawer-punt-pct { font-size: 15px; font-weight: 700; color: var(--text); }
+.drawer-punt-label { font-size: 12px; color: var(--text2); }
+.drawer-punt-label strong { color: var(--text); display: block; font-size: 13px; margin-bottom: 2px; }
+
+.drawer-historial-list.timeline { position: relative; padding-left: 4px; }
+.drawer-historial-list.timeline .drawer-tardanza-item { position: relative; padding-left: 22px; background: transparent; border: none; border-bottom: 1px solid var(--border2); border-radius: 0; padding-top: 10px; padding-bottom: 10px; }
+.drawer-historial-list.timeline .drawer-tardanza-item::before { content: ''; position: absolute; left: 4px; top: 16px; width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 0 3px rgba(16,185,129,0.15); }
+.drawer-historial-list.timeline .drawer-tardanza-item::after { content: ''; position: absolute; left: 8px; top: 24px; bottom: -10px; width: 1px; background: var(--border); }
+.drawer-historial-list.timeline .drawer-tardanza-item:last-child::after { display: none; }
+.drawer-tardanzas-list.timeline .drawer-tardanza-item { position: relative; }
+
+/* Scrollbar sutil */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+@media (max-width: 768px) {
+  .hero-kpi-grid { grid-template-columns: 1fr 1fr; }
 }
 </style>
 </head>
@@ -895,515 +456,537 @@ canvas { max-height: 240px; }
 
 <!-- ── SIDEBAR ── -->
 <aside class="sidebar">
-  <div class="sidebar-brand">
-    <div style="margin-bottom:6px">
-      <img src="/logo-ideal.png" alt="ideal" style="width:150px;height:auto;filter:invert(1)"/>
-    </div>
-    <p style="font-size:10px;color:#444;letter-spacing:1px;text-transform:uppercase">Dashboard</p>
-  </div>
-  <nav class="sidebar-nav">
-    <button class="nav-item active" onclick="showSection('principal')">
-      <span class="nav-icon">📊</span> Principal
-    </button>
-    <button class="nav-item" onclick="showSection('fichajes')">
-      <span class="nav-icon">🕐</span> Fichajes
-    </button>
-    <button class="nav-item" onclick="showSection('empleados')">
-      <span class="nav-icon">👥</span> Empleados
-    </button>
-    <button class="nav-item" onclick="showSection('analisis')">
-      <span class="nav-icon">📈</span> Análisis
-    </button>
-    <button class="nav-item" onclick="showSection('horarios')">
-      <span class="nav-icon">📅</span> Horarios
-    </button>
-  </nav>
-  <div class="sidebar-footer">
-    <span class="live-dot"></span>En vivo · cada 30s
-  </div>
+<div class="sidebar-brand">
+<div style="margin-bottom:6px">
+<img src="/logo-ideal.png" alt="ideal" style="width:150px;height:auto;filter:invert(1)"/>
+</div>
+<p style="font-size:10px;color:#F5C542;letter-spacing:1px;text-transform:uppercase;opacity:0.8">Dashboard Moderno</p>
+</div>
+<nav class="sidebar-nav">
+<button class="nav-item active" onclick="showSection('principal')">
+<span class="nav-icon">📊</span> Principal
+</button>
+<button class="nav-item" onclick="showSection('fichajes')">
+<span class="nav-icon">🕐</span> Fichajes
+</button>
+<button class="nav-item" onclick="showSection('empleados')">
+<span class="nav-icon">👥</span> Empleados
+</button>
+<button class="nav-item" onclick="showSection('analisis')">
+<span class="nav-icon">📈</span> Análisis
+</button>
+<button class="nav-item" onclick="showSection('horarios')">
+<span class="nav-icon">📅</span> Horarios
+</button>
+</nav>
+<div class="sidebar-footer">
+<span class="live-dot"></span>En vivo · cada 30s
+<a class="btn-legacy-link" href="dashboard-barideal.html">🔙 Volver al Diseño Anterior</a>
+</div>
 </aside>
 
 <!-- ── MAIN ── -->
 <main class="main">
-  <div class="topbar">
-    <h2 id="topbar-title" style="font-size:15px;font-weight:600;color:var(--text)">Resumen general</h2>
-    <div class="topbar-actions">
-      <button class="btn btn-outline" onclick="actualizarTodo()">↻ Actualizar</button>
-      <button class="btn btn-gold" onclick="exportarExcel()">⬇ Exportar Excel</button>
-<a href="dashboard-modern.html" class="btn btn-outline" style="text-decoration:none;border-color:rgba(255,200,0,0.45);color:#FFD700;background:rgba(255,200,0,0.08)">🧪 Probar Diseño Moderno</a>
-    </div>
-  </div>
+<div class="topbar">
+<h2 id="topbar-title" style="font-size:15px;font-weight:600;color:var(--text)">Resumen general</h2>
+<div class="topbar-actions">
+<button class="btn btn-outline" onclick="actualizarTodo()">↻ Actualizar</button>
+<button class="btn btn-gold" onclick="exportarExcel()">⬇ Exportar Excel</button>
+</div>
+</div>
 
-  <div class="content">
+<div class="content">
 
-    <!-- ── PRINCIPAL ── -->
-    <section class="section active" id="s-principal">
-      <div class="kpi-grid">
-        <div class="kpi-card" onclick="abrirPopupKpi('fichajes-hoy')">
-          <div class="kpi-label">Fichajes hoy</div>
-          <div class="kpi-value" id="kpi-hoy">—</div>
-          <div class="kpi-sub" id="kpi-hoy-sub">registros de hoy</div>
-        </div>
-        <div class="kpi-card" onclick="abrirPopupKpi('empleados')">
-          <div class="kpi-label">Empleados</div>
-          <div class="kpi-value" id="kpi-empleados">—</div>
-          <div class="kpi-sub">registrados</div>
-        </div>
-        <div class="kpi-card" onclick="abrirPopupKpi('dentro')">
-          <div class="kpi-label">Dentro ahora</div>
-          <div class="kpi-value" id="kpi-dentro">—</div>
-          <div class="kpi-sub" id="kpi-dentro-sub">con entrada activa</div>
-        </div>
-        <div class="kpi-card" onclick="abrirPopupKpi('total')">
-          <div class="kpi-label">Total fichajes</div>
-          <div class="kpi-value" id="kpi-total">—</div>
-          <div class="kpi-sub">histórico</div>
-        </div>
-      </div>
+<!-- ── PRINCIPAL ── -->
+<section class="section active" id="s-principal">
 
-      <div class="section-title">Alertas del día</div>
-      <div class="alert-grid">
-        <div class="alert-card danger" style="cursor:pointer" onclick="abrirPopupAlerta('ausentes')">
-          <div class="alert-title">⛔ Ausentes hoy</div>
-          <div class="alert-value" id="alert-ausentes">—</div>
-          <div class="alert-sub" id="alert-ausentes-nombres">Sin datos</div>
-        </div>
-        <div class="alert-card warning" style="cursor:pointer" onclick="abrirPopupAlerta('tardes')">
-          <div class="alert-title">⏰ Llegadas tarde hoy</div>
-          <div class="alert-value" id="alert-tardes">—</div>
-          <div class="alert-sub" id="alert-tardes-nombres">Sin datos</div>
-        </div>
-        <div class="alert-card success" style="cursor:pointer" onclick="abrirPopupAlerta('puntuales')">
-          <div class="alert-title">✅ Puntuales</div>
-          <div class="alert-value" id="alert-puntuales">—</div>
-          <div class="alert-sub">entraron a tiempo</div>
-        </div>
-        <div class="alert-card incompleto" style="cursor:pointer" onclick="abrirPopupAlerta('incompletos')">
-          <div class="alert-title">⚠️ Fichajes incompletos</div>
-          <div class="alert-value" id="alert-incompletos">—</div>
-          <div class="alert-sub" id="alert-incompletos-nombres">Sin datos</div>
-        </div>
-        <div class="alert-card danger" style="cursor:pointer;border-color:rgba(156,39,176,0.6);background:rgba(156,39,176,0.07)" onclick="abrirPopupAlerta('turno-largo')">
-          <div class="alert-title" style="color:#CE93D8">🔔 Turnos +10h sin salida</div>
-          <div class="alert-value" id="alert-turno-largo">—</div>
-          <div class="alert-sub" id="alert-turno-largo-nombres">Sin datos</div>
-        </div>
-        <div class="alert-card warning" style="cursor:pointer;border-color:rgba(255,152,0,0.6);background:rgba(255,152,0,0.07)" onclick="abrirPopupAlerta('dudosos')">
-          <div class="alert-title" style="color:var(--warning)">🔍 Fichajes dudosos</div>
-          <div class="alert-value" id="alert-dudosos">—</div>
-          <div class="alert-sub" id="alert-dudosos-nombres">Menos de 60 min entre fichajes</div>
-        </div>
-      </div>
+<div class="hero-kpi-grid">
+<div class="hero-kpi-card glow-emerald">
+<span class="hero-kpi-icon">🟢</span>
+<div class="hero-kpi-label">Dentro ahora</div>
+<div class="hero-kpi-value" id="hero-kpi-dentro">—</div>
+<div class="hero-kpi-sub">empleados con entrada activa</div>
+</div>
+<div class="hero-kpi-card glow-amber">
+<span class="hero-kpi-icon">⚠️</span>
+<div class="hero-kpi-label">Alertas hoy</div>
+<div class="hero-kpi-value" id="hero-kpi-alertas">—</div>
+<div class="hero-kpi-sub">ausentes + incompletos + dudosos</div>
+</div>
+<div class="hero-kpi-card glow-pink">
+<span class="hero-kpi-icon">⏰</span>
+<div class="hero-kpi-label">Tardanzas hoy</div>
+<div class="hero-kpi-value" id="hero-kpi-tardanzas">—</div>
+<div class="hero-kpi-sub">llegadas fuera de horario</div>
+</div>
+</div>
 
-      <div class="section-title">Actividad reciente</div>
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Últimos fichajes</div>
-        </div>
-        <div class="panel-body">
-          <table>
-            <thead><tr>
-              <th>Empleado</th><th>Tipo</th><th>Fecha</th><th>Hora</th>
-            </tr></thead>
-            <tbody id="tabla-reciente">
-              <tr><td colspan="4" class="empty-state">Cargando…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+<div class="kpi-grid">
+<div class="kpi-card" onclick="abrirPopupKpi('fichajes-hoy')">
+<div class="kpi-label">Fichajes hoy</div>
+<div class="kpi-value" id="kpi-hoy">—</div>
+<div class="kpi-sub" id="kpi-hoy-sub">registros de hoy</div>
+</div>
+<div class="kpi-card" onclick="abrirPopupKpi('empleados')">
+<div class="kpi-label">Empleados</div>
+<div class="kpi-value" id="kpi-empleados">—</div>
+<div class="kpi-sub">registrados</div>
+</div>
+<div class="kpi-card" onclick="abrirPopupKpi('dentro')">
+<div class="kpi-label">Dentro ahora</div>
+<div class="kpi-value" id="kpi-dentro">—</div>
+<div class="kpi-sub" id="kpi-dentro-sub">con entrada activa</div>
+</div>
+<div class="kpi-card" onclick="abrirPopupKpi('total')">
+<div class="kpi-label">Total fichajes</div>
+<div class="kpi-value" id="kpi-total">—</div>
+<div class="kpi-sub">histórico</div>
+</div>
+</div>
 
-    <!-- ── FICHAJES ── -->
-    <section class="section" id="s-fichajes">
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Registro de fichajes</div>
-          <div class="filters">
-            <select id="filt-empleado" onchange="filtrarFichajes()">
-              <option value="">Todos los empleados</option>
-            </select>
-            <select id="filt-periodo" onchange="filtrarFichajes()">
-              <option value="hoy">Hoy</option>
-              <option value="semana">Esta semana</option>
-              <option value="mes">Este mes</option>
-              <option value="todo">Todo</option>
-            </select>
-          </div>
-        </div>
-        <div class="panel-body">
-          <table>
-            <thead><tr>
-              <th>Empleado</th><th>Fecha</th>
-              <th>Entrada 1</th><th>Salida 1</th>
-              <th>Entrada 2</th><th>Salida 2</th>
-              <th>Horas</th><th>Estado</th>
-            </tr></thead>
-            <tbody id="tabla-fichajes">
-              <tr><td colspan="8" class="empty-state">Cargando…</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="pagination">
-          <button class="page-btn" id="btn-prev" onclick="cambiarPagina(-1)">← Anterior</button>
-          <span class="page-info" id="page-info">1 / 1</span>
-          <button class="page-btn" id="btn-next" onclick="cambiarPagina(1)">Siguiente →</button>
-        </div>
-      </div>
-    </section>
+<div class="section-title">🔔 Centro de acción</div>
+<div class="action-center-wrap">
+<div class="ac-list" id="action-center-list">
+<div class="empty-state">Cargando acciones pendientes…</div>
+</div>
+</div>
 
-    <!-- ── EMPLEADOS ── -->
-    <section class="section" id="s-empleados">
-      <!-- Buscador global -->
-      <div class="panel" style="margin-bottom:20px;overflow:visible">
-        <div class="panel-header">
-          <div class="panel-title">🔍 Buscar empleado</div>
-          <span style="font-size:12px;color:var(--text3)" id="emp-total-count"></span>
-        </div>
-        <div class="panel-body" style="overflow:visible">
-          <div class="emp-search-wrap" id="emp-search-wrap">
-            <input class="emp-search-input" id="emp-search-input" type="text"
-              placeholder="Escribí nombre o apellido…"
-              oninput="buscarEmpleado(this.value)"
-              autocomplete="off"/>
-            <span class="emp-search-icon">🔍</span>
-            <div class="emp-search-results" id="emp-search-results"></div>
-          </div>
-        </div>
-      </div>
+<div class="section-title">Alertas del día — detalle</div>
+<div class="alert-grid">
+<div class="alert-card danger" style="cursor:pointer" onclick="abrirPopupAlerta('ausentes')">
+<div class="alert-title">⛔ Ausentes hoy</div>
+<div class="alert-value" id="alert-ausentes">—</div>
+<div class="alert-sub" id="alert-ausentes-nombres">Sin datos</div>
+</div>
+<div class="alert-card warning" style="cursor:pointer" onclick="abrirPopupAlerta('tardes')">
+<div class="alert-title">⏰ Llegadas tarde hoy</div>
+<div class="alert-value" id="alert-tardes">—</div>
+<div class="alert-sub" id="alert-tardes-nombres">Sin datos</div>
+</div>
+<div class="alert-card success" style="cursor:pointer" onclick="abrirPopupAlerta('puntuales')">
+<div class="alert-title">✅ Puntuales</div>
+<div class="alert-value" id="alert-puntuales">—</div>
+<div class="alert-sub">entraron a tiempo</div>
+</div>
+<div class="alert-card incompleto" style="cursor:pointer" onclick="abrirPopupAlerta('incompletos')">
+<div class="alert-title">⚠️ Fichajes incompletos</div>
+<div class="alert-value" id="alert-incompletos">—</div>
+<div class="alert-sub" id="alert-incompletos-nombres">Sin datos</div>
+</div>
+<div class="alert-card danger" style="cursor:pointer;border-color:rgba(139,92,246,0.6);background:rgba(139,92,246,0.07)" onclick="abrirPopupAlerta('turno-largo')">
+<div class="alert-title" style="color:#C4B5FD">🔔 Turnos +10h sin salida</div>
+<div class="alert-value" id="alert-turno-largo">—</div>
+<div class="alert-sub" id="alert-turno-largo-nombres">Sin datos</div>
+</div>
+<div class="alert-card warning" style="cursor:pointer;border-color:rgba(245,158,11,0.6);background:rgba(245,158,11,0.07)" onclick="abrirPopupAlerta('dudosos')">
+<div class="alert-title" style="color:var(--warning)">🔍 Fichajes dudosos</div>
+<div class="alert-value" id="alert-dudosos">—</div>
+<div class="alert-sub" id="alert-dudosos-nombres">Menos de 60 min entre fichajes</div>
+</div>
+</div>
 
-      <div class="section-title">Estado actual</div>
-      <div class="emp-grid" id="emp-grid">
-        <div class="empty-state">Cargando empleados…</div>
-      </div>
+<div class="section-title">Actividad reciente</div>
+<div class="panel">
+<div class="panel-header">
+<div class="panel-title">Últimos fichajes</div>
+<span style="font-size:11px;color:var(--text3)">💡 Clic en una fila para editar el fichaje</span>
+</div>
+<div class="panel-body">
+<table>
+<thead><tr>
+<th>Empleado</th><th>Tipo</th><th>Fecha</th><th>Hora</th>
+</tr></thead>
+<tbody id="tabla-reciente">
+<tr><td colspan="4" class="empty-state">Cargando…</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
 
-      <!-- Vinculación planilla -->
-      <div class="panel" style="margin-top:20px">
-        <div class="panel-header">
-          <div class="panel-title">👥 Empleados de la planilla</div>
-          <div class="filters">
-            <span style="font-size:12px;color:var(--text3)" id="planilla-status">Cargando…</span>
-          </div>
-        </div>
-        <div class="panel-body">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Nombre en planilla</th>
-                <th>Rol</th>
-                <th>Vinculado con</th>
-                <th>Estado</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-planilla"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+<!-- ── FICHAJES ── -->
+<section class="section" id="s-fichajes">
+<div class="panel">
+<div class="panel-header">
+<div class="panel-title">Registro de fichajes</div>
+<div class="filters">
+<select id="filt-empleado" onchange="filtrarFichajes()">
+<option value="">Todos los empleados</option>
+</select>
+<select id="filt-periodo" onchange="filtrarFichajes()">
+<option value="hoy">Hoy</option>
+<option value="semana">Esta semana</option>
+<option value="mes">Este mes</option>
+<option value="todo">Todo</option>
+</select>
+</div>
+</div>
+<div class="panel-body">
+<table>
+<thead><tr>
+<th>Empleado</th><th>Fecha</th>
+<th>Entrada 1</th><th>Salida 1</th>
+<th>Entrada 2</th><th>Salida 2</th>
+<th>Horas</th><th>Estado</th>
+</tr></thead>
+<tbody id="tabla-fichajes">
+<tr><td colspan="8" class="empty-state">Cargando…</td></tr>
+</tbody>
+</table>
+</div>
+<div class="pagination">
+<button class="page-btn" id="btn-prev" onclick="cambiarPagina(-1)">← Anterior</button>
+<span class="page-info" id="page-info">1 / 1</span>
+<button class="page-btn" id="btn-next" onclick="cambiarPagina(1)">Siguiente →</button>
+</div>
+</div>
+</section>
 
-    <!-- ── ANÁLISIS ── -->
-    <section class="section" id="s-analisis">
+<!-- ── EMPLEADOS ── -->
+<section class="section" id="s-empleados">
+<div class="panel" style="margin-bottom:20px;overflow:visible">
+<div class="panel-header">
+<div class="panel-title">🔍 Buscar empleado</div>
+<span style="font-size:12px;color:var(--text3)" id="emp-total-count"></span>
+</div>
+<div class="panel-body" style="overflow:visible">
+<div class="emp-search-wrap" id="emp-search-wrap">
+<input class="emp-search-input" id="emp-search-input" type="text"
+placeholder="Escribí nombre o apellido…"
+oninput="buscarEmpleado(this.value)"
+autocomplete="off"/>
+<span class="emp-search-icon">🔍</span>
+<div class="emp-search-results" id="emp-search-results"></div>
+</div>
+</div>
+</div>
 
-      <!-- ── KPIs NÓMINA — siempre visibles ── -->
-      <div id="nomina-kpis-wrap" style="margin-bottom:20px">
-        <div class="nomina-kpi-header">
-          <div class="nomina-kpi-title">📊 Toda la nómina — hoy</div>
-          <select id="nomina-periodo" onchange="calcularKpisNomina()" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;outline:none">
-            <option value="hoy">Hoy</option>
-            <option value="semana">Esta semana</option>
-            <option value="mes" selected>Este mes</option>
-            <option value="todo">Todo</option>
-          </select>
-        </div>
-        <div class="nomina-kpi-grid">
-          <div class="nomina-kpi-card" style="--nomina-accent:#4CAF50" onclick="abrirPopupNomina('presentes')">
-            <div class="nomina-kpi-label">Tasa de presencia</div>
-            <div class="nomina-kpi-value" id="nkpi-presencia">—%</div>
-            <div class="nomina-kpi-sub" id="nkpi-presencia-sub">empleados vs esperados</div>
-          </div>
-          <div class="nomina-kpi-card" style="--nomina-accent:#E53935" onclick="abrirPopupNomina('ausentes')">
-            <div class="nomina-kpi-label">Ausentes</div>
-            <div class="nomina-kpi-value" id="nkpi-ausentes" style="color:#E53935">—</div>
-            <div class="nomina-kpi-sub" id="nkpi-ausentes-sub">en el período</div>
-          </div>
-          <div class="nomina-kpi-card" style="--nomina-accent:#FF9800" onclick="abrirPopupNomina('tardanzas')">
-            <div class="nomina-kpi-label">Tardanzas</div>
-            <div class="nomina-kpi-value" id="nkpi-tardanzas" style="color:#FF9800">—</div>
-            <div class="nomina-kpi-sub" id="nkpi-tardanzas-sub">promedio — min</div>
-          </div>
-          <div class="nomina-kpi-card" style="--nomina-accent:#4CAF50" onclick="abrirPopupNomina('puntuales')">
-            <div class="nomina-kpi-label">Puntuales</div>
-            <div class="nomina-kpi-value" id="nkpi-puntuales" style="color:#4CAF50">—</div>
-            <div class="nomina-kpi-sub" id="nkpi-puntuales-sub">% del total esperado</div>
-          </div>
-          <div class="nomina-kpi-card" style="--nomina-accent:#FFFFFF" onclick="abrirPopupNomina('horas')">
-            <div class="nomina-kpi-label">Horas trabajadas</div>
-            <div class="nomina-kpi-value" id="nkpi-horas">—</div>
-            <div class="nomina-kpi-sub" id="nkpi-horas-sub">vs programadas</div>
-          </div>
-        </div>
-      </div>
+<div class="section-title">Estado actual</div>
+<div class="emp-grid" id="emp-grid">
+<div class="empty-state">Cargando empleados…</div>
+</div>
 
-      <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header">
-          <div class="panel-title">Filtrar por empleado</div>
-          <div class="filters">
-            <select id="analisis-empleado" onchange="cargarAnalisis()">
-              <option value="">Seleccioná un empleado</option>
-            </select>
-            <select id="analisis-periodo" onchange="cargarAnalisis()">
-              <option value="hoy">Hoy</option>
-              <option value="semana">Esta semana</option>
-              <option value="mes" selected>Este mes</option>
-              <option value="todo">Todo</option>
-            </select>
-          </div>
-        </div>
-      </div>
+<div class="panel" style="margin-top:20px">
+<div class="panel-header">
+<div class="panel-title">👥 Empleados de la planilla</div>
+<div class="filters">
+<span style="font-size:12px;color:var(--text3)" id="planilla-status">Cargando…</span>
+</div>
+</div>
+<div class="panel-body">
+<table class="data-table">
+<thead>
+<tr>
+<th>Nombre en planilla</th>
+<th>Rol</th>
+<th>Vinculado con</th>
+<th>Estado</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody id="tabla-planilla"></tbody>
+</table>
+</div>
+</div>
+</section>
 
-      <!-- KPIs macro del período seleccionado -->
-      <div id="analisis-kpis" style="display:none;margin-bottom:20px">
-        <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
-          <div class="kpi-card" style="border-color:rgba(76,175,80,0.4)">
-            <div class="kpi-label">Tasa de presencia</div>
-            <div class="kpi-value" id="an-presencia" style="color:#4CAF50">—%</div>
-            <div class="kpi-sub" id="an-presencia-sub">del total esperado</div>
-          </div>
-          <div class="kpi-card" style="border-color:rgba(229,57,53,0.4)">
-            <div class="kpi-label">Ausencias</div>
-            <div class="kpi-value" id="an-ausencias" style="color:#E53935">—</div>
-            <div class="kpi-sub" id="an-ausencias-sub">días sin asistir</div>
-          </div>
-          <div class="kpi-card" style="border-color:rgba(255,152,0,0.4)">
-            <div class="kpi-label">Tardanzas</div>
-            <div class="kpi-value" id="an-tardanzas" style="color:#FF9800">—</div>
-            <div class="kpi-sub" id="an-tardanzas-sub">promedio — min</div>
-          </div>
-          <div class="kpi-card" style="border-color:rgba(201,168,76,0.4)">
-            <div class="kpi-label">Horas trabajadas</div>
-            <div class="kpi-value" id="an-horas" style="color:var(--gold)">—</div>
-            <div class="kpi-sub" id="an-horas-sub">vs programadas</div>
-          </div>
-          <div class="kpi-card" style="border-color:rgba(66,165,245,0.4)">
-            <div class="kpi-label">Puntualidad</div>
-            <div class="kpi-value" id="an-puntualidad" style="color:#42A5F5">—%</div>
-            <div class="kpi-sub">días con horario cumplido</div>
-          </div>
-        </div>
+<!-- ── ANÁLISIS ── -->
+<section class="section" id="s-analisis">
 
-        <!-- Gráfico de asistencia por día -->
-        <div class="panel" style="margin-top:16px;padding:20px">
-          <div class="panel-title" style="margin-bottom:16px">Asistencia por día</div>
-          <div id="an-grafico-wrap" style="overflow-x:auto">
-            <canvas id="an-grafico" height="120"></canvas>
-          </div>
-        </div>
+<div id="nomina-kpis-wrap" style="margin-bottom:20px">
+<div class="nomina-kpi-header">
+<div class="nomina-kpi-title">📊 Toda la nómina — hoy</div>
+<select id="nomina-periodo" onchange="calcularKpisNomina()" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;outline:none">
+<option value="hoy">Hoy</option>
+<option value="semana">Esta semana</option>
+<option value="mes" selected>Este mes</option>
+<option value="todo">Todo</option>
+</select>
+</div>
+<div class="nomina-kpi-grid">
+<div class="nomina-kpi-card" style="--nomina-accent:#10B981" onclick="abrirPopupNomina('presentes')">
+<div class="nomina-kpi-label">Tasa de presencia</div>
+<div class="nomina-kpi-value" id="nkpi-presencia">—%</div>
+<div class="nomina-kpi-sub" id="nkpi-presencia-sub">empleados vs esperados</div>
+</div>
+<div class="nomina-kpi-card" style="--nomina-accent:#EC4899" onclick="abrirPopupNomina('ausentes')">
+<div class="nomina-kpi-label">Ausentes</div>
+<div class="nomina-kpi-value" id="nkpi-ausentes" style="color:#EC4899">—</div>
+<div class="nomina-kpi-sub" id="nkpi-ausentes-sub">en el período</div>
+</div>
+<div class="nomina-kpi-card" style="--nomina-accent:#F59E0B" onclick="abrirPopupNomina('tardanzas')">
+<div class="nomina-kpi-label">Tardanzas</div>
+<div class="nomina-kpi-value" id="nkpi-tardanzas" style="color:#F59E0B">—</div>
+<div class="nomina-kpi-sub" id="nkpi-tardanzas-sub">promedio — min</div>
+</div>
+<div class="nomina-kpi-card" style="--nomina-accent:#10B981" onclick="abrirPopupNomina('puntuales')">
+<div class="nomina-kpi-label">Puntuales</div>
+<div class="nomina-kpi-value" id="nkpi-puntuales" style="color:#10B981">—</div>
+<div class="nomina-kpi-sub" id="nkpi-puntuales-sub">% del total esperado</div>
+</div>
+<div class="nomina-kpi-card" style="--nomina-accent:#F5C542" onclick="abrirPopupNomina('horas')">
+<div class="nomina-kpi-label">Horas trabajadas</div>
+<div class="nomina-kpi-value" id="nkpi-horas">—</div>
+<div class="nomina-kpi-sub" id="nkpi-horas-sub">vs programadas</div>
+</div>
+</div>
+</div>
 
-        <!-- Tabla de alertas semáforo -->
-        <div class="panel" style="margin-top:16px;padding:0">
-          <div class="panel-header" style="padding:14px 20px">
-            <div class="panel-title">Detalle por día</div>
-          </div>
-          <div style="overflow-x:auto">
-            <table class="tabla-fichajes">
-              <thead><tr>
-                <th>Fecha</th>
-                <th>Entrada</th>
-                <th>Salida</th>
-                <th>Horas</th>
-                <th>Estado</th>
-                <th>Diferencia</th>
-              </tr></thead>
-              <tbody id="an-tabla-body"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+<div class="panel" style="margin-bottom:20px">
+<div class="panel-header">
+<div class="panel-title">Filtrar por empleado</div>
+<div class="filters">
+<select id="analisis-empleado" onchange="cargarAnalisis()">
+<option value="">Seleccioná un empleado</option>
+</select>
+<select id="analisis-periodo" onchange="cargarAnalisis()">
+<option value="hoy">Hoy</option>
+<option value="semana">Esta semana</option>
+<option value="mes" selected>Este mes</option>
+<option value="todo">Todo</option>
+</select>
+</div>
+</div>
+</div>
 
-      <div id="analisis-content" style="display:none">
+<div id="analisis-kpis" style="display:none;margin-bottom:20px">
+<div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
+<div class="kpi-card" style="border-color:rgba(16,185,129,0.4)">
+<div class="kpi-label">Tasa de presencia</div>
+<div class="kpi-value" id="an-presencia" style="color:#10B981">—%</div>
+<div class="kpi-sub" id="an-presencia-sub">del total esperado</div>
+</div>
+<div class="kpi-card" style="border-color:rgba(236,72,153,0.4)">
+<div class="kpi-label">Ausencias</div>
+<div class="kpi-value" id="an-ausencias" style="color:#EC4899">—</div>
+<div class="kpi-sub" id="an-ausencias-sub">días sin asistir</div>
+</div>
+<div class="kpi-card" style="border-color:rgba(245,158,11,0.4)">
+<div class="kpi-label">Tardanzas</div>
+<div class="kpi-value" id="an-tardanzas" style="color:#F59E0B">—</div>
+<div class="kpi-sub" id="an-tardanzas-sub">promedio — min</div>
+</div>
+<div class="kpi-card" style="border-color:rgba(245,197,66,0.4)">
+<div class="kpi-label">Horas trabajadas</div>
+<div class="kpi-value" id="an-horas" style="color:var(--gold)">—</div>
+<div class="kpi-sub" id="an-horas-sub">vs programadas</div>
+</div>
+<div class="kpi-card" style="border-color:rgba(56,189,248,0.4)">
+<div class="kpi-label">Puntualidad</div>
+<div class="kpi-value" id="an-puntualidad" style="color:#38BDF8">—%</div>
+<div class="kpi-sub">días con horario cumplido</div>
+</div>
+</div>
 
-        <div class="bolsa-card" id="bolsa-card">
-          <div class="bolsa-main">
-            <div class="bolsa-title">Bolsa de horas</div>
-            <div class="bolsa-value" id="bolsa-valor">+0h</div>
-            <div class="bolsa-sub" id="bolsa-desc">Diferencia respecto a horas programadas</div>
-          </div>
-          <div class="bolsa-breakdown">
-            <div>Trabajadas: <span id="bolsa-trabajadas">0h</span></div>
-            <div>Programadas: <span id="bolsa-programadas">0h</span></div>
-          </div>
-        </div>
+<div class="panel" style="margin-top:16px;padding:20px">
+<div class="panel-title" style="margin-bottom:16px">Asistencia por día</div>
+<div id="an-grafico-wrap" style="overflow-x:auto">
+<canvas id="an-grafico" height="120"></canvas>
+</div>
+</div>
 
-        <div class="resumen-grid">
-          <div class="resumen-card">
-            <div class="resumen-label">Horas trabajadas</div>
-            <div class="resumen-value gold" id="res-horas">—</div>
-            <div class="resumen-sub">en el período</div>
-          </div>
-          <div class="resumen-card">
-            <div class="resumen-label">Días trabajados</div>
-            <div class="resumen-value" id="res-dias">—</div>
-            <div class="resumen-sub">con al menos 1 fichaje</div>
-          </div>
-          <div class="resumen-card">
-            <div class="resumen-label">Promedio diario</div>
-            <div class="resumen-value" id="res-prom">—</div>
-            <div class="resumen-sub">horas por día</div>
-          </div>
-          <div class="resumen-card">
-            <div class="resumen-label">Llegadas tarde</div>
-            <div class="resumen-value warning" id="res-tardes">—</div>
-            <div class="resumen-sub">veces en el período</div>
-          </div>
-          <div class="resumen-card">
-            <div class="resumen-label">Ausencias</div>
-            <div class="resumen-value danger" id="res-ausencias">—</div>
-            <div class="resumen-sub">días sin fichar</div>
-          </div>
-        </div>
+<div class="panel" style="margin-top:16px;padding:0">
+<div class="panel-header" style="padding:14px 20px">
+<div class="panel-title">Detalle por día</div>
+</div>
+<div style="overflow-x:auto">
+<table class="tabla-fichajes">
+<thead><tr>
+<th>Fecha</th>
+<th>Entrada</th>
+<th>Salida</th>
+<th>Horas</th>
+<th>Estado</th>
+<th>Diferencia</th>
+</tr></thead>
+<tbody id="an-tabla-body"></tbody>
+</table>
+</div>
+</div>
+</div>
 
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-title">Horas trabajadas por día</div>
-          </div>
-          <div class="chart-wrap">
-            <canvas id="chart-horas"></canvas>
-          </div>
-        </div>
+<div id="analisis-content" style="display:none">
 
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-title">Detalle de fichajes</div>
-          </div>
-          <div class="panel-body">
-            <table>
-              <thead><tr>
-                <th>Fecha</th><th>Entrada 1</th><th>Salida 1</th>
-                <th>Entrada 2</th><th>Salida 2</th>
-                <th>Total hs</th><th>Estado</th><th>Diferencia</th>
-              </tr></thead>
-              <tbody id="tabla-analisis">
-                <tr><td colspan="8" class="empty-state">Sin datos</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+<div class="bolsa-card" id="bolsa-card">
+<div class="bolsa-main">
+<div class="bolsa-title">Bolsa de horas</div>
+<div class="bolsa-value" id="bolsa-valor">+0h</div>
+<div class="bolsa-sub" id="bolsa-desc">Diferencia respecto a horas programadas</div>
+</div>
+<div class="bolsa-breakdown">
+<div>Trabajadas: <span id="bolsa-trabajadas">0h</span></div>
+<div>Programadas: <span id="bolsa-programadas">0h</span></div>
+</div>
+</div>
 
-      </div>
-      <div id="analisis-empty" style="padding:40px;text-align:center;color:var(--text3);font-size:13px">
-        Seleccioná un empleado para ver su análisis
-      </div>
-    </section>
+<div class="resumen-grid">
+<div class="resumen-card">
+<div class="resumen-label">Horas trabajadas</div>
+<div class="resumen-value gold" id="res-horas">—</div>
+<div class="resumen-sub">en el período</div>
+</div>
+<div class="resumen-card">
+<div class="resumen-label">Días trabajados</div>
+<div class="resumen-value" id="res-dias">—</div>
+<div class="resumen-sub">con al menos 1 fichaje</div>
+</div>
+<div class="resumen-card">
+<div class="resumen-label">Promedio diario</div>
+<div class="resumen-value" id="res-prom">—</div>
+<div class="resumen-sub">horas por día</div>
+</div>
+<div class="resumen-card">
+<div class="resumen-label">Llegadas tarde</div>
+<div class="resumen-value warning" id="res-tardes">—</div>
+<div class="resumen-sub">veces en el período</div>
+</div>
+<div class="resumen-card">
+<div class="resumen-label">Ausencias</div>
+<div class="resumen-value danger" id="res-ausencias">—</div>
+<div class="resumen-sub">días sin fichar</div>
+</div>
+</div>
 
-    <!-- ── HORARIOS ── -->
-    <section class="section" id="s-horarios">
-      <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header">
-          <div class="panel-title">Planilla semanal de turnos</div>
-          <div class="filters" style="gap:8px">
-            <!-- Navegación semana -->
-            <div class="semana-nav">
-              <button class="semana-nav-btn" onclick="navegarSemana(-1)">◀</button>
-              <span class="semana-label" id="semana-label">—</span>
-              <button class="semana-nav-btn" onclick="navegarSemana(1)">▶</button>
-            </div>
-            <input type="date" id="semana-inicio" onchange="cargarHorarios()" style="display:none">
-            <button class="btn btn-outline" onclick="irAHoy()" style="font-size:12px">Hoy</button>
-            <div style="position:relative;display:inline-block">
-              <button class="btn-wsp" onclick="toggleMenuWsp(event)" title="Generar imagen para WhatsApp">📲 WhatsApp ▾</button>
-              <div id="menu-wsp" style="display:none;position:absolute;top:38px;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;z-index:200;min-width:200px;box-shadow:0 8px 24px rgba(0,0,0,0.5)">
-                <div style="font-size:10px;color:var(--text3);padding:0 0 8px;text-transform:uppercase;letter-spacing:0.5px">Seleccioná los roles</div>
-                <label class="wsp-check-label"><input type="checkbox" value="Salón" class="wsp-rol-check" checked> 🍽️ Salón</label>
-                <label class="wsp-check-label"><input type="checkbox" value="Cocina" class="wsp-rol-check" checked> 👨‍🍳 Cocina</label>
-                <label class="wsp-check-label"><input type="checkbox" value="Encargado" class="wsp-rol-check"> 👔 Encargado</label>
-                <label class="wsp-check-label"><input type="checkbox" value="Limpieza" class="wsp-rol-check"> 🧹 Limpieza</label>
-                <label class="wsp-check-label"><input type="checkbox" value="Administración" class="wsp-rol-check"> 📊 Administración</label>
-                <button onclick="generarGrillaWsp()" class="menu-wsp-btn" style="margin-top:8px;background:#25D366;color:#fff;font-weight:700;width:100%;border-radius:6px">📲 Generar grilla</button>
-              </div>
-            </div>
-            <button class="btn btn-outline" onclick="document.getElementById('file-horarios').click()" style="font-size:12px">
-              📁 Importar Excel
-            </button>
-            <input type="file" id="file-horarios" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarHorarios(event)">
-          </div>
-        </div>
+<div class="panel">
+<div class="panel-header">
+<div class="panel-title">Horas trabajadas por día</div>
+</div>
+<div class="chart-wrap">
+<canvas id="chart-horas"></canvas>
+</div>
+</div>
 
-        <!-- Leyenda rápida -->
-        <div style="display:flex;gap:16px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text3)">
-          <span>💡 Clic en celda para editar turno</span>
-          <span style="color:#64B4FF">■ Franco</span>
-          <span style="color:#FF5050">■ Ausente</span>
-          <span style="color:#DDD">■ Turno asignado</span>
-        </div>
+<div class="panel">
+<div class="panel-header">
+<div class="panel-title">Detalle de fichajes</div>
+</div>
+<div class="panel-body">
+<table>
+<thead><tr>
+<th>Fecha</th><th>Entrada 1</th><th>Salida 1</th>
+<th>Entrada 2</th><th>Salida 2</th>
+<th>Total hs</th><th>Estado</th><th>Diferencia</th>
+</tr></thead>
+<tbody id="tabla-analisis">
+<tr><td colspan="8" class="empty-state">Sin datos</td></tr>
+</tbody>
+</table>
+</div>
+</div>
 
-        <div style="overflow-x:auto">
-          <table class="horarios-table">
-            <thead>
-              <tr>
-                <th class="th-nombre">Empleado</th>
-                <th class="th-rol">Rol</th>
-                <th id="th-lun">Lun</th>
-                <th id="th-mar">Mar</th>
-                <th id="th-mie">Mié</th>
-                <th id="th-jue">Jue</th>
-                <th id="th-vie">Vie</th>
-                <th id="th-sab">Sáb</th>
-                <th id="th-dom">Dom</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-horarios">
-              <tr><td colspan="9" class="empty-state">Cargando…</td></tr>
-            </tbody>
-          </table>
-        </div>
+</div>
+<div id="analisis-empty" style="padding:40px;text-align:center;color:var(--text3);font-size:13px">
+Seleccioná un empleado para ver su análisis
+</div>
+</section>
 
-        <div id="sin-vincular-alert" style="display:none;margin:12px 16px;padding:10px 14px;background:rgba(255,180,0,0.1);border:1px solid rgba(255,180,0,0.3);border-radius:8px;font-size:12px;color:#FFB400">
-          ⚠️ <strong id="sin-vincular-count">0</strong> empleado(s) de la planilla aún no vinculados con la app.
-          <button onclick="showSection('empleados')" style="margin-left:8px;background:none;border:none;color:#FFB400;text-decoration:underline;cursor:pointer;font-size:12px">Ver empleados</button>
-        </div>
-      </div>
-    </section>
+<!-- ── HORARIOS ── -->
+<section class="section" id="s-horarios">
+<div class="panel" style="margin-bottom:20px">
+<div class="panel-header">
+<div class="panel-title">Planilla semanal de turnos</div>
+<div class="filters" style="gap:8px">
+<div class="semana-nav">
+<button class="semana-nav-btn" onclick="navegarSemana(-1)">◀</button>
+<span class="semana-label" id="semana-label">—</span>
+<button class="semana-nav-btn" onclick="navegarSemana(1)">▶</button>
+</div>
+<input type="date" id="semana-inicio" onchange="cargarHorarios()" style="display:none">
+<button class="btn btn-outline" onclick="irAHoy()" style="font-size:12px">Hoy</button>
+<div style="position:relative;display:inline-block">
+<button class="btn-wsp" onclick="toggleMenuWsp(event)" title="Generar imagen para WhatsApp">📲 WhatsApp ▾</button>
+<div id="menu-wsp" style="display:none;position:absolute;top:38px;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;z-index:200;min-width:200px;box-shadow:0 8px 24px rgba(0,0,0,0.5)">
+<div style="font-size:10px;color:var(--text3);padding:0 0 8px;text-transform:uppercase;letter-spacing:0.5px">Seleccioná los roles</div>
+<label class="wsp-check-label"><input type="checkbox" value="Salón" class="wsp-rol-check" checked> 🍽️ Salón</label>
+<label class="wsp-check-label"><input type="checkbox" value="Cocina" class="wsp-rol-check" checked> 👨‍🍳 Cocina</label>
+<label class="wsp-check-label"><input type="checkbox" value="Encargado" class="wsp-rol-check"> 👔 Encargado</label>
+<label class="wsp-check-label"><input type="checkbox" value="Limpieza" class="wsp-rol-check"> 🧹 Limpieza</label>
+<label class="wsp-check-label"><input type="checkbox" value="Administración" class="wsp-rol-check"> 📊 Administración</label>
+<button onclick="generarGrillaWsp()" class="menu-wsp-btn" style="margin-top:8px;background:#25D366;color:#fff;font-weight:700;width:100%;border-radius:6px">📲 Generar grilla</button>
+</div>
+</div>
+<button class="btn btn-outline" onclick="document.getElementById('file-horarios').click()" style="font-size:12px">
+📁 Importar Excel
+</button>
+<input type="file" id="file-horarios" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarHorarios(event)">
+</div>
+</div>
 
-  </div><!-- /content -->
+<div style="display:flex;gap:16px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text3)">
+<span>💡 Clic en celda para editar turno</span>
+<span style="color:#64B4FF">■ Franco</span>
+<span style="color:#FF5050">■ Ausente</span>
+<span style="color:#DDD">■ Turno asignado</span>
+</div>
+
+<div style="overflow-x:auto">
+<table class="horarios-table">
+<thead>
+<tr>
+<th class="th-nombre">Empleado</th>
+<th class="th-rol">Rol</th>
+<th id="th-lun">Lun</th>
+<th id="th-mar">Mar</th>
+<th id="th-mie">Mié</th>
+<th id="th-jue">Jue</th>
+<th id="th-vie">Vie</th>
+<th id="th-sab">Sáb</th>
+<th id="th-dom">Dom</th>
+</tr>
+</thead>
+<tbody id="tabla-horarios">
+<tr><td colspan="9" class="empty-state">Cargando…</td></tr>
+</tbody>
+</table>
+</div>
+
+<div id="sin-vincular-alert" style="display:none;margin:12px 16px;padding:10px 14px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;font-size:12px;color:#F59E0B">
+⚠️ <strong id="sin-vincular-count">0</strong> empleado(s) de la planilla aún no vinculados con la app.
+<button onclick="showSection('empleados')" style="margin-left:8px;background:none;border:none;color:#F59E0B;text-decoration:underline;cursor:pointer;font-size:12px">Ver empleados</button>
+</div>
+</div>
+</section>
+
+</div><!-- /content -->
 </main>
 
 <!-- ── MODAL EDITAR EMPLEADO ── -->
 <div class="modal-bg" id="modal-edit-emp">
-  <div class="modal-edit-emp">
-    <div class="modal-edit-header">
-      <div class="modal-edit-title">Editar empleado</div>
-      <button class="modal-close-btn" onclick="cerrarEditarEmp()">×</button>
-    </div>
-    <div class="modal-edit-body">
-      <input type="hidden" id="edit-emp-id"/>
-      <input type="hidden" id="edit-emp-tipo"/> <!-- 'app' o 'planilla' -->
-      <div class="modal-edit-field">
-        <label>Nombre</label>
-        <input class="modal-edit-input" id="edit-emp-nombre" type="text"/>
-      </div>
-      <div class="modal-edit-field">
-        <label>Apellido</label>
-        <input class="modal-edit-input" id="edit-emp-apellido" type="text"/>
-      </div>
-      <div class="modal-edit-field" id="edit-celular-field">
-        <label>Celular</label>
-        <input class="modal-edit-input" id="edit-emp-celular" type="tel"/>
-      </div>
-      <div class="modal-edit-field" id="edit-rol-field">
-        <label>Rol</label>
-        <input class="modal-edit-input" id="edit-emp-rol" type="text"/>
-      </div>
+<div class="modal-edit-emp">
+<div class="modal-edit-header">
+<div class="modal-edit-title">Editar empleado</div>
+<button class="modal-close-btn" onclick="cerrarEditarEmp()">×</button>
+</div>
+<div class="modal-edit-body">
+<input type="hidden" id="edit-emp-id"/>
+<input type="hidden" id="edit-emp-tipo"/>
+<div class="modal-edit-field">
+<label>Nombre</label>
+<input class="modal-edit-input" id="edit-emp-nombre" type="text"/>
+</div>
+<div class="modal-edit-field">
+<label>Apellido</label>
+<input class="modal-edit-input" id="edit-emp-apellido" type="text"/>
+</div>
+<div class="modal-edit-field" id="edit-celular-field">
+<label>Celular</label>
+<input class="modal-edit-input" id="edit-emp-celular" type="tel"/>
+</div>
+<div class="modal-edit-field" id="edit-rol-field">
+<label>Rol</label>
+<input class="modal-edit-input" id="edit-emp-rol" type="text"/>
+</div>
 <div class="modal-edit-field" id="edit-pin-field">
 <label>PIN de Seguridad (4 dígitos)</label>
 <input class="modal-edit-input" id="edit-emp-pin" type="text" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="1234"/>
 </div>
-    </div>
-    <div class="modal-edit-footer">
-      <button class="modal-edit-danger" id="edit-delete-btn" onclick="confirmarEliminar()">🗑 Eliminar</button>
-      <button class="modal-edit-cancel" onclick="cerrarEditarEmp()">Cancelar</button>
-      <button class="modal-edit-save" onclick="guardarEdicion()">Guardar</button>
-    </div>
-  </div>
+</div>
+<div class="modal-edit-footer">
+<button class="modal-edit-danger" id="edit-delete-btn" onclick="confirmarEliminar()">🗑 Eliminar</button>
+<button class="modal-edit-cancel" onclick="cerrarEditarEmp()">Cancelar</button>
+<button class="modal-edit-save" onclick="guardarEdicion()">Guardar</button>
+</div>
+</div>
 </div>
 
 <!-- ── MODAL EDITAR FICHAJE ── -->
@@ -1446,122 +1029,112 @@ canvas { max-height: 240px; }
 
 <!-- ── MODAL NUEVO EMPLEADO ── -->
 <div class="modal-bg" id="modal-emp-nuevo">
-  <div class="modal-emp-new">
-    <div class="modal-emp-header">
-      <div class="modal-emp-title" id="modal-emp-title">Agregar empleado</div>
-      <button class="modal-close-btn" onclick="cerrarModalEmp()">×</button>
-    </div>
-    <div class="modal-emp-body">
-      <div class="modal-emp-field">
-        <label>Nombre</label>
-        <input class="modal-emp-input" id="new-emp-nombre" type="text" placeholder="Ej: Juan"/>
-      </div>
-      <div class="modal-emp-field">
-        <label>Apellido</label>
-        <input class="modal-emp-input" id="new-emp-apellido" type="text" placeholder="Ej: González"/>
-      </div>
-      <div class="modal-emp-field">
-        <label>Rol / Sector</label>
-        <input class="modal-emp-input" id="new-emp-rol" type="text" placeholder="Ej: Cocina, Salón…"/>
-        <div class="rol-suggestions" id="rol-suggestions"></div>
-      </div>
-      <div class="modal-emp-field" id="vincular-field" style="display:none">
-        <label>Vincular con empleado de la app (opcional)</label>
-        <select class="modal-emp-input" id="new-emp-vincular">
-          <option value="">Sin vincular por ahora</option>
-        </select>
-      </div>
-    </div>
-    <div class="modal-emp-footer">
-      <button class="btn-cancelar-emp" onclick="cerrarModalEmp()">Cancelar</button>
-      <button class="btn-guardar-emp" onclick="guardarNuevoEmp()">Agregar</button>
-    </div>
-  </div>
+<div class="modal-emp-new">
+<div class="modal-emp-header">
+<div class="modal-emp-title" id="modal-emp-title">Agregar empleado</div>
+<button class="modal-close-btn" onclick="cerrarModalEmp()">×</button>
+</div>
+<div class="modal-emp-body">
+<div class="modal-emp-field">
+<label>Nombre</label>
+<input class="modal-emp-input" id="new-emp-nombre" type="text" placeholder="Ej: Juan"/>
+</div>
+<div class="modal-emp-field">
+<label>Apellido</label>
+<input class="modal-emp-input" id="new-emp-apellido" type="text" placeholder="Ej: González"/>
+</div>
+<div class="modal-emp-field">
+<label>Rol / Sector</label>
+<input class="modal-emp-input" id="new-emp-rol" type="text" placeholder="Ej: Cocina, Salón…"/>
+<div class="rol-suggestions" id="rol-suggestions"></div>
+</div>
+<div class="modal-emp-field" id="vincular-field" style="display:none">
+<label>Vincular con empleado de la app (opcional)</label>
+<select class="modal-emp-input" id="new-emp-vincular">
+<option value="">Sin vincular por ahora</option>
+</select>
+</div>
+</div>
+<div class="modal-emp-footer">
+<button class="btn-cancelar-emp" onclick="cerrarModalEmp()">Cancelar</button>
+<button class="btn-guardar-emp" onclick="guardarNuevoEmp()">Agregar</button>
+</div>
+</div>
 </div>
 
 <!-- ── MODAL TURNO NUEVO ── -->
 <div id="modal-turno" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto">
-  <div style="background:#181818;border:1px solid rgba(255,255,255,0.12);border-radius:14px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6);margin:auto">
+<div style="background:rgba(16,20,31,0.85);backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,0.12);border-radius:16px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6);margin:auto">
 
-    <!-- Header -->
-    <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;background:#181818;z-index:1">
-      <div>
-        <div id="modal-title" style="font-size:15px;font-weight:600;color:#F0F0F0"></div>
-        <div id="modal-info" style="font-size:12px;color:#555;margin-top:3px"></div>
-      </div>
-      <button onclick="cerrarModal()" style="background:none;border:none;color:#555;font-size:24px;cursor:pointer;line-height:1;padding:0;margin-left:12px">×</button>
-    </div>
-
-    <!-- Días de la semana -->
-    <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06)">
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:10px">Aplicar a los días</div>
-      <div style="display:flex;gap:6px;justify-content:space-between" id="dias-checks">
-        <!-- se llena con JS -->
-      </div>
-    </div>
-
-    <!-- Empleados del mismo sector -->
-    <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06)">
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:10px">Aplicar a los empleados</div>
-      <div id="emp-checks" style="display:flex;flex-direction:column;gap:4px;max-height:100px;overflow-y:auto;padding-right:4px">
-        <!-- se llena con JS -->
-      </div>
-    </div>
-
-    <!-- Estado Franco / Ausente -->
-    <div style="display:flex;gap:8px;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06)">
-      <button id="mqb-franco" onclick="toggleEstadoModal('franco')"
-        style="flex:1;padding:8px;border-radius:8px;border:1.5px solid rgba(100,180,255,0.3);background:rgba(100,180,255,0.08);color:#64B4FF;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s">
-        F &nbsp;Franco
-      </button>
-      <button id="mqb-ausente" onclick="toggleEstadoModal('ausente')"
-        style="flex:1;padding:8px;border-radius:8px;border:1.5px solid rgba(255,80,80,0.3);background:rgba(255,80,80,0.08);color:#FF5050;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s">
-        A &nbsp;Ausente
-      </button>
-      <button id="mqb-nt" onclick="toggleEstadoModal('nt')"
-        style="flex:1;padding:8px;border-radius:8px;border:1.5px solid rgba(120,120,120,0.3);background:rgba(120,120,120,0.08);color:#aaa;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s">
-        NT
-      </button>
-      <button onclick="borrarTurno()"
-        style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#777;font-size:12px;cursor:pointer">
-        ✕ Borrar
-      </button>
-    </div>
-
-    <!-- Horarios -->
-    <div style="padding:14px 20px">
-      <div style="margin-bottom:12px">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:6px">Turno principal</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <input type="text" id="m-entrada" placeholder="08:00" maxlength="5" pattern="[0-9]{2}:[0-9]{2}"
-            style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:16px;text-align:center;outline:none">
-          <span style="color:#555">→</span>
-          <input type="text" id="m-salida" placeholder="17:00" maxlength="5" pattern="[0-9]{2}:[0-9]{2}"
-            style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:16px;text-align:center;outline:none">
-        </div>
-      </div>
-      <div>
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:6px">2º turno <span style="font-weight:400;text-transform:none">(opcional)</span></div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <input type="text" id="m-entrada2" placeholder="—" maxlength="5" pattern="[0-9]{2}:[0-9]{2}"
-            style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:16px;text-align:center;outline:none">
-          <span style="color:#555">→</span>
-          <input type="text" id="m-salida2" placeholder="—" maxlength="5" pattern="[0-9]{2}:[0-9]{2}"
-            style="flex:1;background:#0A0A0A;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F0F0F0;font-size:16px;text-align:center;outline:none">
-        </div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div style="padding:12px 20px 16px;display:flex;gap:8px;position:sticky;bottom:0;background:#181818;border-top:1px solid rgba(255,255,255,0.06)">
-      <button onclick="cerrarModal()" style="padding:10px 16px;background:transparent;color:#777;border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:13px;cursor:pointer">Cancelar</button>
-      <button id="btn-guardar-turno" onclick="guardarTurno()" style="flex:1;padding:10px;background:#F0F0F0;color:#000;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Guardar turno</button>
-    </div>
-
-  </div>
+<div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;background:rgba(16,20,31,0.95);z-index:1">
+<div>
+<div id="modal-title" style="font-size:15px;font-weight:600;color:#F1F4FA"></div>
+<div id="modal-info" style="font-size:12px;color:#616B82;margin-top:3px"></div>
+</div>
+<button onclick="cerrarModal()" style="background:none;border:none;color:#616B82;font-size:24px;cursor:pointer;line-height:1;padding:0;margin-left:12px">×</button>
 </div>
 
+<div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06)">
+<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#616B82;margin-bottom:10px">Aplicar a los días</div>
+<div style="display:flex;gap:6px;justify-content:space-between" id="dias-checks"></div>
+</div>
+
+<div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06)">
+<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#616B82;margin-bottom:10px">Aplicar a los empleados</div>
+<div id="emp-checks" style="display:flex;flex-direction:column;gap:4px;max-height:100px;overflow-y:auto;padding-right:4px"></div>
+</div>
+
+<div style="display:flex;gap:8px;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06)">
+<button id="mqb-franco" onclick="toggleEstadoModal('franco')"
+style="flex:1;padding:8px;border-radius:8px;border:1.5px solid rgba(100,180,255,0.3);background:rgba(100,180,255,0.08);color:#64B4FF;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s">
+F &nbsp;Franco
+</button>
+<button id="mqb-ausente" onclick="toggleEstadoModal('ausente')"
+style="flex:1;padding:8px;border-radius:8px;border:1.5px solid rgba(236,72,153,0.3);background:rgba(236,72,153,0.08);color:#EC4899;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s">
+A &nbsp;Ausente
+</button>
+<button id="mqb-nt" onclick="toggleEstadoModal('nt')"
+style="flex:1;padding:8px;border-radius:8px;border:1.5px solid rgba(120,120,120,0.3);background:rgba(120,120,120,0.08);color:#aaa;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s">
+NT
+</button>
+<button onclick="borrarTurno()"
+style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#777;font-size:12px;cursor:pointer">
+✕ Borrar
+</button>
+</div>
+
+<div style="padding:14px 20px">
+<div style="margin-bottom:12px">
+<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#616B82;margin-bottom:6px">Turno principal</div>
+<div style="display:flex;align-items:center;gap:8px">
+<input type="text" id="m-entrada" placeholder="08:00" maxlength="5" pattern="[0-9]{2}:[0-9]{2}"
+style="flex:1;background:#0B0F19;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F1F4FA;font-size:16px;text-align:center;outline:none">
+<span style="color:#616B82">→</span>
+<input type="text" id="m-salida" placeholder="17:00" maxlength="5" pattern="[0-9]{2}:[0-9]{2}"
+style="flex:1;background:#0B0F19;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F1F4FA;font-size:16px;text-align:center;outline:none">
+</div>
+</div>
+<div>
+<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#616B82;margin-bottom:6px">2º turno <span style="font-weight:400;text-transform:none">(opcional)</span></div>
+<div style="display:flex;align-items:center;gap:8px">
+<input type="text" id="m-entrada2" placeholder="—" maxlength="5" pattern="[0-9]{2}:[0-9]{2}"
+style="flex:1;background:#0B0F19;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F1F4FA;font-size:16px;text-align:center;outline:none">
+<span style="color:#616B82">→</span>
+<input type="text" id="m-salida2" placeholder="—" maxlength="5" pattern="[0-9]{2}:[0-9]{2}"
+style="flex:1;background:#0B0F19;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;color:#F1F4FA;font-size:16px;text-align:center;outline:none">
+</div>
+</div>
+</div>
+
+<div style="padding:12px 20px 16px;display:flex;gap:8px;position:sticky;bottom:0;background:rgba(16,20,31,0.95);border-top:1px solid rgba(255,255,255,0.06)">
+<button onclick="cerrarModal()" style="padding:10px 16px;background:transparent;color:#777;border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:13px;cursor:pointer">Cancelar</button>
+<button id="btn-guardar-turno" onclick="guardarTurno()" style="flex:1;padding:10px;background:linear-gradient(135deg,#F5C542,#F0A500);color:#12100A;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Guardar turno</button>
+</div>
+
+</div>
+</div>
 <script>
+
 // ══════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════
@@ -1905,26 +1478,22 @@ function calcularAlertasHoy(fichajesHoy) {
 //  TABLA RECIENTE
 // ══════════════════════════════════
 function renderRecientes() {
-  const tbody = document.getElementById('tabla-reciente');
-  const recientes = todosLosFichajes.slice(0, 15);
-  if (!recientes.length) {
-    tbody.innerHTML = `<tr><td colspan="4" class="empty-state">Sin fichajes</td></tr>`;
-    return;
-  }
-  const tiposLabel = { entrada: 'Entrada 1', salida: 'Salida 1', entrada2: 'Entrada 2', salida2: 'Salida 2' };
-  tbody.innerHTML = recientes.map(f => `
-        <tr style="cursor:pointer" onclick="abrirEditarFichaje(${f.id})">
-      <td class="td-nombre">${f.nombre || ''} ${f.apellido || ''}</td>
-      <td><span class="badge badge-${f.tipo}">${tiposLabel[f.tipo] || f.tipo}</span></td>
-      <td>${fmtFecha(f.fecha_hora)}</td>
-      <td>${fmt(f.fecha_hora)}</td>
-    </tr>
-  `).join('');
+const tbody = document.getElementById('tabla-reciente');
+const recientes = todosLosFichajes.slice(0, 15);
+if (!recientes.length) {
+tbody.innerHTML = `<tr><td colspan="4" class="empty-state">Sin fichajes</td></tr>`;
+return;
 }
-
-// ══════════════════════════════════
-//  TABLA FICHAJES (paginada y por día)
-// ══════════════════════════════════
+const tiposLabel = { entrada: 'Entrada 1', salida: 'Salida 1', entrada2: 'Entrada 2', salida2: 'Salida 2' };
+tbody.innerHTML = recientes.map(f => `
+<tr class="fichaje-row-modern" onclick="abrirEditarFichaje(${f.id})">
+<td class="td-nombre"><span class="row-avatar-mini">${avatarLetras(f.nombre, f.apellido)}</span><span>${f.nombre || ''} ${f.apellido || ''}</span></td>
+<td><span class="badge badge-${f.tipo}">${tiposLabel[f.tipo] || f.tipo}</span></td>
+<td>${fmtFecha(f.fecha_hora)}</td>
+<td>${fmt(f.fecha_hora)}</td>
+</tr>
+`).join('');
+}
 function filtrarFichajes() {
   const empId = document.getElementById('filt-empleado').value;
   const periodo = document.getElementById('filt-periodo').value;
@@ -2873,7 +2442,7 @@ function abrirEditarEmp(id, nombre, apellido, celular, pin) {
   document.getElementById('edit-emp-nombre').value = nombre;
   document.getElementById('edit-emp-apellido').value = apellido;
   document.getElementById('edit-emp-celular').value = celular;
-      document.getElementById('edit-emp-pin').value = '';
+  document.getElementById('edit-emp-pin').value = pin || '';
   document.getElementById('edit-celular-field').style.display = 'block';
   document.getElementById('edit-rol-field').style.display = 'none';
   document.getElementById('modal-edit-emp').classList.add('show');
@@ -2886,7 +2455,7 @@ function abrirEditarPlanilla(id, nombre, apellido, rol, pin) {
   document.getElementById('edit-emp-nombre').value = nombre;
   document.getElementById('edit-emp-apellido').value = apellido;
   document.getElementById('edit-emp-rol').value = rol;
-      document.getElementById('edit-emp-pin').value = '';
+  document.getElementById('edit-emp-pin').value = pin || '';
   document.getElementById('edit-celular-field').style.display = 'none';
   document.getElementById('edit-rol-field').style.display = 'block';
   document.getElementById('modal-edit-emp').classList.add('show');
@@ -3893,6 +3462,7 @@ function actualizarDrawer() {
   // Calcular horas trabajadas
   let minTrabajados = 0;
   let tardanzas = [];
+  let _diasConEntradaRefDrawer = 0, _diasPuntualesDrawer = 0;
   Object.entries(grupos).forEach(([fecha, g]) => {
     if (g.entrada && g.salida) minTrabajados += minutosEntre(g.entrada.fecha_hora, g.salida.fecha_hora);
     if (g.entrada2 && g.salida2) minTrabajados += minutosEntre(g.entrada2.fecha_hora, g.salida2.fecha_hora);
@@ -3908,7 +3478,10 @@ function actualizarDrawer() {
         const diff = Math.round((real - prog) / 60000);
         if (diff > TOLERANCIA_MINUTOS) {
           tardanzas.push({ fecha, diff, hora: fmt(g.entrada.fecha_hora), asignado: entradaRef.substring(0,5) });
+        } else {
+          _diasPuntualesDrawer++;
         }
+        _diasConEntradaRefDrawer++;
       }
     }
   });
@@ -3950,6 +3523,15 @@ function actualizarDrawer() {
   document.getElementById('drawer-balance').className = 'drawer-stat-val ' + (balance > 0 ? 'verde' : balance < 0 ? 'rojo' : '');
   document.getElementById('drawer-balance-sub').textContent = balance > 0 ? 'empresa debe' : balance < 0 ? 'empleado debe' : 'exacto';
   document.getElementById('drawer-tardanzas').textContent = tardanzas.length;
+  const _pctPuntDrawer = _diasConEntradaRefDrawer > 0 ? Math.round((_diasPuntualesDrawer/_diasConEntradaRefDrawer)*100) : null;
+  const _elPuntPct = document.getElementById('drawer-punt-pct');
+  const _elPuntRing = document.getElementById('drawer-punt-ring');
+  if (_elPuntPct) {
+    _elPuntPct.textContent = _pctPuntDrawer === null ? '—' : _pctPuntDrawer + '%';
+    const _colorPunt = _pctPuntDrawer === null ? '#555' : _pctPuntDrawer >= 90 ? '#10B981' : _pctPuntDrawer >= 70 ? '#F59E0B' : '#EC4899';
+    _elPuntPct.style.color = _colorPunt;
+    if (_elPuntRing) _elPuntRing.style.background = 'conic-gradient(' + _colorPunt + ' ' + (_pctPuntDrawer||0) + '%, rgba(255,255,255,0.08) 0)';
+  }
 
   const lista = document.getElementById('drawer-tardanzas-list');
   if (!tardanzas.length) {
@@ -4556,30 +4138,160 @@ function expandirFilaKpi(el, tipo, idx) {
   expandEl.style.display = 'block';
 }
 
+
+</script>
+<script>
+// ══════════════════════════════════
+// CAPA ADICIONAL — UI MODERNA (no modifica la lógica original)
+// ══════════════════════════════════
+
+function sincronizarHeroKPIs() {
+  const dentroEl = document.getElementById('kpi-dentro');
+  const tardesEl = document.getElementById('alert-tardes');
+  const ausentesEl = document.getElementById('alert-ausentes');
+  const incompletosEl = document.getElementById('alert-incompletos');
+  const turnoLargoEl = document.getElementById('alert-turno-largo');
+  const dudososEl = document.getElementById('alert-dudosos');
+
+  const dentro = dentroEl ? dentroEl.textContent : '—';
+  const tardes = tardesEl ? tardesEl.textContent : '—';
+  const ausentes = parseInt(ausentesEl ? ausentesEl.textContent : '0') || 0;
+  const incompletos = parseInt(incompletosEl ? incompletosEl.textContent : '0') || 0;
+  const turnoLargo = parseInt(turnoLargoEl ? turnoLargoEl.textContent : '0') || 0;
+  const dudosos = parseInt(dudososEl ? dudososEl.textContent : '0') || 0;
+  const totalAlertas = ausentes + incompletos + turnoLargo + dudosos;
+
+  const elD = document.getElementById('hero-kpi-dentro'); if (elD) elD.textContent = dentro;
+  const elA = document.getElementById('hero-kpi-alertas'); if (elA) elA.textContent = totalAlertas;
+  const elT = document.getElementById('hero-kpi-tardanzas'); if (elT) elT.textContent = tardes;
+}
+
+function cerrarTurnoAccion(empId) {
+  if (!empId) return;
+  if (!confirm('¿Cerrar el turno de este empleado ahora?')) return;
+  drawerEmpId = empId;
+  forzarCierreTurno();
+}
+
+function ignorarDudosoAccion(fichajeId) {
+  if (!fichajeId) return;
+  autorizarFichaje(fichajeId);
+}
+
+function eliminarDudosoAccion(fichajeId) {
+  if (!fichajeId) return;
+  eliminarFichaje(fichajeId);
+}
+
+function renderActionCenter() {
+  const cont = document.getElementById('action-center-list');
+  if (!cont) return;
+  if (typeof _alertaData === 'undefined') return;
+
+  const items = [];
+
+  (_alertaData['turno-largo'] || []).forEach(d => {
+    if (!d.empId) return;
+    items.push(`<div class="ac-card ac-violet">
+      <div class="ac-card-main">
+        <div class="ac-card-icon">⏱️</div>
+        <div>
+          <div class="ac-card-title">${d.nombre}</div>
+          <div class="ac-card-sub">${d.detalle || ''}</div>
+        </div>
+      </div>
+      <div class="ac-card-actions">
+        <button class="ac-btn ac-btn-primary" onclick="cerrarTurnoAccion(${d.empId})">Cerrar Turno</button>
+        <button class="ac-btn ac-btn-ghost" onclick="abrirDrawerEmp(${d.empId})">Ver ficha</button>
+      </div>
+    </div>`);
+  });
+
+  (_alertaData['incompletos'] || []).forEach(d => {
+    if (!d.empId) return;
+    items.push(`<div class="ac-card ac-amber">
+      <div class="ac-card-main">
+        <div class="ac-card-icon">⚠️</div>
+        <div>
+          <div class="ac-card-title">${d.nombre}</div>
+          <div class="ac-card-sub">${d.desde || ''}</div>
+        </div>
+      </div>
+      <div class="ac-card-actions">
+        <button class="ac-btn ac-btn-primary" onclick="cerrarTurnoAccion(${d.empId})">Cerrar Turno</button>
+        <button class="ac-btn ac-btn-ghost" onclick="abrirDrawerEmp(${d.empId})">Ver ficha</button>
+      </div>
+    </div>`);
+  });
+
+  (_alertaData['dudosos'] || []).forEach(d => {
+    const fid = d.fichajeActual ? d.fichajeActual.id : null;
+    if (!fid) return;
+    items.push(`<div class="ac-card ac-amber">
+      <div class="ac-card-main">
+        <div class="ac-card-icon">🔍</div>
+        <div>
+          <div class="ac-card-title">${d.nombre}</div>
+          <div class="ac-card-sub">${d.detalle || ''}</div>
+        </div>
+      </div>
+      <div class="ac-card-actions">
+        <button class="ac-btn ac-btn-emerald" onclick="ignorarDudosoAccion(${fid})">Ignorar</button>
+        <button class="ac-btn ac-btn-ghost" onclick="eliminarDudosoAccion(${fid})">Eliminar</button>
+      </div>
+    </div>`);
+  });
+
+  cont.innerHTML = items.length ? items.join('') : '<div class="empty-state">✅ Todo en orden. No hay acciones pendientes.</div>';
+}
+
+function refrescarUIModerna() {
+  try { sincronizarHeroKPIs(); } catch(e) {}
+  try { renderActionCenter(); } catch(e) {}
+}
+
+setInterval(refrescarUIModerna, 1500);
+document.addEventListener('DOMContentLoaded', refrescarUIModerna);
+window.addEventListener('load', refrescarUIModerna);
 </script>
 
 <!-- ── DRAWER FICHA EMPLEADO ── -->
 <div class="drawer-overlay" id="drawer-overlay" onclick="cerrarDrawer()"></div>
 <div id="drawer-emp">
-  <div class="drawer-header">
-    <div class="drawer-title" id="drawer-emp-title">Ficha del empleado</div>
-    <button class="drawer-close" onclick="cerrarDrawer()">×</button>
-  </div>
-  <div class="drawer-body">
-    <div class="drawer-emp-info">
-      <div class="drawer-avatar" id="drawer-avatar">—</div>
-      <div>
-        <div class="drawer-emp-name" id="drawer-emp-name">—</div>
-        <div class="drawer-emp-sub" id="drawer-emp-sub">—</div>
-      </div>
-    </div>
-    <div id="drawer-turno-abierto-wrap" style="display:none;background:rgba(229,57,53,0.1);border:1px solid rgba(229,57,53,0.3);border-radius:10px;padding:12px 16px;margin-bottom:14px">
-      <div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:6px">⚠️ Turno abierto sin salida</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Este empleado tiene una entrada sin salida registrada. Podés cerrar el turno manualmente para que pueda volver a fichar.</div>
-      <button onclick="forzarCierreTurno()" style="width:100%;padding:9px;background:var(--danger);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Cerrar turno ahora</button>
-    </div>
+<div class="drawer-header">
+<div class="drawer-title" id="drawer-emp-title">Ficha del empleado</div>
+<button class="drawer-close" onclick="cerrarDrawer()">×</button>
+</div>
+<div class="drawer-body">
+<div class="drawer-emp-info">
+<div class="drawer-avatar" id="drawer-avatar">—</div>
+<div>
+<div class="drawer-emp-name" id="drawer-emp-name">—</div>
+<div class="drawer-emp-sub" id="drawer-emp-sub">—</div>
+</div>
+</div>
 
-<div id="drawer-fichaje-manual-wrap" style="display:none;background: rgba(255,167,38,0.1);border:1px solid rgba(255,167,38,0.3);border-radius:10px;padding:12px 16px;margin-bottom:14px">
+<div class="drawer-punt-wrap">
+<div class="drawer-punt-ring-outer">
+<div id="drawer-punt-ring">
+<div class="drawer-punt-ring-inner">
+<span id="drawer-punt-pct">—</span>
+</div>
+</div>
+</div>
+<div class="drawer-punt-label">
+<strong>Puntualidad</strong>
+% de llegadas dentro de horario en el período seleccionado
+</div>
+</div>
+
+<div id="drawer-turno-abierto-wrap" style="display:none;background:rgba(236,72,153,0.1);border:1px solid rgba(236,72,153,0.3);border-radius:10px;padding:12px 16px">
+<div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:6px">⚠️ Turno abierto sin salida</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Este empleado tiene una entrada sin salida registrada. Podés cerrar el turno manualmente para que pueda volver a fichar.</div>
+<button onclick="forzarCierreTurno()" style="width:100%;padding:9px;background:var(--danger);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Cerrar turno ahora</button>
+</div>
+
+<div id="drawer-fichaje-manual-wrap" style="display:none;background: rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:12px 16px">
 <div style="font-size:12px;font-weight:700;color:var(--warning);margin-bottom:6px">⚠️ Secuencia de fichaje irregular</div>
 <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Este empleado tiene un fichaje con la secuencia rota. Carga manualmente el fichaje faltante.</div>
 <div style="display:flex;gap:8px;margin-bottom:8px">
@@ -4597,91 +4309,91 @@ function expandirFilaKpi(el, tipo, idx) {
 <button onclick="guardarFichajeManual()" style="width:100%;padding:9px;background:var(--warning);border:none;border-radius:8px;color:#000;font-size:13px;font-weight:700;cursor:pointer">Guardar fichaje</button>
 </div>
 
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div class="drawer-section-title">Estadísticas</div>
-      <select class="drawer-period-select" id="drawer-period" onchange="actualizarDrawer()">
-        <option value="hoy">Hoy</option>
-        <option value="semana">Esta semana</option>
-        <option value="mes" selected>Este mes</option>
-        <option value="mes_anterior">Mes anterior</option>
-      </select>
-    </div>
-    <div class="drawer-stat-grid">
-      <div class="drawer-stat-card">
-        <div class="drawer-stat-label">Horas trabajadas</div>
-        <div class="drawer-stat-val" id="drawer-hs-trabajadas">—</div>
-        <div class="drawer-stat-sub" id="drawer-hs-trabajadas-sub"></div>
-      </div>
-      <div class="drawer-stat-card">
-        <div class="drawer-stat-label">Horas asignadas</div>
-        <div class="drawer-stat-val" id="drawer-hs-asignadas">—</div>
-        <div class="drawer-stat-sub" id="drawer-hs-asignadas-sub"></div>
-      </div>
-      <div class="drawer-stat-card">
-        <div class="drawer-stat-label">Balance</div>
-        <div class="drawer-stat-val" id="drawer-balance">—</div>
-        <div class="drawer-stat-sub" id="drawer-balance-sub"></div>
-      </div>
-      <div class="drawer-stat-card">
-        <div class="drawer-stat-label">Tardanzas</div>
-        <div class="drawer-stat-val" id="drawer-tardanzas">—</div>
-        <div class="drawer-stat-sub">en el período</div>
-      </div>
-    </div>
-    <div>
-      <div class="drawer-section-title">Detalle de tardanzas</div>
-      <div class="drawer-tardanzas-list" id="drawer-tardanzas-list">
-        <div style="font-size:13px;color:var(--text3)">Sin tardanzas en el período</div>
-      </div>
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div class="drawer-section-title">Estadísticas</div>
+<select class="drawer-period-select" id="drawer-period" onchange="actualizarDrawer()">
+<option value="hoy">Hoy</option>
+<option value="semana">Esta semana</option>
+<option value="mes" selected>Este mes</option>
+<option value="mes_anterior">Mes anterior</option>
+</select>
+</div>
+<div class="drawer-stat-grid">
+<div class="drawer-stat-card">
+<div class="drawer-stat-label">Horas trabajadas</div>
+<div class="drawer-stat-val" id="drawer-hs-trabajadas">—</div>
+<div class="drawer-stat-sub" id="drawer-hs-trabajadas-sub"></div>
+</div>
+<div class="drawer-stat-card">
+<div class="drawer-stat-label">Horas asignadas</div>
+<div class="drawer-stat-val" id="drawer-hs-asignadas">—</div>
+<div class="drawer-stat-sub" id="drawer-hs-asignadas-sub"></div>
+</div>
+<div class="drawer-stat-card">
+<div class="drawer-stat-label">Balance</div>
+<div class="drawer-stat-val" id="drawer-balance">—</div>
+<div class="drawer-stat-sub" id="drawer-balance-sub"></div>
+</div>
+<div class="drawer-stat-card">
+<div class="drawer-stat-label">Tardanzas</div>
+<div class="drawer-stat-val" id="drawer-tardanzas">—</div>
+<div class="drawer-stat-sub">en el período</div>
+</div>
+</div>
 <div>
-<div class="drawer-section-title">Historial de fichajes</div>
-<div class="drawer-tardanzas-list" id="drawer-historial-list">
+<div class="drawer-section-title">Detalle de tardanzas</div>
+<div class="drawer-tardanzas-list" id="drawer-tardanzas-list">
+<div style="font-size:13px;color:var(--text3)">Sin tardanzas en el período</div>
+</div>
+</div>
+<div>
+<div class="drawer-section-title">Línea de tiempo — fichajes de la semana</div>
+<div class="drawer-historial-list timeline" id="drawer-historial-list">
 <div style="font-size:13px;color:var(--text3)">Sin fichajes en el período</div>
 </div>
 </div>
-    </div>
-  </div>
+</div>
 </div>
 
 <!-- ── POPUP PUNTUALIDAD ── -->
 <div id="popup-puntualidad">
-  <div class="popup-puntualidad-box">
-    <div class="popup-punt-header">
-      <div>
-        <div class="popup-punt-title" id="popup-punt-nombre">—</div>
-        <div class="popup-punt-sub" id="popup-punt-fecha">—</div>
-      </div>
-      <button class="popup-punt-close" onclick="cerrarPopupPunt()">×</button>
-    </div>
-    <div class="popup-punt-row">
-      <span class="popup-punt-key">Horario asignado</span>
-      <span class="popup-punt-val" id="popup-punt-asignado">—</span>
-    </div>
-    <div class="popup-punt-row">
-      <span class="popup-punt-key">Hora real de entrada</span>
-      <span class="popup-punt-val" id="popup-punt-real">—</span>
-    </div>
-    <div class="popup-punt-row">
-      <span class="popup-punt-key">Diferencia</span>
-      <span class="popup-punt-val" id="popup-punt-diff">—</span>
-    </div>
-    <div class="popup-punt-row">
-      <span class="popup-punt-key">Estado</span>
-      <span class="popup-punt-val" id="popup-punt-estado">—</span>
-    </div>
-  </div>
+<div class="popup-puntualidad-box">
+<div class="popup-punt-header">
+<div>
+<div class="popup-punt-title" id="popup-punt-nombre">—</div>
+<div class="popup-punt-sub" id="popup-punt-fecha">—</div>
 </div>
-
+<button class="popup-punt-close" onclick="cerrarPopupPunt()">×</button>
+</div>
+<div class="popup-punt-row">
+<span class="popup-punt-key">Horario asignado</span>
+<span class="popup-punt-val" id="popup-punt-asignado">—</span>
+</div>
+<div class="popup-punt-row">
+<span class="popup-punt-key">Hora real de entrada</span>
+<span class="popup-punt-val" id="popup-punt-real">—</span>
+</div>
+<div class="popup-punt-row">
+<span class="popup-punt-key">Diferencia</span>
+<span class="popup-punt-val" id="popup-punt-diff">—</span>
+</div>
+<div class="popup-punt-row">
+<span class="popup-punt-key">Estado</span>
+<span class="popup-punt-val" id="popup-punt-estado">—</span>
+</div>
+</div>
+</div>
 
 <!-- ── POPUP ALERTAS ── -->
 <div id="popup-alerta">
-  <div class="popup-alerta-box">
-    <div class="popup-alerta-header">
-      <div class="popup-alerta-title" id="popup-alerta-title">—</div>
-      <button class="popup-alerta-close" onclick="cerrarPopupAlerta()">×</button>
-    </div>
-    <div class="popup-alerta-body" id="popup-alerta-body"></div>
-  </div>
+<div class="popup-alerta-box">
+<div class="popup-alerta-header">
+<div class="popup-alerta-title" id="popup-alerta-title">—</div>
+<button class="popup-alerta-close" onclick="cerrarPopupAlerta()">×</button>
 </div>
+<div class="popup-alerta-body" id="popup-alerta-body"></div>
+</div>
+</div>
+
 </body>
 </html>
