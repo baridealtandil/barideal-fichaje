@@ -2869,7 +2869,7 @@ function abrirEditarEmp(id, nombre, apellido, celular, pin) {
   document.getElementById('edit-emp-nombre').value = nombre;
   document.getElementById('edit-emp-apellido').value = apellido;
   document.getElementById('edit-emp-celular').value = celular;
-  document.getElementById('edit-emp-pin').value = pin || '';
+      document.getElementById('edit-emp-pin').value = '';
   document.getElementById('edit-celular-field').style.display = 'block';
   document.getElementById('edit-rol-field').style.display = 'none';
   document.getElementById('modal-edit-emp').classList.add('show');
@@ -2882,7 +2882,7 @@ function abrirEditarPlanilla(id, nombre, apellido, rol, pin) {
   document.getElementById('edit-emp-nombre').value = nombre;
   document.getElementById('edit-emp-apellido').value = apellido;
   document.getElementById('edit-emp-rol').value = rol;
-  document.getElementById('edit-emp-pin').value = pin || '';
+      document.getElementById('edit-emp-pin').value = '';
   document.getElementById('edit-celular-field').style.display = 'none';
   document.getElementById('edit-rol-field').style.display = 'block';
   document.getElementById('modal-edit-emp').classList.add('show');

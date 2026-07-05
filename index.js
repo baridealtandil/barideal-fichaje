@@ -173,13 +173,13 @@ app.post("/api/empleados", async (c) => {
 });
 
 app.get("/api/empleados/list", async (c) => {
-  const empleados = await sql`SELECT * FROM empleados ORDER BY apellido, nombre ASC`;
+  const empleados = await sql`SELECT id, nombre, apellido, celular, created_at FROM empleados ORDER BY apellido, nombre ASC`;
   return c.json(empleados);
 });
 
 app.get("/api/empleados/:id", async (c) => {
   const id = c.req.param("id");
-  const [empleado] = await sql`SELECT * FROM empleados WHERE id = ${id}`;
+      const [empleado] = await sql`SELECT id, nombre, apellido, celular, created_at FROM empleados WHERE id = ${id}`;
   if (!empleado) return c.json({ error: "Empleado no encontrado" }, 404);
   return c.json(empleado);
 });
@@ -423,7 +423,7 @@ app.get("/api/fichajes", async (c) => {
 // ══════════════════════════════════════════════════
 app.get("/api/planilla/empleados", async (c) => {
   const empleados = await sql`
-    SELECT pe.*, e.celular, e.nombre as emp_nombre, e.apellido as emp_apellido
+        SELECT pe.id, pe.nombre, pe.apellido, pe.rol, pe.empleado_id, pe.created_at, e.celular, e.nombre as emp_nombre, e.apellido as emp_apellido
     FROM planilla_empleados pe
     LEFT JOIN empleados e ON pe.empleado_id = e.id
     ORDER BY pe.rol, pe.apellido, pe.nombre`;
@@ -760,7 +760,7 @@ setTimeout(cronNotificaciones, 30000);
 app.put("/api/empleados/:id", async (c) => {
     const id = c.req.param("id");
   const { nombre, apellido, celular, pin } = await c.req.json();
-  await sql`UPDATE empleados SET nombre=${nombre}, apellido=${apellido}, celular=${celular}, pin=${pin || null} WHERE id=${id}`;
+    await sql`UPDATE empleados SET nombre=${nombre}, apellido=${apellido}, celular=${celular}, pin=COALESCE(NULLIF(${pin || ''}, ''), pin) WHERE id=${id}`;
   return c.json({ ok: true });
 });
 
@@ -777,7 +777,7 @@ app.delete("/api/empleados/:id", async (c) => {
 app.put("/api/planilla/empleados/:id", async (c) => {
   const id = c.req.param("id");
   const { nombre, apellido, rol, pin } = await c.req.json();
-  await sql`UPDATE planilla_empleados SET nombre=${nombre}, apellido=${apellido}, rol=${rol}, pin=${pin || null} WHERE id=${id}`;
+    await sql`UPDATE planilla_empleados SET nombre=${nombre}, apellido=${apellido}, rol=${rol}, pin=COALESCE(NULLIF(${pin || ''}, ''), pin) WHERE id=${id}`;
   return c.json({ ok: true });
 });
 
