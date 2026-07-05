@@ -168,7 +168,6 @@ outline: none; -webkit-tap-highlight-color: transparent;
 .btn-mitad:not(:disabled):active { transform: scale(0.94); }
 .btn-mitad:disabled { cursor: not-allowed; opacity: 0.25; }
 #btn-entrada { border-right: 1px solid var(--border); }
-.btn-mitad.tenue { opacity: 0.35; }
 .btn-mitad.destacado { opacity: 1; }
 .btn-mitad.entrada-mitad.destacado { background: rgba(255,255,255,0.05); }
 .btn-mitad.salida-mitad.destacado { background: rgba(76,175,80,0.07); }
@@ -177,7 +176,6 @@ outline: none; -webkit-tap-highlight-color: transparent;
 .btn-mitad.salida-mitad.destacado .btn-label { color: var(--success); }
 .btn-mitad.entrada-mitad .coffee-cup { stroke: rgba(255,255,255,0.9); }
 .btn-mitad.salida-mitad .coffee-cup { stroke: var(--success); }
-.btn-mitad.tenue .coffee-cup { stroke: var(--dim); }
 .geo-status {
 display: flex; align-items: center; gap: 8px;
 font-size: 12px; color: var(--off);
@@ -352,7 +350,7 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
       <div class="nombre" id="header-nombre">—</div>
       <div class="id-tag" id="header-id">ID —</div>
     </div>
-    <button onclick="refreshManual(this)" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;outline:none;transition:transform 0.3s ease">↻</button>
+    <button onclick="refreshManual(this)" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:6px 12px;display:flex;align-items:center;justify-content:center;gap:6px;color:#fff;font-size:13px;cursor:pointer;outline:none;transition:transform 0.3s ease;white-space:nowrap">↻ Sincronizar App</button>
   </div>
   <div class="app-body">
     <div class="clock-display">
@@ -374,11 +372,11 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
       <div class="radar-pulse"></div>
       <div class="radar-sweep" id="btn-ring"></div>
       <div id="btn-fichar-wrap">
-<button id="btn-entrada" class="btn-mitad entrada-mitad tenue" onclick="fichar(tipoEntradaActual)" disabled>
+<button id="btn-entrada" class="btn-mitad entrada-mitad destacado" onclick="fichar(tipoEntradaActual)" disabled>
 <img src="/logo-ideal.png" alt="ideal" style="width:44px;height:auto;filter:invert(1);opacity:0.9"/>
 <span class="btn-label">Entrada</span>
 </button>
-<button id="btn-salida" class="btn-mitad salida-mitad tenue" onclick="fichar(tipoSalidaActual)" disabled>
+<button id="btn-salida" class="btn-mitad salida-mitad destacado" onclick="fichar(tipoSalidaActual)" disabled>
 <img src="/logo-ideal.png" alt="ideal" style="width:44px;height:auto;filter:invert(1);opacity:0.9"/>
 <span class="btn-label">Salida</span>
 </button>
@@ -461,6 +459,7 @@ let tipoEntradaActual = 'entrada';
 let tipoSalidaActual = 'salida';
 let turnoHoyData = null;
 let secuenciaRota = false;
+let cargandoFichaje = false;
 
 function haversine(lat1, lng1, lat2, lng2) {
   const R = 6371000;
@@ -623,15 +622,20 @@ async function cargarHistorial() {
 
 async function refreshManual(btn) {
   if (btn) {
-    btn.style.transform = 'rotate(360deg)';
-    setTimeout(function() { btn.style.transform = ''; }, 300);
+    btn.disabled = true;
+    btn.textContent = '↻ Sincronizando...';
   }
   try {
-    await Promise.all([cargarHistorial(), cargarTurno()]);
-    toast('Datos actualizados');
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const reg of regs) {
+        await reg.unregister();
+      }
+    }
   } catch(e) {
-    toast('Error al actualizar');
+    console.warn('Error al desregistrar service workers:', e);
   }
+  window.location.reload(true);
 }
 
 
@@ -804,28 +808,26 @@ function actualizarBoton() {
     proximoTipo = 'salida2';
   } else {
     proximoTipo = null;
-    btnEntrada.disabled = true;
-    btnSalida.disabled = true;
-    btnEntrada.classList.remove('destacado'); btnEntrada.classList.add('tenue');
-    btnSalida.classList.remove('destacado'); btnSalida.classList.add('tenue');
-    return;
   }
 
-  const familiaEntrada = (proximoTipo === 'entrada' || proximoTipo === 'entrada2');
-  btnEntrada.classList.toggle('destacado', familiaEntrada);
-  btnEntrada.classList.toggle('tenue', !familiaEntrada);
-  btnSalida.classList.toggle('destacado', !familiaEntrada);
-  btnSalida.classList.toggle('tenue', familiaEntrada);
-
-  btnEntrada.disabled = !geoOk || !empleado;
-  btnSalida.disabled = !geoOk || !empleado;
+  const habilitado = geoOk && !!empleado && !cargandoFichaje;
+  btnEntrada.disabled = !habilitado;
+  btnSalida.disabled = !habilitado;
 }
 
 let _posConfirmada = null;
 
 async function fichar(tipoElegido) {
+  if (cargandoFichaje) return;
+  cargandoFichaje = true;
+  actualizarBoton();
+
   if (tipoElegido) proximoTipo = tipoElegido;
-  if (!geoOk || !empleado) return;
+  if (!geoOk || !empleado) {
+    cargandoFichaje = false;
+    actualizarBoton();
+    return;
+  }
   const ring = document.getElementById('btn-ring');
   if (ring) ring.classList.add('active');
 
@@ -841,6 +843,7 @@ async function fichar(tipoElegido) {
   if (!pos) {
     if (ring) ring.classList.remove('active');
     toast('No se pudo verificar la ubicacion. Intenta de nuevo.');
+    cargandoFichaje = false;
     actualizarBoton();
     return;
   }
@@ -849,6 +852,7 @@ async function fichar(tipoElegido) {
   if (dist > RADIO_METROS) {
     if (ring) ring.classList.remove('active');
     toast('Estas a '+Math.round(dist)+'m del local. Necesitas estar a menos de '+RADIO_METROS+'m.');
+    cargandoFichaje = false;
     actualizarBoton();
     return;
   }
@@ -889,12 +893,17 @@ async function fichar(tipoElegido) {
 function cancelarSospechoso() {
   document.getElementById('overlay-sospechoso').classList.remove('show');
   _posConfirmada = null;
+  cargandoFichaje = false;
   actualizarBoton();
 }
 
 async function confirmarSospechoso() {
   document.getElementById('overlay-sospechoso').classList.remove('show');
-  if (!_posConfirmada) return;
+  if (!_posConfirmada) {
+    cargandoFichaje = false;
+    actualizarBoton();
+    return;
+  }
   if (proximoTipo === 'salida' || proximoTipo === 'salida2') {
     const tipoEntrada = proximoTipo === 'salida2' ? 'entrada2' : 'entrada';
     const ultEnt = fichajesHoy.find(function(f){return f.tipo===tipoEntrada;});
@@ -909,12 +918,18 @@ async function confirmarSospechoso() {
 function cancelarSalida() {
   document.getElementById('overlay-confirm').classList.remove('show');
   _posConfirmada = null;
+  cargandoFichaje = false;
   actualizarBoton();
 }
 
 async function confirmarSalida() {
   document.getElementById('overlay-confirm').classList.remove('show');
-  if (_posConfirmada) await registrarFichaje(_posConfirmada);
+  if (_posConfirmada) {
+    await registrarFichaje(_posConfirmada);
+  } else {
+    cargandoFichaje = false;
+    actualizarBoton();
+  }
 }
 
 async function registrarFichaje(pos) {
@@ -945,6 +960,8 @@ async function registrarFichaje(pos) {
   } catch(e) {
     if (ring) ring.classList.remove('active');
     toast('Error al registrar. Verifica tu conexion.');
+  } finally {
+    cargandoFichaje = false;
     actualizarBoton();
   }
 }
