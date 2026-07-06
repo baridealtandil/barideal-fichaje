@@ -344,47 +344,66 @@ const tiposValidos = ["entrada", "salida", "entrada2", "salida2"];
 // Forzar cierre de turno abierto (desde dashboard del encargado)
 app.post("/api/fichajes/forzar-cierre", async (c) => {
   try {
-    const { empleado_id } = await c.req.json();
-    if (!empleado_id) return c.json({ error: "empleado_id requerido" }, 400);
+    const { empleado_id, fecha_hora, pin } = await c.req.json();
+    if (!empleado_id || !fecha_hora || !pin)
+      return c.json({ error: "Faltan datos requeridos (empleado_id, fecha_hora, pin)" }, 400);
 
-    const ahoraAR = new Date(Date.now() - 3 * 60 * 60 * 1000 - 5 * 60 * 60 * 1000); // jornada laboral divide a las 05:00
-    const hoy = ahoraAR.toISOString().split("T")[0];
-    const ayerD = new Date(ahoraAR); ayerD.setDate(ayerD.getDate() - 1);
-    const ayer = ayerD.toISOString().split("T")[0];
+    // Validar PIN de encargado
+    const [encargado] = await sql`
+      SELECT nombre, apellido FROM planilla_empleados
+      WHERE rol = 'Encargado' AND pin = ${pin}
+      LIMIT 1`;
+    if (!encargado)
+      return c.json({ error: "PIN incorrecto" }, 403);
 
-    // Buscar en hoy y ayer
-    const fechas = [hoy, ayer];
-    let cerrados = 0;
+    const editorNombre = `${encargado.nombre} ${encargado.apellido}`;
 
-    for (const fecha of fechas) {
-      const fichajes = await sql`
-        SELECT tipo, lat, lng FROM fichajes
-        WHERE empleado_id = ${empleado_id} AND ((fecha_hora - INTERVAL '5 hours') AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fecha}::date
-        ORDER BY fecha_hora ASC`;
+    // Determinar qué tipo de salida insertar (salida o salida2)
+    // Buscamos la fecha laboral del nuevo fichaje (fecha_hora - 5 horas)
+    const fechaFichaje = new Date(fecha_hora);
+    const fechaFichajeShift = new Date(fechaFichaje.getTime() - 5 * 60 * 60 * 1000);
+    const fechaLaboral = fechaFichajeShift.toISOString().split("T")[0];
 
-      const tipos = fichajes.map(f => f.tipo);
-      const lastFichaje = fichajes[fichajes.length - 1];
-      const lat = lastFichaje?.lat || 0;
-      const lng = lastFichaje?.lng || 0;
+    // Obtener los fichajes de esa fecha laboral para ver qué entrada estaba abierta
+    const fichajes = await sql`
+      SELECT tipo, lat, lng FROM fichajes
+      WHERE empleado_id = ${empleado_id} 
+        AND ((fecha_hora - INTERVAL '5 hours') AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date = ${fechaLaboral}::date
+      ORDER BY fecha_hora ASC`;
 
-      // Cerrar entrada sin salida
-      if (tipos.includes('entrada') && !tipos.includes('salida')) {
-        await sql`INSERT INTO fichajes (empleado_id, tipo, lat, lng, fecha_hora)
-          VALUES (${empleado_id}, 'salida', ${lat}, ${lng}, NOW())`;
-        cerrados++;
-      }
-      // Cerrar entrada2 sin salida2
-      if (tipos.includes('entrada2') && !tipos.includes('salida2')) {
-        await sql`INSERT INTO fichajes (empleado_id, tipo, lat, lng, fecha_hora)
-          VALUES (${empleado_id}, 'salida2', ${lat}, ${lng}, NOW())`;
-        cerrados++;
+    const tipos = fichajes.map(f => f.tipo);
+    const lastFichaje = fichajes[fichajes.length - 1];
+    const lat = lastFichaje?.lat || 0;
+    const lng = lastFichaje?.lng || 0;
+
+    let tipoSalida = null;
+    if (tipos.includes('entrada') && !tipos.includes('salida')) {
+      tipoSalida = 'salida';
+    } else if (tipos.includes('entrada2') && !tipos.includes('salida2')) {
+      tipoSalida = 'salida2';
+    }
+
+    if (!tipoSalida) {
+      // Si no detectamos por fecha_laboral, podemos buscar el último fichaje en general
+      const [ultimo] = await sql`
+        SELECT tipo FROM fichajes
+        WHERE empleado_id = ${empleado_id}
+        ORDER BY fecha_hora DESC LIMIT 1`;
+      if (ultimo?.tipo === 'entrada') tipoSalida = 'salida';
+      else if (ultimo?.tipo === 'entrada2') tipoSalida = 'salida2';
+      else {
+        return c.json({ error: "No se encontró ningún turno abierto para cerrar" }, 400);
       }
     }
 
-    if (cerrados === 0)
-      return c.json({ ok: true, mensaje: "No había turnos abiertos" });
+    // Insertar la salida como MANUAL: TRUE
+    const [nuevoFichaje] = await sql`
+      INSERT INTO fichajes (empleado_id, tipo, lat, lng, fecha_hora, manual, editado_por)
+      VALUES (${empleado_id}, ${tipoSalida}, ${lat}, ${lng}, ${fecha_hora}, TRUE, ${editorNombre})
+      RETURNING *`;
 
-    return c.json({ ok: true, cerrados, mensaje: `${cerrados} turno(s) cerrado(s)` });
+    console.log(`✏️ Turno cerrado manualmente por ${editorNombre} para el empleado ${empleado_id}`);
+    return c.json({ ok: true, mensaje: "Turno cerrado correctamente", fichaje: nuevoFichaje });
   } catch(e) {
     console.error("Error forzar-cierre:", e.message);
     return c.json({ error: e.message }, 500);

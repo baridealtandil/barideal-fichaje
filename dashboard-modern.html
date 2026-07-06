@@ -1027,6 +1027,37 @@ Seleccioná un empleado para ver su análisis
 </div>
 </div>
 
+<!-- ── MODAL FORZAR CIERRE TURNO ── -->
+<div class="modal-bg" id="modal-cierre-manual">
+  <div class="modal-edit-emp">
+    <div class="modal-edit-header">
+      <div class="modal-edit-title">Cerrar turno abierto</div>
+      <button class="modal-close-btn" onclick="cerrarForzarCierre()">×</button>
+    </div>
+    <div class="modal-edit-body">
+      <div style="font-size:12px;color:var(--danger);margin-bottom:14px;line-height:1.4">
+        ⚠️ Ingresá la fecha y hora reales en que el empleado se retiró de su jornada laboral.
+      </div>
+      <div class="modal-edit-field">
+        <label>Fecha de salida</label>
+        <input class="modal-edit-input" id="cierre-fichaje-fecha" type="date"/>
+      </div>
+      <div class="modal-edit-field">
+        <label>Hora de salida</label>
+        <input class="modal-edit-input" id="cierre-fichaje-hora" type="time"/>
+      </div>
+      <div class="modal-edit-field">
+        <label>PIN de Encargado</label>
+        <input class="modal-edit-input" id="cierre-fichaje-pin" type="password" maxlength="4" inputmode="numeric" placeholder="••••"/>
+      </div>
+    </div>
+    <div class="modal-edit-footer">
+      <button class="modal-edit-cancel" onclick="cerrarForzarCierre()">Cancelar</button>
+      <button class="modal-edit-save" onclick="guardarForzarCierre()" style="background:var(--danger)">Cerrar turno</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── MODAL NUEVO EMPLEADO ── -->
 <div class="modal-bg" id="modal-emp-nuevo">
 <div class="modal-emp-new">
@@ -3311,30 +3342,74 @@ function verificarTurnoAbierto(empId) {
   if (wrap) wrap.style.display = turnoAbierto ? 'block' : 'none';
 }
 
-async function forzarCierreTurno() {
+function abrirForzarCierre() {
   if (!drawerEmpId) return;
-  const btn = document.querySelector('#drawer-turno-abierto-wrap button');
+
+  const empFichajes = todosLosFichajes.filter(f => f.empleado_id === drawerEmpId);
+  let entradaAbierta = null;
+  for (let i = 0; i < empFichajes.length; i++) {
+    const f = empFichajes[i];
+    if (f.tipo === 'entrada' || f.tipo === 'entrada2') {
+      const salidaTipo = f.tipo === 'entrada' ? 'salida' : 'salida2';
+      const tieneSalida = empFichajes.some(s => s.tipo === salidaTipo && new Date(s.fecha_hora) > new Date(f.fecha_hora));
+      if (!tieneSalida) {
+        entradaAbierta = f;
+        break;
+      }
+    }
+  }
+
+  const fechaInput = document.getElementById('cierre-fichaje-fecha');
+  const horaInput = document.getElementById('cierre-fichaje-hora');
+  const pinInput = document.getElementById('cierre-fichaje-pin');
+
+  if (entradaAbierta) {
+    fechaInput.value = entradaAbierta.fecha_hora.split('T')[0];
+  } else {
+    fechaInput.value = fechaHoy();
+  }
+  horaInput.value = '';
+  pinInput.value = '';
+  document.getElementById('modal-cierre-manual').classList.add('show');
+}
+
+function cerrarForzarCierre() {
+  document.getElementById('modal-cierre-manual').classList.remove('show');
+}
+
+async function guardarForzarCierre() {
+  if (!drawerEmpId) return;
+  const fecha = document.getElementById('cierre-fichaje-fecha').value;
+  const hora = document.getElementById('cierre-fichaje-hora').value;
+  const pin = document.getElementById('cierre-fichaje-pin').value.trim();
+  if (!fecha || !hora) { alert('Completa la fecha y la hora de salida'); return; }
+  if (!pin) { alert('Ingresá el PIN del encargado para autorizar el cierre'); return; }
+  const fecha_hora = `${fecha}T${hora}:00`;
+
+  const btn = document.querySelector('#modal-cierre-manual .modal-edit-save');
   if (btn) { btn.disabled = true; btn.textContent = 'Cerrando...'; }
 
   try {
     const r = await fetch(`${API}/api/fichajes/forzar-cierre`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ empleado_id: drawerEmpId })
+      body: JSON.stringify({ empleado_id: drawerEmpId, fecha_hora, pin })
     });
     const data = await r.json();
     if (r.ok) {
+      cerrarForzarCierre();
       alert(data.mensaje || 'Turno cerrado correctamente');
       await actualizarTodo();
       verificarTurnoAbierto(drawerEmpId);
+      if (typeof actualizarDrawer === 'function') actualizarDrawer();
     } else {
-      alert('Error al cerrar turno');
+      alert(data.error || 'Error al cerrar turno');
     }
   } catch(e) {
     alert('Error de conexión');
   }
 
-  if (btn) { btn.disabled = false; btn.textContent = 'Cerrar turno ahora'; }
+  if (btn) { btn.disabled = false; btn.textContent = 'Cerrar turno'; }
 }
 
 function verificarSecuenciaIrregular(empId) {
@@ -4168,9 +4243,8 @@ function sincronizarHeroKPIs() {
 
 function cerrarTurnoAccion(empId) {
   if (!empId) return;
-  if (!confirm('¿Cerrar el turno de este empleado ahora?')) return;
   drawerEmpId = empId;
-  forzarCierreTurno();
+  abrirForzarCierre();
 }
 
 function ignorarDudosoAccion(fichajeId) {

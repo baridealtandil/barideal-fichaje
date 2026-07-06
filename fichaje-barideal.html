@@ -324,6 +324,13 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
   border: none; border-radius: 10px;
   color: #0A0A0A; font-size: 15px; font-weight: 800; cursor: pointer;
 }
+#overlay-advertencia-manual {
+  position: fixed; inset: 0; background: var(--bg);
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 1000; gap: 16px; padding: 32px; text-align: center;
+  box-sizing: border-box;
+}
+#overlay-advertencia-manual.show { display: flex; }
 </style>
 </head>
 <body>
@@ -476,6 +483,18 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
     <input type="time" id="incompleto-hora" style="width:100%;padding:12px;padding-left:20px;padding-right:20px;box-sizing:border-box;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;font-size:18px;text-align:left;outline:none;margin-bottom:10px">
     <button class="incompleto-btn" id="btn-confirmar-salida" onclick="informarSalidaManual()" style="background:var(--warning);color:#000">Confirmar salida</button>
     <button class="incompleto-btn" onclick="cerrarIncompleto()" style="background:rgba(255,255,255,0.15);margin-top:12px;font-size:14px;border:1px solid rgba(255,255,255,0.3)">El encargado lo resuelve</button>
+  </div>
+</div>
+
+<div id="overlay-advertencia-manual">
+  <div class="sospechoso-icon">⚠️</div>
+  <div class="sospechoso-title" style="color:var(--warning);font-size:22px;font-weight:800;margin-bottom:8px">Advertencia de Olvido</div>
+  <div class="sospechoso-sub" style="line-height:1.5;margin:16px 0;font-size:14px;color:rgba(255,255,255,0.85)">
+    ⚠️ Tu salida anterior fue registrada de forma manual por un encargado debido a un olvido.<br><br>
+    Este olvido será considerado una <strong>llegada tarde</strong>. Recordá que 3 llegadas tarde significan la pérdida del presentismo.
+  </div>
+  <div class="sospechoso-btns" style="width:100%;max-width:300px;margin-top:16px">
+    <button class="sospechoso-btn-ok" onclick="confirmarAdvertenciaManual()" style="width:100%;background:var(--warning);color:#000;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer">Entendido</button>
   </div>
 </div>
 
@@ -632,9 +651,36 @@ async function cargarTurno() {
   }
 }
 
+let anteriorManualOlvidado = false;
+let ultimoManualId = null;
+
 async function cargarHistorial() {
   const res = await resolverFechaLaboral();
   fichajesHoy = res.fichajesActivos;
+
+  // Buscar último fichaje histórico del empleado para ver si fue manual
+  try {
+    const rFichajes = await fetch(API+'/api/fichajes?emp_id='+empleado.id).then(function(x){return x.json();});
+    if (Array.isArray(rFichajes) && rFichajes.length > 0) {
+      const hoyLocal = fechaLocal();
+      const historicos = rFichajes.filter(function(f) {
+        const fechaF = f.fecha_hora.split('T')[0];
+        return fechaF !== hoyLocal;
+      });
+      if (historicos.length > 0) {
+        const ultimo = historicos[0];
+        if ((ultimo.tipo === 'salida' || ultimo.tipo === 'salida2') && ultimo.manual) {
+          if (localStorage.getItem('barideal_adv_visto_' + ultimo.id) !== 'true') {
+            anteriorManualOlvidado = true;
+            ultimoManualId = ultimo.id;
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('Error al verificar fichaje manual previo:', e);
+  }
+
   try {
     const hoyLocal = fechaLocal();
     if (res.fecha !== hoyLocal) {
@@ -824,6 +870,12 @@ async function fichar(tipoElegido) {
   if (tipoElegido) proximoTipo = tipoElegido;
   if (!empleado) return;
 
+  // Interceptar si es una entrada y el anterior fue olvidado (manual)
+  if ((proximoTipo === 'entrada' || proximoTipo === 'entrada2') && anteriorManualOlvidado) {
+    document.getElementById('overlay-advertencia-manual').classList.add('show');
+    return;
+  }
+
   cargandoFichaje = true;
   actualizarBoton();
 
@@ -919,6 +971,15 @@ function cancelarSalida() {
 async function confirmarSalida() {
   document.getElementById('overlay-confirm').classList.remove('show');
   if (_posConfirmada) await registrarFichaje(_posConfirmada);
+}
+
+function confirmarAdvertenciaManual() {
+  document.getElementById('overlay-advertencia-manual').classList.remove('show');
+  anteriorManualOlvidado = false;
+  if (ultimoManualId) {
+    localStorage.setItem('barideal_adv_visto_' + ultimoManualId, 'true');
+  }
+  fichar(proximoTipo);
 }
 
 async function registrarFichaje(pos) {
