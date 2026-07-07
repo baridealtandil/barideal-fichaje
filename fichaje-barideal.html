@@ -476,13 +476,15 @@ pointer-events: none; z-index: 200; max-width: 310px; text-align: center;
 
 <div id="overlay-incompleto">
   <div class="incompleto-icon">⚠️</div>
-  <div class="incompleto-title">Turno sin cerrar</div>
-  <div class="incompleto-sub" id="incompleto-msg">Tenés una entrada sin salida registrada.</div>
-  <div id="incompleto-form" style="width:100%;max-width:300px;margin-top:8px">
-    <div style="font-size:12px;color:var(--warning);margin-bottom:8px;text-align:center">Ingresá la hora real en que saliste</div>
-    <input type="time" id="incompleto-hora" style="width:100%;padding:12px;padding-left:20px;padding-right:20px;box-sizing:border-box;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;font-size:18px;text-align:left;outline:none;margin-bottom:10px">
-    <button class="incompleto-btn" id="btn-confirmar-salida" onclick="informarSalidaManual()" style="background:var(--warning);color:#000">Confirmar salida</button>
-    <button class="incompleto-btn" onclick="cerrarIncompleto()" style="background:rgba(255,255,255,0.15);margin-top:12px;font-size:14px;border:1px solid rgba(255,255,255,0.3)">El encargado lo resuelve</button>
+  <div class="incompleto-title" style="color:var(--warning);font-size:22px;font-weight:800;margin-bottom:8px">Turno sin cerrar</div>
+  <div class="incompleto-sub" id="incompleto-msg" style="line-height:1.5;margin:12px 0;font-size:14px;color:rgba(255,255,255,0.85)">
+    Tenés una entrada de ayer sin salida registrada.
+  </div>
+  <div class="incompleto-sub" style="line-height:1.5;margin:12px 0;font-size:14px;color:var(--warning)">
+    ⚠️ Recordá que el olvido de fichaje se considera una <strong>llegada tarde</strong> y acumular 3 implica la <strong>pérdida del presentismo</strong>. Deberás pedirle a un encargado que registre tu salida de ayer.
+  </div>
+  <div style="width:100%;max-width:300px;margin-top:16px">
+    <button class="incompleto-btn" onclick="cerrarIncompleto()" style="width:100%;background:var(--warning);color:#000;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer">Entendido</button>
   </div>
 </div>
 
@@ -715,8 +717,6 @@ async function refreshManual(btn) {
   window.location.reload(true);
 }
 
-let _entradaAbiertaRef = null;
-
 function verificarFichajeIncompletoOverlay() {
   try {
     const tienes = function(tipo) { return fichajesHoy.some(function(f){return f.tipo===tipo;}); };
@@ -734,7 +734,7 @@ function verificarFichajeIncompletoOverlay() {
     const msEntrada = new Date(entradaAbierta.fecha_hora).getTime();
     const hs = (ahora - msEntrada) / 3600000;
     if (hs < 10) return;
-    _entradaAbiertaRef = entradaAbierta;
+    
     const horaEntrada = fmt(entradaAbierta.fecha_hora);
     const fechaEntrada = new Date(entradaAbierta.fecha_hora).toLocaleDateString('es-AR', {
       weekday: 'long', day: 'numeric', month: 'long',
@@ -742,79 +742,15 @@ function verificarFichajeIncompletoOverlay() {
     });
     const hsRed = Math.floor(hs);
     const msgEl = document.getElementById('incompleto-msg');
-    if (msgEl) msgEl.textContent = 'Entraste el '+fechaEntrada+' a las '+horaEntrada+' y no hay salida registrada (hace '+hsRed+'h).';
-    const horaInput = document.getElementById('incompleto-hora');
-    if (horaInput && !horaInput.value) {
-      const now = new Date();
-      const lh = String(now.getHours()).padStart(2,'0');
-      const lm = String(now.getMinutes()).padStart(2,'0');
-      horaInput.value = lh+':'+lm;
+    if (msgEl) {
+      msgEl.innerHTML = 'Entraste el ' + fechaEntrada + ' a las ' + horaEntrada + ' y no hay salida registrada (hace ' + hsRed + 'h).';
     }
-    const btnConfirmar = document.getElementById('btn-confirmar-salida');
-    if (btnConfirmar) { btnConfirmar.disabled = false; btnConfirmar.textContent = 'Confirmar salida'; }
     document.getElementById('overlay-incompleto').classList.add('show');
   } catch(e) { console.warn('verificarFichajeIncompletoOverlay:', e); }
 }
 
 function cerrarIncompleto() {
   document.getElementById('overlay-incompleto').classList.remove('show');
-}
-
-async function informarSalidaManual() {
-  const btnConfirmar = document.getElementById('btn-confirmar-salida');
-  const horaInput = document.getElementById('incompleto-hora');
-  if (!horaInput || !horaInput.value) { toast('Ingresa la hora de salida'); return; }
-  const entrada = _entradaAbiertaRef;
-  if (!entrada) { toast('Error: no se encontro la entrada abierta'); return; }
-  if (btnConfirmar) {
-    btnConfirmar.disabled = true;
-    btnConfirmar.textContent = 'Registrando...';
-  }
-  const partes = horaInput.value.split(':');
-  const hh = parseInt(partes[0], 10);
-  const mm = parseInt(partes[1], 10);
-  const entradaDate = new Date(entrada.fecha_hora);
-  const salidaDate = new Date(entradaDate.getTime());
-  const entradaLocalMs = entradaDate.getTime() - 3*3600000;
-  const entradaLocal = new Date(entradaLocalMs);
-  salidaDate.setUTCFullYear(entradaLocal.getUTCFullYear(), entradaLocal.getUTCMonth(), entradaLocal.getUTCDate());
-  salidaDate.setUTCHours(hh + 3, mm, 0, 0);
-  if (salidaDate.getTime() <= entradaDate.getTime()) {
-    salidaDate.setUTCDate(salidaDate.getUTCDate() + 1);
-  }
-  const tipoSalida = entrada.tipo === 'entrada2' ? 'salida2' : 'salida';
-  try {
-    const r = await fetch(API+'/api/fichajes/cierre-manual', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        empleado_id: empleado.id,
-        tipo: tipoSalida,
-        lat: geoLat || 0,
-        lng: geoLng || 0,
-        fecha_hora: salidaDate.toISOString(),
-        manual: true
-      })
-    });
-    if (r.ok) {
-      cerrarIncompleto();
-      toast('Salida registrada correctamente');
-      await cargarHistorial();
-    } else {
-      const err = await r.json().catch(function(){return {};});
-      toast(err.error || 'Error al registrar la salida');
-      if (btnConfirmar) {
-        btnConfirmar.disabled = false;
-        btnConfirmar.textContent = 'Confirmar salida';
-      }
-    }
-  } catch(e) {
-    toast('Error de conexion');
-    if (btnConfirmar) {
-      btnConfirmar.disabled = false;
-      btnConfirmar.textContent = 'Confirmar salida';
-    }
-  }
 }
 
 function renderHistorial() {

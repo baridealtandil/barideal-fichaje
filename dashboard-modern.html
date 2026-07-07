@@ -3384,7 +3384,7 @@ async function guardarForzarCierre() {
   const pin = document.getElementById('cierre-fichaje-pin').value.trim();
   if (!fecha || !hora) { alert('Completa la fecha y la hora de salida'); return; }
   if (!pin) { alert('Ingresá el PIN del encargado para autorizar el cierre'); return; }
-  const fecha_hora = `${fecha}T${hora}:00`;
+  const fecha_hora = `${fecha}T${hora}:00-03:00`;
 
   const btn = document.querySelector('#modal-cierre-manual .modal-edit-save');
   if (btn) { btn.disabled = true; btn.textContent = 'Cerrando...'; }
@@ -3423,7 +3423,7 @@ const tipo = document.getElementById('manual-fichaje-tipo').value;
 const fecha = document.getElementById('manual-fichaje-fecha').value;
 const hora = document.getElementById('manual-fichaje-hora').value;
 if (!fecha || !hora) { alert('Completa la fecha y la hora del fichaje'); return; }
-const fecha_hora = `${fecha}T${hora}:00`;
+const fecha_hora = `${fecha}T${hora}:00-03:00`;
 const btn = document.querySelector('#drawer-fichaje-manual-wrap button');
 if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
 try {
@@ -3475,7 +3475,7 @@ async function guardarEdicionFichaje() {
   const pin = document.getElementById('edit-fichaje-pin').value.trim();
   if (!fecha || !hora) { alert('Completa la fecha y la hora del fichaje'); return; }
   if (!pin) { alert('Ingresá el PIN del encargado para autorizar el cambio'); return; }
-  const fecha_hora = `${fecha}T${hora}:00`;
+  const fecha_hora = `${fecha}T${hora}:00-03:00`;
   const btn = document.querySelector('#modal-edit-fichaje .modal-edit-save');
   if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
   try {
