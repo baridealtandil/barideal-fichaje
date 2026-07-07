@@ -3364,7 +3364,7 @@ function abrirForzarCierre() {
   const pinInput = document.getElementById('cierre-fichaje-pin');
 
   if (entradaAbierta) {
-    fechaInput.value = entradaAbierta.fecha_hora.split('T')[0];
+    fechaInput.value = new Date(entradaAbierta.fecha_hora).toLocaleDateString('sv-SE', { timeZone: 'America/Argentina/Buenos_Aires' });
   } else {
     fechaInput.value = fechaHoy();
   }
@@ -3455,9 +3455,9 @@ function abrirEditarFichaje(id) {
   fichajeEditId = id;
   document.getElementById('edit-fichaje-id').value = id;
   document.getElementById('edit-fichaje-tipo').value = f.tipo;
-  const partes = f.fecha_hora.split('T');
-  document.getElementById('edit-fichaje-fecha').value = partes[0];
-  document.getElementById('edit-fichaje-hora').value = (partes[1] || '00:00:00').substring(0,5);
+  const localDateObj = new Date(f.fecha_hora);
+  document.getElementById('edit-fichaje-fecha').value = localDateObj.toLocaleDateString('sv-SE', { timeZone: 'America/Argentina/Buenos_Aires' });
+  document.getElementById('edit-fichaje-hora').value = localDateObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Argentina/Buenos_Aires' });
   document.getElementById('edit-fichaje-pin').value = '';
   document.getElementById('modal-edit-fichaje').classList.add('show');
 }
