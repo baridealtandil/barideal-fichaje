@@ -168,7 +168,19 @@ width: 100%; max-width: 320px; text-align: center;
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 .btn-circular:not(:disabled):active { transform: scale(0.94); }
-.btn-circular:disabled { cursor: not-allowed; opacity: 1 !important; }
+.btn-circular:disabled {
+  cursor: not-allowed;
+  opacity: 0.22 !important;
+  filter: grayscale(0.9);
+  box-shadow: none !important;
+  border-color: rgba(255,255,255,0.12) !important;
+}
+.radar-container.disabled-radar .radar-pulse {
+  display: none !important;
+}
+.radar-container.disabled-radar .radar-ring {
+  opacity: 0.15 !important;
+}
 
 /* Estilo Entrada */
 .btn-circular.entrada-circular {
@@ -774,6 +786,8 @@ function renderHistorial() {
 function actualizarBoton() {
   const btnEntrada = document.getElementById('btn-entrada');
   const btnSalida = document.getElementById('btn-salida');
+  const contEntrada = document.getElementById('radar-entrada-container');
+  const contSalida = document.getElementById('radar-salida-container');
   if (!btnEntrada || !btnSalida) return;
 
   const tipos = fichajesHoy.map(function(f){return f.tipo;});
@@ -794,9 +808,31 @@ function actualizarBoton() {
     proximoTipo = null;
   }
 
-  const deshabilitar = !empleado || cargandoFichaje;
-  btnEntrada.disabled = deshabilitar;
-  btnSalida.disabled = deshabilitar;
+  const deshabilitarTodo = !empleado || cargandoFichaje;
+
+  if (deshabilitarTodo) {
+    btnEntrada.disabled = true;
+    btnSalida.disabled = true;
+    if (contEntrada) contEntrada.classList.add('disabled-radar');
+    if (contSalida) contSalida.classList.add('disabled-radar');
+  } else {
+    if (proximoTipo === 'entrada' || proximoTipo === 'entrada2') {
+      btnEntrada.disabled = false;
+      btnSalida.disabled = true;
+      if (contEntrada) contEntrada.classList.remove('disabled-radar');
+      if (contSalida) contSalida.classList.add('disabled-radar');
+    } else if (proximoTipo === 'salida' || proximoTipo === 'salida2') {
+      btnEntrada.disabled = true;
+      btnSalida.disabled = false;
+      if (contEntrada) contEntrada.classList.add('disabled-radar');
+      if (contSalida) contSalida.classList.remove('disabled-radar');
+    } else {
+      btnEntrada.disabled = true;
+      btnSalida.disabled = true;
+      if (contEntrada) contEntrada.classList.add('disabled-radar');
+      if (contSalida) contSalida.classList.add('disabled-radar');
+    }
+  }
 }
 
 let _posConfirmada = null;
