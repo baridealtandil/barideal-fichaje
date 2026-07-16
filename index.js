@@ -903,10 +903,12 @@ app.get("/api/metricas/horas", async (c) => {
     // 2. Determinar la fecha de inicio para traer fichajes (inicio del mes actual o desde la fecha 'desde')
     // Usamos hora local de Argentina (UTC-3) restando 5hs para la jornada
     const ahoraAR = new Date(Date.now() - 3 * 60 * 60 * 1000 - 5 * 60 * 60 * 1000);
-    
-    // Obtener primer día de este mes
+    const hoyStr = ahoraAR.toISOString().split("T")[0];
     const primerDiaMes = `${ahoraAR.getFullYear()}-${String(ahoraAR.getMonth() + 1).padStart(2, '0')}-01`;
     
+    const rangeDesde = desde || primerDiaMes;
+    const rangeHasta = hasta || hoyStr;
+
     // Lunes de esta semana
     const day = ahoraAR.getDay();
     const diffToMonday = day === 0 ? -6 : 1 - day;
@@ -915,8 +917,8 @@ app.get("/api/metricas/horas", async (c) => {
     const lunesSemana = lunesD.toISOString().split("T")[0];
 
     let fechaInicioQuery = primerDiaMes;
-    if (desde && desde < fechaInicioQuery) {
-      fechaInicioQuery = desde;
+    if (rangeDesde && rangeDesde < fechaInicioQuery) {
+      fechaInicioQuery = rangeDesde;
     }
 
     // 3. Traer todos los fichajes desde la fecha calculada
@@ -927,8 +929,16 @@ app.get("/api/metricas/horas", async (c) => {
       WHERE ((f.fecha_hora - INTERVAL '5 hours') AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date >= ${fechaInicioQuery}::date
       ORDER BY f.empleado_id, f.fecha_hora ASC`;
 
-    // 4. Calcular horas por empleado
-    const hoyStr = ahoraAR.toISOString().split("T")[0];
+    // 4. Traer todos los horarios programados del período elegido
+    const horarios = await sql`
+      SELECT h.*, pe.empleado_id
+      FROM horarios h
+      JOIN planilla_empleados pe ON h.planilla_emp_id = pe.id
+      WHERE pe.empleado_id IS NOT NULL
+        AND h.fecha >= ${rangeDesde}::date
+        AND h.fecha <= ${rangeHasta}::date`;
+
+    // 5. Calcular horas por empleado
     const primerDiaMesRef = new Date(primerDiaMes + 'T12:00:00');
     const lunesSemanaRef = new Date(lunesSemana + 'T12:00:00');
 
@@ -971,7 +981,7 @@ app.get("/api/metricas/horas", async (c) => {
         if (dRef >= primerDiaMesRef) {
           minMes += minDia;
         }
-        if (desde && hasta && fechaLab >= desde && fechaLab <= hasta) {
+        if (fechaLab >= rangeDesde && fechaLab <= rangeHasta) {
           minCustom += minDia;
         }
       });
@@ -992,6 +1002,39 @@ app.get("/api/metricas/horas", async (c) => {
         }
       }
 
+      // Calcular minutos asignados en el período
+      let minAsignados = 0;
+      const empHorarios = horarios.filter(h => h.empleado_id === emp.id);
+      
+      empHorarios.forEach(h => {
+        if (h.estado === 'franco' || h.estado === 'ausente') return;
+        
+        let fechaStr;
+        if (h.fecha instanceof Date) {
+          fechaStr = h.fecha.toISOString().split('T')[0];
+        } else {
+          fechaStr = String(h.fecha).split(' ')[0].split('T')[0];
+        }
+        
+        let e1 = h.entrada1 || h.entrada;
+        let s1 = h.salida1 || h.salida;
+        if (e1 && s1) {
+          const prog = new Date(`${fechaStr}T${e1}`);
+          let fin1 = new Date(`${fechaStr}T${s1}`);
+          if (fin1 < prog) fin1.setDate(fin1.getDate() + 1);
+          minAsignados += Math.round((fin1 - prog) / 60000);
+        }
+        
+        let e2 = h.entrada2;
+        let s2 = h.salida2;
+        if (e2 && s2) {
+          const prog2 = new Date(`${fechaStr}T${e2}`);
+          let fin2 = new Date(`${fechaStr}T${s2}`);
+          if (fin2 < prog2) fin2.setDate(fin2.getDate() + 1);
+          minAsignados += Math.round((fin2 - prog2) / 60000);
+        }
+      });
+
       return {
         id: emp.id,
         nombre: emp.nombre,
@@ -1001,7 +1044,9 @@ app.get("/api/metricas/horas", async (c) => {
           semana: minSemana,
           mes: minMes,
           enCurso: minEnCurso,
-          custom: (desde && hasta) ? minCustom : null
+          customTrabajadas: minCustom,
+          customAsignadas: minAsignados,
+          customBalance: minCustom - minAsignados
         },
         estaTrabajando
       };

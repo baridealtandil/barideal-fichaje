@@ -12,6 +12,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 <style>
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -956,15 +960,10 @@ Seleccioná un empleado para ver su análisis
     <div class="panel-header">
       <div class="panel-title">⏱️ Resumen de Horas Trabajadas</div>
       <div class="filters" style="display:flex;align-items:center;gap:12px">
-        <div style="display:flex;align-items:center;gap:6px">
-          <label style="font-size:12px;color:var(--text3)">Desde:</label>
-          <input type="date" id="horas-desde" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;outline:none">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:var(--text3)">Período:</span>
+          <input type="text" id="horas-rango-flatpickr" placeholder="Seleccionar rango..." style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:12px;outline:none;width:220px;cursor:pointer;text-align:center">
         </div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <label style="font-size:12px;color:var(--text3)">Hasta:</label>
-          <input type="date" id="horas-hasta" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;outline:none">
-        </div>
-        <button onclick="buscarHorasPersonalizadas()" class="btn btn-gold" style="padding:6px 16px;font-size:12px">Buscar</button>
       </div>
     </div>
     
@@ -974,14 +973,16 @@ Seleccioná un empleado para ver su análisis
           <tr>
             <th>Empleado</th>
             <th>Hoy</th>
-            <th>Semana en Curso</th>
-            <th>Mes en Curso</th>
+            <th>Semana</th>
+            <th>Mes</th>
             <th>En Curso (Activo)</th>
-            <th>Período Elegido</th>
+            <th>Asignadas (Período)</th>
+            <th>Trabajadas (Período)</th>
+            <th>Balance (Período)</th>
           </tr>
         </thead>
         <tbody id="tabla-horas-resumen">
-          <tr><td colspan="6" class="empty-state">Cargando datos...</td></tr>
+          <tr><td colspan="8" class="empty-state">Cargando datos...</td></tr>
         </tbody>
       </table>
     </div>
@@ -1245,7 +1246,10 @@ function showSection(id) {
   document.getElementById('topbar-title').textContent = titles[id] || '';
   if (id === 'horarios') cargarHorarios();
   if (id === 'analisis') calcularKpisNomina();
-  if (id === 'horas') cargarMetricasHoras();
+  if (id === 'horas') {
+    initFlatpickrHoras();
+    cargarMetricasHoras();
+  }
 }
 
 // ══════════════════════════════════
@@ -1315,6 +1319,35 @@ async function actualizarTodo() {
 
 let _horasDesdeSel = '';
 let _horasHastaSel = '';
+let flatpickrHorasInstancia = null;
+
+function initFlatpickrHoras() {
+  if (flatpickrHorasInstancia) return;
+  
+  const ahoraAR = new Date(Date.now() - 3 * 60 * 60 * 1000 - 5 * 60 * 60 * 1000);
+  const hoyStr = ahoraAR.toISOString().split("T")[0];
+  const primerDiaMes = `${ahoraAR.getFullYear()}-${String(ahoraAR.getMonth() + 1).padStart(2, '0')}-01`;
+  
+  _horasDesdeSel = primerDiaMes;
+  _horasHastaSel = hoyStr;
+  
+  flatpickrHorasInstancia = flatpickr("#horas-rango-flatpickr", {
+    mode: "range",
+    locale: "es",
+    dateFormat: "Y-m-d",
+    theme: "dark",
+    defaultDate: [primerDiaMes, hoyStr],
+    onChange: function(selectedDates, dateStr, instance) {
+      if (selectedDates.length === 2) {
+        const desde = instance.formatDate(selectedDates[0], "Y-m-d");
+        const hasta = instance.formatDate(selectedDates[1], "Y-m-d");
+        _horasDesdeSel = desde;
+        _horasHastaSel = hasta;
+        cargarMetricasHoras();
+      }
+    }
+  });
+}
 
 async function cargarMetricasHoras() {
   const tbody = document.getElementById('tabla-horas-resumen');
@@ -1331,7 +1364,7 @@ async function cargarMetricasHoras() {
     const data = await res.json();
     
     if (!data.length) {
-      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No hay empleados registrados</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No hay empleados registrados</td></tr>';
       return;
     }
     
@@ -1345,7 +1378,20 @@ async function cargarMetricasHoras() {
         enCurso = `<span class="live-dot" style="margin-right:6px"></span><span style="color:var(--success);font-weight:700">${horasStr(emp.minutos.enCurso)}</span>`;
       }
       
-      const customVal = emp.minutos.custom !== null ? (emp.minutos.custom > 0 ? horasStr(emp.minutos.custom) : '0 hs') : '—';
+      const customAsignadas = emp.minutos.customAsignadas > 0 ? horasStr(emp.minutos.customAsignadas) : '0 hs';
+      const customTrabajadas = emp.minutos.customTrabajadas > 0 ? horasStr(emp.minutos.customTrabajadas) : '0 hs';
+      
+      // Balance
+      const balanceMin = emp.minutos.customBalance;
+      let balanceStr = '0 hs';
+      let balanceColor = 'var(--text)';
+      if (balanceMin > 0) {
+        balanceStr = `+${horasStr(balanceMin)}`;
+        balanceColor = 'var(--success)';
+      } else if (balanceMin < 0) {
+        balanceStr = `-${horasStr(Math.abs(balanceMin))}`;
+        balanceColor = 'var(--danger)';
+      }
       
       return `
         <tr>
@@ -1354,26 +1400,16 @@ async function cargarMetricasHoras() {
           <td>${semana}</td>
           <td>${mes}</td>
           <td>${enCurso}</td>
-          <td style="font-weight:600;color:var(--gold)">${customVal}</td>
+          <td>${customAsignadas}</td>
+          <td>${customTrabajadas}</td>
+          <td style="font-weight:700;color:${balanceColor}">${balanceStr}</td>
         </tr>
       `;
     }).join('');
   } catch (e) {
     console.error('Error loading metrics:', e);
-    tbody.innerHTML = `<tr><td colspan="6" class="empty-state" style="color:var(--danger)">⚠️ Error al cargar: ${e.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="empty-state" style="color:var(--danger)">⚠️ Error al cargar: ${e.message}</td></tr>`;
   }
-}
-
-function buscarHorasPersonalizadas() {
-  const desde = document.getElementById('horas-desde').value;
-  const hasta = document.getElementById('horas-hasta').value;
-  if (!desde || !hasta) {
-    alert('Por favor selecciona ambas fechas (Desde y Hasta)');
-    return;
-  }
-  _horasDesdeSel = desde;
-  _horasHastaSel = hasta;
-  cargarMetricasHoras();
 }
 
 // ══════════════════════════════════
