@@ -478,6 +478,9 @@ th { background: rgba(255,255,255,0.03); color: var(--text3); }
 <button class="nav-item" onclick="showSection('horarios')">
 <span class="nav-icon">📅</span> Horarios
 </button>
+<button class="nav-item" onclick="showSection('horas')">
+<span class="nav-icon">⏱️</span> Horas
+</button>
 </nav>
 <div class="sidebar-footer">
 <span class="live-dot"></span>En vivo · cada 30s
@@ -947,6 +950,44 @@ Seleccioná un empleado para ver su análisis
 </div>
 </section>
 
+<!-- ── SECCIÓN RESUMEN DE HORAS ── -->
+<section class="section" id="s-horas">
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">⏱️ Resumen de Horas Trabajadas</div>
+      <div class="filters" style="display:flex;align-items:center;gap:12px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <label style="font-size:12px;color:var(--text3)">Desde:</label>
+          <input type="date" id="horas-desde" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;outline:none">
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <label style="font-size:12px;color:var(--text3)">Hasta:</label>
+          <input type="date" id="horas-hasta" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;outline:none">
+        </div>
+        <button onclick="buscarHorasPersonalizadas()" class="btn btn-gold" style="padding:6px 16px;font-size:12px">Buscar</button>
+      </div>
+    </div>
+    
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Empleado</th>
+            <th>Hoy</th>
+            <th>Semana en Curso</th>
+            <th>Mes en Curso</th>
+            <th>En Curso (Activo)</th>
+            <th>Período Elegido</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-horas-resumen">
+          <tr><td colspan="6" class="empty-state">Cargando datos...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
 </div><!-- /content -->
 </main>
 
@@ -1199,11 +1240,12 @@ function showSection(id) {
   const titles = {
     principal: 'Resumen general', fichajes: 'Registro de fichajes',
     empleados: 'Estado de empleados', analisis: 'Análisis por empleado',
-    horarios: 'Planilla de horarios'
+    horarios: 'Planilla de horarios', horas: 'Resumen de horas trabajadas'
   };
   document.getElementById('topbar-title').textContent = titles[id] || '';
   if (id === 'horarios') cargarHorarios();
   if (id === 'analisis') calcularKpisNomina();
+  if (id === 'horas') cargarMetricasHoras();
 }
 
 // ══════════════════════════════════
@@ -1266,6 +1308,72 @@ async function actualizarTodo() {
   if (document.getElementById('s-analisis')?.classList.contains('active')) {
     calcularKpisNomina();
   }
+  if (document.getElementById('s-horas')?.classList.contains('active')) {
+    cargarMetricasHoras();
+  }
+}
+
+let _horasDesdeSel = '';
+let _horasHastaSel = '';
+
+async function cargarMetricasHoras() {
+  const tbody = document.getElementById('tabla-horas-resumen');
+  if (!tbody) return;
+  
+  let url = `${API}/api/metricas/horas`;
+  if (_horasDesdeSel && _horasHastaSel) {
+    url += `?desde=${_horasDesdeSel}&hasta=${_horasHastaSel}`;
+  }
+  
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Status: ' + res.status);
+    const data = await res.json();
+    
+    if (!data.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No hay empleados registrados</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = data.map(emp => {
+      const hoy = emp.minutos.hoy > 0 ? horasStr(emp.minutos.hoy) : '—';
+      const semana = emp.minutos.semana > 0 ? horasStr(emp.minutos.semana) : '—';
+      const mes = emp.minutos.mes > 0 ? horasStr(emp.minutos.mes) : '—';
+      
+      let enCurso = '—';
+      if (emp.estaTrabajando) {
+        enCurso = `<span class="live-dot" style="margin-right:6px"></span><span style="color:var(--success);font-weight:700">${horasStr(emp.minutos.enCurso)}</span>`;
+      }
+      
+      const customVal = emp.minutos.custom !== null ? (emp.minutos.custom > 0 ? horasStr(emp.minutos.custom) : '0 hs') : '—';
+      
+      return `
+        <tr>
+          <td style="font-weight:700">${emp.apellido}, ${emp.nombre}</td>
+          <td>${hoy}</td>
+          <td>${semana}</td>
+          <td>${mes}</td>
+          <td>${enCurso}</td>
+          <td style="font-weight:600;color:var(--gold)">${customVal}</td>
+        </tr>
+      `;
+    }).join('');
+  } catch (e) {
+    console.error('Error loading metrics:', e);
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-state" style="color:var(--danger)">⚠️ Error al cargar: ${e.message}</td></tr>`;
+  }
+}
+
+function buscarHorasPersonalizadas() {
+  const desde = document.getElementById('horas-desde').value;
+  const hasta = document.getElementById('horas-hasta').value;
+  if (!desde || !hasta) {
+    alert('Por favor selecciona ambas fechas (Desde y Hasta)');
+    return;
+  }
+  _horasDesdeSel = desde;
+  _horasHastaSel = hasta;
+  cargarMetricasHoras();
 }
 
 // ══════════════════════════════════

@@ -889,6 +889,131 @@ app.put("/api/fichajes/:id", async (c) => {
   }
 });
   
+app.get("/api/metricas/horas", async (c) => {
+  try {
+    const desde = c.req.query("desde"); // "YYYY-MM-DD"
+    const hasta = c.req.query("hasta"); // "YYYY-MM-DD"
+
+    // 1. Obtener lista de empleados
+    const empleados = await sql`
+      SELECT id, nombre, apellido, celular
+      FROM empleados
+      ORDER BY apellido, nombre ASC`;
+
+    // 2. Determinar la fecha de inicio para traer fichajes (inicio del mes actual o desde la fecha 'desde')
+    // Usamos hora local de Argentina (UTC-3) restando 5hs para la jornada
+    const ahoraAR = new Date(Date.now() - 3 * 60 * 60 * 1000 - 5 * 60 * 60 * 1000);
+    
+    // Obtener primer día de este mes
+    const primerDiaMes = `${ahoraAR.getFullYear()}-${String(ahoraAR.getMonth() + 1).padStart(2, '0')}-01`;
+    
+    // Lunes de esta semana
+    const day = ahoraAR.getDay();
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+    const lunesD = new Date(ahoraAR);
+    lunesD.setDate(ahoraAR.getDate() + diffToMonday);
+    const lunesSemana = lunesD.toISOString().split("T")[0];
+
+    let fechaInicioQuery = primerDiaMes;
+    if (desde && desde < fechaInicioQuery) {
+      fechaInicioQuery = desde;
+    }
+
+    // 3. Traer todos los fichajes desde la fecha calculada
+    const fichajes = await sql`
+      SELECT f.*,
+             ((f.fecha_hora - INTERVAL '5 hours') AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date::text as fecha_laboral
+      FROM fichajes f
+      WHERE ((f.fecha_hora - INTERVAL '5 hours') AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires')::date >= ${fechaInicioQuery}::date
+      ORDER BY f.empleado_id, f.fecha_hora ASC`;
+
+    // 4. Calcular horas por empleado
+    const hoyStr = ahoraAR.toISOString().split("T")[0];
+    const primerDiaMesRef = new Date(primerDiaMes + 'T12:00:00');
+    const lunesSemanaRef = new Date(lunesSemana + 'T12:00:00');
+
+    const result = empleados.map(emp => {
+      const empFichajes = fichajes.filter(f => f.empleado_id === emp.id);
+
+      // Agrupar fichajes del empleado por fecha_laboral
+      const dias = {};
+      empFichajes.forEach(f => {
+        if (!dias[f.fecha_laboral]) dias[f.fecha_laboral] = {};
+        dias[f.fecha_laboral][f.tipo] = f;
+      });
+
+      let minHoy = 0;
+      let minSemana = 0;
+      let minMes = 0;
+      let minCustom = 0;
+      let minEnCurso = 0;
+      let estaTrabajando = false;
+
+      // Calcular minutos por día laboral
+      Object.entries(dias).forEach(([fechaLab, g]) => {
+        const dRef = new Date(fechaLab + 'T12:00:00');
+        
+        let minDia = 0;
+        if (g.entrada && g.salida) {
+          minDia += Math.round((new Date(g.salida.fecha_hora) - new Date(g.entrada.fecha_hora)) / 60000);
+        }
+        if (g.entrada2 && g.salida2) {
+          minDia += Math.round((new Date(g.salida2.fecha_hora) - new Date(g.entrada2.fecha_hora)) / 60000);
+        }
+
+        // Sumar al acumulado correspondiente
+        if (fechaLab === hoyStr) {
+          minHoy += minDia;
+        }
+        if (dRef >= lunesSemanaRef) {
+          minSemana += minDia;
+        }
+        if (dRef >= primerDiaMesRef) {
+          minMes += minDia;
+        }
+        if (desde && hasta && fechaLab >= desde && fechaLab <= hasta) {
+          minCustom += minDia;
+        }
+      });
+
+      // Calcular si está trabajando EN CURSO (último fichaje abierto en las últimas 12 horas)
+      if (empFichajes.length > 0) {
+        const ultimo = empFichajes[empFichajes.length - 1];
+        const esEntradaAbierta = (ultimo.tipo === 'entrada' && !dias[ultimo.fecha_laboral].salida) ||
+                                 (ultimo.tipo === 'entrada2' && !dias[ultimo.fecha_laboral].salida2);
+        
+        if (esEntradaAbierta) {
+          const diffMs = Date.now() - new Date(ultimo.fecha_hora).getTime();
+          const diffHoras = diffMs / 3600000;
+          if (diffHoras < 12) { // Consideramos activo si fue hace menos de 12 horas
+            minEnCurso = Math.round(diffMs / 60000);
+            estaTrabajando = true;
+          }
+        }
+      }
+
+      return {
+        id: emp.id,
+        nombre: emp.nombre,
+        apellido: emp.apellido,
+        minutos: {
+          hoy: minHoy,
+          semana: minSemana,
+          mes: minMes,
+          enCurso: minEnCurso,
+          custom: (desde && hasta) ? minCustom : null
+        },
+        estaTrabajando
+      };
+    });
+
+    return c.json(result);
+  } catch (e) {
+    console.error("Error GET /api/metricas/horas:", e.message);
+    return c.json({ error: e.message }, 500);
+  }
+});
+
 app.get("/", (c) => c.json({ app: "Bar Ideal API", version: "2.1", status: "ok" }));
 
 await migrate();
